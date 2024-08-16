@@ -27,7 +27,7 @@ jobs:
           push: true
           file: docker/Dockerfile.arm64
           tags: |
-            discuit/discuit:${{ github.sha }}-arm64
+            ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }}-arm64
 
       - name: Build and push Docker image for AMD64
         uses: docker/build-push-action@v5
@@ -36,17 +36,17 @@ jobs:
           push: true
           file: docker/Dockerfile.amd64
           tags: |
-            discuit/discuit:${{ github.sha }}-amd64
+            ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }}-amd64
 
       - name: Create and push Docker manifest
         uses: int128/docker-manifest-create-action@v2
         with:
           tags: |
-            discuit/discuit:latest
-            discuit/discuit:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_REPO }}:latest
+            ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }}
           sources: |
-            discuit/discuit:${{ github.sha }}-arm64
-            discuit/discuit:${{ github.sha }}-amd64
+            ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }}-arm64
+            ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }}-amd64
 
       - name: Authenticate and obtain Docker Hub JWT token (for cleanup)
         id: get_token
@@ -64,5 +64,5 @@ jobs:
         env:
           TOKEN: ${{ env.TOKEN }}
         run: |
-          curl -s -H "Authorization: JWT $TOKEN" -X DELETE "https://hub.docker.com/v2/repositories/discuit/discuit/tags/${{ github.sha }}-arm64/"
-          curl -s -H "Authorization: JWT $TOKEN" -X DELETE "https://hub.docker.com/v2/repositories/discuit/discuit/tags/${{ github.sha }}-amd64/"
+          curl -s -H "Authorization: JWT $TOKEN" -X DELETE "https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_REPO }}/tags/${{ github.sha }}-arm64/"
+          curl -s -H "Authorization: JWT $TOKEN" -X DELETE "https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_REPO }}/tags/${{ github.sha }}-amd64/"

@@ -17,6 +17,8 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
+require golang.org/x/tools v0.5.1-0.20230111220935-a7f7db3f17fc // indirect
+
 require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
