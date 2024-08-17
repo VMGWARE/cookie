@@ -1,0 +1,43 @@
+services:
+  database:
+    image: mariadb:10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: discuit
+      MYSQL_USER: discuit
+      MYSQL_PASSWORD: discuit
+    ports:
+      - 3306:3306
+    volumes:
+      - discuit-database:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - discuit-redis:/data
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    ports:
+      - 7700:7700
+    volumes:
+      - discuit-meilisearch-data:/data.ms
+    environment:
+      MEILI_NO_ANALYTICS: true
+      # Log level: debug, info, warning, error
+      MEILI_LOG_LEVEL: debug
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+    ports:
+      - 8008:80
+
+volumes:
+  discuit-database:
+  discuit-redis:
+  discuit-meilisearch-data:
