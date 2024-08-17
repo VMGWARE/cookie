@@ -25,11 +25,15 @@ func Before(c *cli.Context) error {
 		log.Fatal("Error parsing config file: ", err)
 	}
 
-	if os.Args[1] != "inject-config" {
-		db := openDatabase(conf.DBAddr, conf.DBUser, conf.DBPassword, conf.DBName)
-		c.Context = context.WithValue(c.Context, "db", db)
+	// If the first argument is "inject-config", inject the config into the context.
+	if len(os.Args) > 1 && os.Args[1] == "inject-config" {
+		c.Context = context.WithValue(c.Context, "config", conf)
+		return nil
 	}
 
+	// Load rest of the context.
+	db := openDatabase(conf.DBAddr, conf.DBUser, conf.DBPassword, conf.DBName)
+	c.Context = context.WithValue(c.Context, "db", db)
 	c.Context = context.WithValue(c.Context, "config", conf)
 	return nil
 }
