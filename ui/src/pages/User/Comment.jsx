@@ -17,13 +17,13 @@ const Comment = ({ comment, onRemoveFromList = null }) => {
         <span>commented on</span>
         <Link
           className="comment-post-title"
-          to={`/${comment.communityName}/post/${comment.postPublicId}`}
+          to={`/${CONFIG.communityPrefix}${comment.communityName}/post/${comment.postPublicId}`}
         >
           {comment.postTitle}
         </Link>
         <span>in</span>
         {/*<CommunityLink name={comment.communityName} />*/}
-        <Link to={`/${comment.communityName}`} style={{ color: 'inherit', fontWeight: '600' }}>
+        <Link to={`/${CONFIG.communityPrefix}${comment.communityName}`} style={{ color: 'inherit', fontWeight: '600' }}>
           {comment.communityName}
         </Link>
         <span>
@@ -32,7 +32,7 @@ const Comment = ({ comment, onRemoveFromList = null }) => {
       </div>
       <Link
         className="comment-body"
-        to={`/${comment.communityName}/post/${comment.postPublicId}/${comment.id}`}
+        to={`/${CONFIG.communityPrefix}${comment.communityName}/post/${comment.postPublicId}/${comment.id}`}
       >
         <ShowMoreBox>
           <MarkdownBody noLinks>{comment.body}</MarkdownBody>

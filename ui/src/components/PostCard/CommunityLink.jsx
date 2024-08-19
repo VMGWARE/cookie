@@ -9,7 +9,7 @@ const CommunityLink = ({ className, target = '_self', name, proPic, noLink = fal
   };
   if (!noLink) {
     props.target = target;
-    props.to = `/${name}`;
+    props.to = `/${CONFIG.communityPrefix}${name}`;
   }
   const children = [<CommunityProPic proPic={proPic} name={name} />, <span>{name}</span>];
   return React.createElement(noLink ? 'div' : Link, props, ...children);

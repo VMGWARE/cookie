@@ -333,13 +333,16 @@ const AppSwitch = () => {
         <Route exact path="/@:username/lists/:listName">
           <List />
         </Route>
-        <Route exact path="/:name">
+        <Route exact path={`/${CONFIG.communityPrefix}:name`}>
           <Community />
         </Route>
-        <ProtectedRoute path="/:name/modtools">
+        <ProtectedRoute path={`/${CONFIG.communityPrefix}:name/modtools`}>
           <Modtools />
         </ProtectedRoute>
-        <Route exact path={['/:name/post/:id', '/:name/post/:id/:commentId']}>
+        <Route exact path={`/${CONFIG.communityPrefix}:name/post/:id`}>
+          <Post />
+        </Route>
+        <Route exact path={`/${CONFIG.communityPrefix}:name/post/:id/:commentId`}>
           <Post />
         </Route>
         <Route path="*">

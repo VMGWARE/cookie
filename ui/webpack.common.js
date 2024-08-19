@@ -46,6 +46,7 @@ function readYamlConfigFile() {
   if (!config.defaultFeedSort) {
     config.defaultFeedSort = 'hot';
   }
+  config.communityPrefix = '+'; // currently hardcoded, but could be added to the config file in the future
   config.cacheStorageVersion = makeid(8); // changes on each build
 
   return config;

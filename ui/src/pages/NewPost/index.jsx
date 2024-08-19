@@ -171,7 +171,7 @@ const NewPost = () => {
       // fromPostPage property is set manually upon edit button click.
       history.goBack();
     } else {
-      history.replace(`/${post.communityName}/post/${post.publicId}`);
+      history.replace(`/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`);
     }
   };
 

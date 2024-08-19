@@ -1,3 +1,5 @@
+name: "discuit"
+
 services:
   database:
     image: mariadb:10.5

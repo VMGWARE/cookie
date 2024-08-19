@@ -32,7 +32,7 @@ const Target = ({ ...props }) => {
 const PostShareButton = ({ post }) => {
   const dispatch = useDispatch();
 
-  const url = `${window.location.origin}/${post.communityName}/post/${post.publicId}`;
+  const url = `${window.location.origin}/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`;
   const handleCopyURL = () => {
     let text = 'Failed to copy link to clipboard.';
     if (copyToClipboard(url)) {

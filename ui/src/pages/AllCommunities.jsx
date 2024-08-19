@@ -249,7 +249,7 @@ RequestCommunityButton.propTypes = {
 };
 
 const ListItem = ({ community }) => {
-  const to = `/${community.name}`;
+  const to = `/${CONFIG.communityPrefix}${community.name}`;
 
   const history = useHistory();
   const ref = useRef();

@@ -104,7 +104,7 @@ const Post = () => {
   useEffect(() => {
     if (community && post) {
       const seps = location.pathname.split('/');
-      if (seps.length > 0 && seps[1] !== community.name) {
+      if (seps.length > 0 && seps[1] !== CONFIG.communityPrefix + community.name) {
         seps[1] = community.name;
         let newPathname = '';
         seps.forEach((sep) => (newPathname += `${sep}/`));
