@@ -58,7 +58,7 @@ const Sidebar = ({ isMobile = false }) => {
           })
           .map((c) => (
             <Link
-              to={`/${c.name}`}
+              to={`/${CONFIG.communityPrefix}${c.name}`}
               key={c.id}
               className="sidebar-item with-image"
               onClick={handleClose}

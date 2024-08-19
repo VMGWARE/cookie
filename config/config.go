@@ -73,6 +73,8 @@ type Config struct {
 	DiscordURL     string `yaml:"discordURL"`
 	GithubURL      string `yaml:"githubURL"`
 	SubstackURL    string `yaml:"substackURL"`
+
+	// CommunityPrefix string `yaml:"communityPrefix"`
 }
 
 // Parse parses the yaml file at path and returns a Config.
@@ -92,6 +94,8 @@ func Parse(path string) (*Config, error) {
 		// Required fields:
 		ForumCreationReqPoints: -1,
 		MaxForumsPerUser:       -1,
+
+		// CommunityPrefix: "+",
 	}
 
 	var envConfigMap = map[string]interface{}{
@@ -153,6 +157,8 @@ func Parse(path string) (*Config, error) {
 		"DISCUIT_DISCORD_URL":     &c.DiscordURL,
 		"DISCUIT_GITHUB_URL":      &c.GithubURL,
 		"DISCUIT_SUBSTACK_URL":    &c.SubstackURL,
+
+		// "DISCUIT_COMMUNITY_PREFIX": &c.CommunityPrefix,
 	}
 
 	// Attempt to unmarshal the YAML file if it exists

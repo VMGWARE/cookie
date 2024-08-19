@@ -49,7 +49,7 @@ const Community = () => {
         const rcomm = await res.json();
         dispatch(communityAdded(rcomm));
 
-        const pathname = `/${rcomm.name}`;
+        const pathname = `/${CONFIG.communityPrefix}${rcomm.name}`;
         if (location.pathname !== pathname) {
           history.replace(`${pathname}${location.search}${location.hash}`);
         }
@@ -128,7 +128,7 @@ const Community = () => {
           Create post
         </a>
         {(community.userMod || (user && user.isAdmin)) && (
-          <Link className="button border-radius-0" to={`/${name}/modtools`}>
+          <Link className="button border-radius-0" to={`${CONFIG.communityPrefix}${name}/modtools`}>
             {`MOD TOOLS` + (!community.userMod ? ' (ADMIN)' : '')}
           </Link>
         )}

@@ -35,7 +35,7 @@ const CreateCommunity = ({ open, onClose }) => {
         const community = await res.json();
         dispatch(sidebarCommunitiesUpdated([...communities, community]));
         onClose();
-        history.push(`/${name}`);
+        history.push(`/${CONFIG.communityPrefix}${name}`);
       } else if (res.status === 409) {
         setFormError('A community by that name already exists.');
       } else {

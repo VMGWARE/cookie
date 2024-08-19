@@ -9,7 +9,7 @@ import CommunityProPic from '../../components/CommunityProPic';
 
 const CommunityCard = ({ community }) => {
   const { name } = community;
-  const communityURL = `/${name}`;
+  const communityURL = `/${CONFIG.communityPrefix}${name}`;
 
   return (
     <div className="card card-sub about-community">

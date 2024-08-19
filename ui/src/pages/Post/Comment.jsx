@@ -64,7 +64,7 @@ const Comment = ({
     });
   };
 
-  const commentShareURL = `/${community.name}/post/${postId}/${comment.id}`;
+  const commentShareURL = `/${CONFIG.communityPrefix}${community.name}/post/${postId}/${comment.id}`;
 
   const deleted = comment.deletedAt !== null;
 
@@ -377,7 +377,7 @@ const Comment = ({
   const noMoreComments = comment.noReplies - noChildrenReplies;
   const showEditDelete = loggedIn && !deleted && user.id === comment.userId;
   const showReport = loggedIn && !deleted && user.id !== comment.userId;
-  // const commentShareURL = `/${community.name}/post/${postId}?focus=${comment.id}#${comment.id}`;
+  // const commentShareURL = `/${CONFIG.communityPrefix}${community.name}/post/${postId}?focus=${comment.id}#${comment.id}`;
 
   const getModActionsItems = (disabled = false) => {
     const checkboxId = `ch-mods-${comment.id}`;

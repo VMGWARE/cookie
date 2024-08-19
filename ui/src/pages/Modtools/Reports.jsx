@@ -73,7 +73,7 @@ const Reports = ({ community }) => {
             let removedUser;
             if (report.type === 'post') {
               const post = report.target;
-              handleURL = `/${post.communityName}/post/${post.publicId}`;
+              handleURL = `/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`;
               item = <PostCard initialPost={post} compact inModTools />;
               if (post.deletedAt) {
                 removed = true;
@@ -81,7 +81,7 @@ const Reports = ({ community }) => {
               }
             } else {
               const comment = report.target;
-              handleURL = `/${community.name}/post/${comment.postPublicId}/${comment.id}`;
+              handleURL = `/${CONFIG.communityPrefix}${community.name}/post/${comment.postPublicId}/${comment.id}`;
               item = (
                 <div>
                   <Link to={handleURL}>{comment.body}</Link>

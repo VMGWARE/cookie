@@ -32,7 +32,7 @@ const PostCard = ({
     setPost(initialPost);
   }, [initialPost]);
 
-  const postURL = `/${post.communityName}/post/${post.publicId}`;
+  const postURL = `/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`;
   const target = openInTab ? '_blank' : '_self';
   const disabled = inModTools || post.locked;
 

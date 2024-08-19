@@ -152,32 +152,32 @@ const NotificationItem = ({ notification, ...rest }) => {
   let to = '';
   switch (type) {
     case 'new_comment':
-      to = `/${notif.post.communityName}/post/${notif.post.publicId}`;
+      to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
       if (notif.noComments === 1) to += `/${notif.commentId}`;
       else to += `?notifId=${notification.id}`;
       image = getNotifImage(notif);
       break;
     case 'comment_reply':
-      to = `/${notif.post.communityName}/post/${notif.post.publicId}`;
+      to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
       if (notif.noComments === 1) to += `/${notif.commentId}`;
       else to += `?notifId=${notification.id}`;
       image = getNotifImage(notif);
       break;
     case 'new_votes':
       if (notif.targetType === 'post') {
-        to = `/${notif.post.communityName}/post/${notif.post.publicId}`;
+        to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
       } else {
-        to = `/${notif.comment.communityName}/post/${notif.comment.postPublicId}/${notif.comment.id}`;
+        to = `/${CONFIG.communityPrefix}${notif.comment.communityName}/post/${notif.comment.postPublicId}/${notif.comment.id}`;
       }
       image = getNotifImage(notif);
       break;
     case 'deleted_post':
       // Currently only deleted post notifications get here.
-      to = `/${notif.post.communityName}/post/${notif.post.publicId}`;
+      to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
       image = getNotifImage(notif);
       break;
     case 'mod_add':
-      to = `/${notif.communityName}`;
+      to = `/${CONFIG.communityPrefix}${notif.communityName}`;
       image = getNotifImage(notif);
       break;
     case 'new_badge':

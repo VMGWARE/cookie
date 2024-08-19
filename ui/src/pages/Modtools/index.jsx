@@ -84,60 +84,60 @@ const Modtools = () => {
       <Sidebar />
       <div className="modtools-head">
         <h1>
-          <Link to={`/${communityName}`}>{communityName} </Link>Modtools
+          <Link to={`/${CONFIG.communityPrefix}${communityName}`}>{communityName} </Link>Modtools
         </h1>
       </div>
       <div className="modtools-dashboard">
         <div className="sidebar">
           <Link
             className={isActiveCls('sidebar-item', pathname === '/modtools/settings')}
-            to={`/${communityName}/modtools/settings`}
+            to={`/${CONFIG.communityPrefix}${communityName}/modtools/settings`}
           >
             Community settings
           </Link>
           <div className="sidebar-topic">Content</div>
           <Link
             className={isActiveCls('sidebar-item', pathname === '/modtools/reports')}
-            to={`/${communityName}/modtools/reports`}
+            to={`/${CONFIG.communityPrefix}${communityName}/modtools/reports`}
           >
             Reports
           </Link>
           <Link
             className={isActiveCls('sidebar-item', pathname === '/modtools/removed')}
-            to={`/${communityName}/modtools/removed`}
+            to={`/${CONFIG.communityPrefix}${communityName}/modtools/removed`}
           >
             Removed
           </Link>
           <Link
             className={isActiveCls('sidebar-item', pathname === '/modtools/locked')}
-            to={`/${communityName}/modtools/locked`}
+            to={`/${CONFIG.communityPrefix}${communityName}/modtools/locked`}
           >
             Locked
           </Link>
           <div className="sidebar-topic">Users</div>
           <Link
             className={isActiveCls('sidebar-item', pathname === '/modtools/banned')}
-            to={`/${communityName}/modtools/banned`}
+            to={`/${CONFIG.communityPrefix}${communityName}/modtools/banned`}
           >
             Banned
           </Link>
           <Link
             className={isActiveCls('sidebar-item', pathname === '/modtools/mods')}
-            to={`/${communityName}/modtools/mods`}
+            to={`/${CONFIG.communityPrefix}${communityName}/modtools/mods`}
           >
             Moderators
           </Link>
           <div className="sidebar-topic">Rules</div>
           <Link
             className={isActiveCls('sidebar-item', pathname === '/modtools/rules')}
-            to={`/${communityName}/modtools/rules`}
+            to={`/${CONFIG.communityPrefix}${communityName}/modtools/rules`}
           >
             Rules
           </Link>
         </div>
         <Switch>
           <Route exact path={path}>
-            <Redirect to={`/${communityName}/modtools/settings`} />
+            <Redirect to={`/${CONFIG.communityPrefix}${communityName}/modtools/settings`} />
           </Route>
           <Route exact path={`${path}/settings`}>
             <Settings community={community} />

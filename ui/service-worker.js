@@ -165,7 +165,7 @@ const getNotificationInfo = (notification, csrfToken) => {
   switch (type) {
     case 'new_comment':
       {
-        let to = `/${notif.post.communityName}/post/${notif.post.publicId}`;
+        let to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
         if (notif.noComments === 1) {
           ret.title = `@${notif.commentAuthor} commented on your post '${notif.post.title}'`;
           to += `/${notif.commentId}`;
@@ -177,7 +177,7 @@ const getNotificationInfo = (notification, csrfToken) => {
       break;
     case 'comment_reply':
       {
-        let to = `/${notif.post.communityName}/post/${notif.post.publicId}`;
+        let to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
         if (notif.noComments === 1) {
           ret.title = `@${notif.commentAuthor} replied to your comment on post '${notif.post.title}'`;
           to += `/${notif.commentId}`;
@@ -192,13 +192,13 @@ const getNotificationInfo = (notification, csrfToken) => {
         ret.title = `${stringCount(notif.noVotes, false, 'new upvote')} on your post '${
           notif.post.title
         }'`;
-        setToURL(`/${notif.post.communityName}/post/${notif.post.publicId}`);
+        setToURL(`/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`);
       } else {
         ret.title = `${stringCount(notif.noVotes, false, 'new vote')} on your comment in '${
           notif.post.title
         }'`;
         setToURL(
-          `/${notif.comment.communityName}/post/${notif.comment.postPublicId}/${notif.comment.id}`
+          `/${CONFIG.communityPrefix}${notif.comment.communityName}/post/${notif.comment.postPublicId}/${notif.comment.id}`
         );
       }
       break;
@@ -206,11 +206,11 @@ const getNotificationInfo = (notification, csrfToken) => {
       const by =
         notif.deletedAs === 'mods' ? `moderators of ${notif.post.communityName}` : 'admins';
       ret.title = `Your post '${notif.post.title}' has been removed by the ${by}`;
-      setToURL(`/${notif.post.communityName}/post/${notif.post.publicId}`);
+      setToURL(`/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`);
       break;
     case 'mod_add':
       ret.title = `You are added as a moderator of /${notif.communityName} by @${notif.addedBy}`;
-      setToURL(`/${notif.post.communityName}/post/${notif.post.publicId}`);
+      setToURL(`/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`);
       break;
     case 'new_badge':
       ret.title =
