@@ -2,7 +2,7 @@ import { useInsertionEffect, useReducer, useRef } from 'react';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router';
-import { APIError, mfetch, mfetchjson, usernameLegalLetters } from '../helper';
+import { APIError, mfetch, mfetchjson, usernameLegalLetters } from '../helper/index.js';
 import {
   muteCommunity,
   muteUser,
@@ -11,10 +11,10 @@ import {
   snackAlertError,
   unmuteCommunity,
   unmuteUser,
-} from '../slices/mainSlice';
+} from '../slices/mainSlice.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectUser, userAdded } from '../slices/usersSlice';
-import { selectUsersLists, usersListsAdded } from '../slices/listsSlice';
+import { selectUser, userAdded } from '../slices/usersSlice.js';
+import { selectUsersLists, usersListsAdded } from '../slices/listsSlice.js';
 
 export function useDelayedEffect(callback, deps, delay = 1000) {
   const [timer, setTimer] = useState(null);

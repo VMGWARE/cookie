@@ -1,5 +1,5 @@
-import { APIError, mfetch, mfetchjson } from '../helper';
-import { communitiesAdded } from './communitiesSlice';
+import { APIError, mfetch, mfetchjson } from '../helper/index.js';
+import { communitiesAdded } from './communitiesSlice.js';
 
 const initialNotifications = {
   loaded: false,

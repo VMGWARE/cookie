@@ -1,5 +1,5 @@
-import { addComment, commentsTree, searchTree } from './commentsTree';
-import { commentsCountIncremented } from './postsSlice';
+import { addComment, commentsTree, searchTree } from './commentsTree.js';
+import { commentsCountIncremented } from './postsSlice.js';
 
 const initialState = {
   ids: [],

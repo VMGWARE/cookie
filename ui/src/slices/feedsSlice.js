@@ -1,4 +1,4 @@
-import { multiplePostsAdded } from './postsSlice';
+import { multiplePostsAdded } from './postsSlice.js';
 
 const initialState = {
   urls: [],
