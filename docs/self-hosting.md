@@ -11,7 +11,7 @@ Before you begin, make sure you have the following installed on your system:
 - [Go (1.21 or higher)](https://go.dev/)
 - [MariaDB](https://mariadb.org/)
 - [Redis](https://redis.io/)
-- [Node.js and NPM](https://nodejs.org/en/download/package-manager)
+- [Bun](https://bun.sh)
 - [Docker (optional, for running with Docker)](https://www.docker.com/products/docker-desktop/)
 - [libvips](https://libvips.github.io/libvips/install.html) (for image transformations)
 

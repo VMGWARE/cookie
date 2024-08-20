@@ -8,7 +8,6 @@ go build
 
 # Build the React app
 cd ui
-npm ci
-npm run build:prod
+bun install --frozen-lockfile
+bun -b run build:prod
 cd ..
-

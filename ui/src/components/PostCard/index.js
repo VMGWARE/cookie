@@ -1,5 +1,5 @@
-import PostCard from './PostCard';
-import getEmbedComponent from './embed';
+import PostCard from './PostCard.jsx';
+import getEmbedComponent from './embed.jsx';
 
 const templatePost = {
   id: '0929348029384034',

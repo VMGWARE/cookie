@@ -1,5 +1,5 @@
-import { selectImageCopyURL, stringCount } from './src/helper';
-import { badgeImage } from './src/pages/User/Badge';
+import { selectImageCopyURL, stringCount } from './src/helper/index.js';
+import { badgeImage } from './src/pages/User/Badge.jsx';
 
 const CACHE_VERSION = CONFIG.cacheStorageVersion;
 
@@ -192,7 +192,9 @@ const getNotificationInfo = (notification, csrfToken) => {
         ret.title = `${stringCount(notif.noVotes, false, 'new upvote')} on your post '${
           notif.post.title
         }'`;
-        setToURL(`/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`);
+        setToURL(
+          `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`
+        );
       } else {
         ret.title = `${stringCount(notif.noVotes, false, 'new vote')} on your comment in '${
           notif.post.title

@@ -4,15 +4,15 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { HelmetProvider } from 'react-helmet-async';
 import { ErrorBoundary } from 'react-error-boundary';
-import App from './App';
-import store from './store';
+import App from './App.jsx';
+import store from './store.js';
 import PullToRefresh from 'pulltorefreshjs';
 import './scss/styles.scss';
 import '../manifest.json';
 import './assets/imgs/logo-manifest-512.png';
 import './assets/imgs/discuit-logo-pwa-badge.png';
-import { isDeviceIos, mfetchjson } from './helper';
-import { forceSwUpdate } from './AppUpdate';
+import { isDeviceIos, mfetchjson } from './helper/index.js';
+import { forceSwUpdate } from './AppUpdate.jsx';
 
 const Fallback = ({ error, resetErrorBoundary }) => {
   useEffect(() => {
