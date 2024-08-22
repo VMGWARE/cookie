@@ -1,0 +1,21 @@
+when:
+  - event: [pull_request]
+  - event: [push, tag, manual]
+    branch:
+      - ${CI_REPO_DEFAULT_BRANCH}
+
+variables:
+  - &golang_image "golang:1.21"
+
+steps:
+  install-dependencies:
+    image: *golang_image
+    commands:
+      - go mod tidy
+
+  tests:
+    image: *golang_image
+    commands:
+      - apt-get update
+      - apt-get install -y libvips-dev libvips
+      - go test -race -cover -coverprofile coverage.out -timeout 180s  github.com/discuitnet/discuit/...
