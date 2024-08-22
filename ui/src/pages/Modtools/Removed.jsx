@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import ReportsView from './ReportsView';
-import { useLoading, usePagination } from '../../hooks';
-import { mfetchjson, timeAgo } from '../../helper';
-import PostCard from '../../components/PostCard';
-import { useDispatch } from 'react-redux';
-import { snackAlertError } from '../../slices/mainSlice';
-import Pagination from '../../components/Pagination';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import Pagination from "../../components/Pagination";
+import PostCard from "../../components/PostCard";
+import { mfetchjson, timeAgo } from "../../helper";
+import { useLoading, usePagination } from "../../hooks";
+import { snackAlertError } from "../../slices/mainSlice";
+import ReportsView from "./ReportsView";
 
 const Removed = ({ community, filter, title }) => {
   const dispatch = useDispatch();
@@ -22,19 +24,21 @@ const Removed = ({ community, filter, title }) => {
     (async () => {
       try {
         const json = await mfetchjson(
-          `/api/posts?communityId=${community.id}&filter=${filter}&page=${page}&limit=${limit}`
+          `/api/posts?communityId=${community.id}&filter=${filter}&page=${page}&limit=${limit}`,
         );
         setPosts(json.posts || []);
         setNoPosts(json.noPosts);
-        setLoading('loaded');
+        setLoading("loaded");
       } catch (error) {
-        setLoading('failed');
+        setLoading("failed");
         dispatch(snackAlertError(error));
       }
     })();
   }, [community.id, filter, page, limit]);
 
-  if (loading !== 'loaded') return null;
+  if (loading !== "loaded") {
+    return null;
+  }
 
   return (
     <ReportsView title={`${title} (${noPosts})`}>
@@ -42,7 +46,7 @@ const Removed = ({ community, filter, title }) => {
         {posts.map((post) => (
           <div key={post.id} className="card card-padding card-report">
             <div className="card-report-head">
-              <div className="left"></div>
+              <div className="left" />
               <div className="right">{timeAgo(post.createdAt)}</div>
             </div>
             <div className="card-report-item">
@@ -51,7 +55,11 @@ const Removed = ({ community, filter, title }) => {
           </div>
         ))}
       </div>
-      <Pagination noPages={noPages} onClick={(next) => setPage(next)} current={page} />
+      <Pagination
+        noPages={noPages}
+        onClick={(next) => setPage(next)}
+        current={page}
+      />
     </ReportsView>
   );
 };

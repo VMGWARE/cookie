@@ -1,25 +1,52 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { Redirect, Route, Switch, useHistory, useLocation } from 'react-router-dom';
-import Chat from './components/Chat';
-import LoginPrompt from './components/LoginPrompt';
-import Navbar from './components/Navbar';
-import Snacks from './components/Snacks';
-import Elements from './Elements';
-import { isDeviceStandalone, mfetchjson } from './helper';
-import { useCanonicalTag, useLoading, useWindowWidth } from './hooks';
-import AppLoading from './pages/AppLoading';
-import Community from './pages/Community';
-import Home from './pages/Home';
-import Modtools from './pages/Modtools';
-import NewPost from './pages/NewPost';
-import NotFound from './pages/NotFound';
-import Post from './pages/Post';
-import Settings from './pages/Settings';
-import User from './pages/User';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useCallback } from "react";
+import { Helmet } from "react-helmet-async";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Redirect,
+  Route,
+  Switch,
+  useHistory,
+  useLocation,
+} from "react-router-dom";
+import AppUpdate from "./AppUpdate";
+import Elements from "./Elements";
+import PushNotifications from "./PushNotifications";
+import { ButtonClose } from "./components/Button";
+import Chat from "./components/Chat";
+import CreateCommunity from "./components/CreateCommunity";
+import LoginPrompt from "./components/LoginPrompt";
+import Modal from "./components/Modal";
+import Navbar from "./components/Navbar";
+import NotificationsView from "./components/Navbar/NotificationsView";
+import SaveToListModal from "./components/SaveToListModal";
+import Sidebar from "./components/Sidebar";
+import Signup from "./components/Signup";
+import Snacks from "./components/Snacks";
+import { isDeviceStandalone, mfetchjson } from "./helper";
+import { useCanonicalTag, useLoading, useWindowWidth } from "./hooks";
+import About from "./pages/About";
+import AllCommunities from "./pages/AllCommunities";
+import AppLoading from "./pages/AppLoading";
+import Community from "./pages/Community";
+import Guidelines from "./pages/Guidelines";
+import Home from "./pages/Home";
+import { List, Lists } from "./pages/Lists";
+import Login from "./pages/Login";
+import MarkdownGuide from "./pages/MarkdownGuide";
+import Modtools from "./pages/Modtools";
+import NewPost from "./pages/NewPost";
+import NotFound from "./pages/NotFound";
+import Offline from "./pages/Offline";
+import Post from "./pages/Post";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Settings from "./pages/Settings";
+import { getDevicePreference } from "./pages/Settings/devicePrefs";
+import Terms from "./pages/Terms";
+import User from "./pages/User";
 import {
   bannedFromUpdated,
   createCommunityModalOpened,
@@ -34,35 +61,16 @@ import {
   snackAlert,
   toggleSidebarOpen,
   userLoggedIn,
-} from './slices/mainSlice';
-import About from './pages/About';
-import Guidelines from './pages/Guidelines';
-import Sidebar from './components/Sidebar';
-import Signup from './components/Signup';
-import Modal from './components/Modal';
-import { ButtonClose } from './components/Button';
-import LoginForm from './views/LoginForm';
-import MarkdownGuide from './pages/MarkdownGuide';
-import Terms from './pages/Terms';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import { Helmet } from 'react-helmet-async';
-import NotificationsView from './components/Navbar/NotificationsView';
-import Login from './pages/Login';
-import { useCallback } from 'react';
-import CreateCommunity from './components/CreateCommunity';
-import AllCommunities from './pages/AllCommunities';
-import Offline from './pages/Offline';
-import AppUpdate from './AppUpdate';
-import PushNotifications from './PushNotifications';
-import { List, Lists } from './pages/Lists';
-import SaveToListModal from './components/SaveToListModal';
-import { getDevicePreference } from './pages/Settings/devicePrefs';
+} from "./slices/mainSlice";
+import LoginForm from "./views/LoginForm";
 
 // Value taken from _mixins.scss file.
 const tabletBreakpoint = 1170;
 
 // Global data, use sparingly.
-if (!window.appData) window.appData = {};
+if (!window.appData) {
+  window.appData = {};
+}
 window.appData.historyLength = 0;
 
 const App = () => {
@@ -80,22 +88,24 @@ const App = () => {
         setIsOnline(online);
       }
     };
-    window.addEventListener('online', listner);
-    window.addEventListener('offline', listner);
+    window.addEventListener("online", listner);
+    window.addEventListener("offline", listner);
     return () => {
-      window.removeEventListener('online', listner);
-      window.removeEventListener('offline', listner);
+      window.removeEventListener("online", listner);
+      window.removeEventListener("offline", listner);
     };
   }, []);
 
   const [loading, setLoading] = useLoading();
   useEffect(() => {
-    if (!isOnline) return;
-    (async function () {
+    if (!isOnline) {
+      return;
+    }
+    (async () => {
       // See if user is logged in. This is the first API call.
       try {
         // const initial = await mfetchjson('/api/_initial');
-        const res = await fetch('/api/_initial');
+        const res = await fetch("/api/_initial");
 
         if (!res.ok) {
           if (res.status === 408) {
@@ -110,7 +120,7 @@ const App = () => {
 
         // Save CSRF token in localStorage because service workers don't cache
         // Cookies.
-        window.localStorage.setItem('csrftoken', res.headers.get('Csrf-Token'));
+        window.localStorage.setItem("csrftoken", res.headers.get("Csrf-Token"));
 
         if (initial.user) {
           dispatch(userLoggedIn(initial.user));
@@ -124,23 +134,25 @@ const App = () => {
         dispatch(listsAdded(initial.lists));
       } catch (err) {
         console.error(err);
-        dispatch(snackAlert('Something went wrong.'));
+        dispatch(snackAlert("Something went wrong."));
       }
-      setLoading('loaded');
+      setLoading("loaded");
     })();
   }, [isOnline]);
 
   // Analytics.
   useEffect(() => {
-    if (!isOnline) return;
+    if (!isOnline) {
+      return;
+    }
     const f = async () => {
       if (isDeviceStandalone()) {
         // Track PWA use.
         try {
-          await mfetchjson(`/api/analytics`, {
-            method: 'POST',
+          await mfetchjson("/api/analytics", {
+            method: "POST",
             body: JSON.stringify({
-              event: 'pwa_use',
+              event: "pwa_use",
             }),
           });
         } catch (error) {
@@ -158,7 +170,7 @@ const App = () => {
     if (loggedIn) {
       const timerId = setInterval(async () => {
         try {
-          const rUser = await mfetchjson(`/api/_user`);
+          const rUser = await mfetchjson("/api/_user");
           dispatch(userLoggedIn(rUser));
         } catch (error) {
           console.error(error);
@@ -181,40 +193,48 @@ const App = () => {
   useEffect(() => {
     if (sidebarOpen) {
       const prev = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = prev;
       };
     }
   }, [sidebarOpen]);
 
-  const notifsNewCount = useSelector((state) => state.main.notifications.newCount);
-  const notifsNewCountStr = notifsNewCount > 0 ? `(${notifsNewCount}) ` : '';
+  const notifsNewCount = useSelector(
+    (state) => state.main.notifications.newCount,
+  );
+  const notifsNewCountStr = notifsNewCount > 0 ? `(${notifsNewCount}) ` : "";
   const titleTemplate = `${notifsNewCountStr} %s - ${CONFIG.siteName}`;
 
   const loginModalOpen = useSelector((state) => state.main.loginModalOpen);
   const signupModalOpen = useSelector((state) => state.main.signupModalOpen);
 
-  const createCommunityOpen = useSelector((state) => state.main.createCommunityModalOpen);
+  const createCommunityOpen = useSelector(
+    (state) => state.main.createCommunityModalOpen,
+  );
 
   // Offline page is only rendered if the user goes to a new page while the
   // internet connectivity is lost.
-  const [showOfflinePage, setShowOfflinePage] = useState(!window.navigator.onLine);
+  const [showOfflinePage, setShowOfflinePage] = useState(
+    !window.navigator.onLine,
+  );
   const location = useLocation();
   useEffect(() => {
     setShowOfflinePage(!window.navigator.onLine);
   }, [location]);
   useEffect(() => {
-    if (isOnline) setShowOfflinePage(false);
+    if (isOnline) {
+      setShowOfflinePage(false);
+    }
   }, [isOnline]);
 
   // Device preferences:
   const settingsChanged = useSelector((state) => state.main.settingsChanged);
   useEffect(() => {
-    if (getDevicePreference('font') === 'system') {
-      document.documentElement.classList.add('is-system-font');
+    if (getDevicePreference("font") === "system") {
+      document.documentElement.classList.add("is-system-font");
       return () => {
-        document.documentElement.classList.remove('is-system-font');
+        document.documentElement.classList.remove("is-system-font");
       };
     }
   }, [settingsChanged]);
@@ -223,9 +243,10 @@ const App = () => {
     return <Offline />;
   }
 
-  if (loading === 'initial') {
+  if (loading === "initial") {
     return null;
-  } else if (loading === 'loading') {
+  }
+  if (loading === "loading") {
     return <AppLoading />;
   }
 
@@ -248,14 +269,17 @@ const App = () => {
           className="body-overlay"
           onClick={() => dispatch(toggleSidebarOpen())}
           ref={overlayRef}
-        ></div>
+        />
       )}
       <AppSwitch />
       <Snacks />
-      {process.env.NODE_ENV !== 'production' && chatOpen && <Chat />}
+      {process.env.NODE_ENV !== "production" && chatOpen && <Chat />}
       <SaveToListModal />
       <LoginPrompt />
-      <Signup open={signupModalOpen} onClose={() => dispatch(signupModalOpened(false))} />
+      <Signup
+        open={signupModalOpen}
+        onClose={() => dispatch(signupModalOpened(false))}
+      />
       <Modal
         open={loginModalOpen}
         onClose={() => dispatch(loginModalOpened(false))}
@@ -283,7 +307,9 @@ const AppSwitch = () => {
   return (
     <>
       <Switch>
-        {process.env.NODE_ENV !== 'production' && <Route path="/elements" component={Elements} />}
+        {process.env.NODE_ENV !== "production" && (
+          <Route path="/elements" component={Elements} />
+        )}
         {/*
         <Route exact path="/search">
           <Search />
@@ -303,7 +329,7 @@ const AppSwitch = () => {
         <Route exact path="/login">
           <Login />
         </Route>
-        <Route exact path={['/', '/subscriptions', '/all']}>
+        <Route exact path={["/", "/subscriptions", "/all"]}>
           <Home />
         </Route>
         <Route exact path="/communities">
@@ -342,7 +368,10 @@ const AppSwitch = () => {
         <Route exact path={`/${CONFIG.communityPrefix}:name/post/:id`}>
           <Post />
         </Route>
-        <Route exact path={`/${CONFIG.communityPrefix}:name/post/:id/:commentId`}>
+        <Route
+          exact
+          path={`/${CONFIG.communityPrefix}:name/post/:id/:commentId`}
+        >
           <Post />
         </Route>
         <Route path="*">
@@ -370,7 +399,7 @@ const ProtectedRoute = ({ children, ...rest }) => {
         ) : (
           <Redirect
             to={{
-              pathname: '/login',
+              pathname: "/login",
               state: { from: location },
             }}
           />
@@ -395,7 +424,9 @@ const ScrollToTop = () => {
   const history = useHistory();
 
   useEffect(() => {
-    if (history.action !== 'POP') window.scrollTo(0, 0);
+    if (history.action !== "POP") {
+      window.scrollTo(0, 0);
+    }
     window.appData.historyLength++;
   }, [location.pathname]);
 
@@ -404,6 +435,8 @@ const ScrollToTop = () => {
 
 const CanonicalTag = () => {
   const location = useLocation();
-  useCanonicalTag(window.location.origin + window.location.pathname, [location]);
+  useCanonicalTag(window.location.origin + window.location.pathname, [
+    location,
+  ]);
   return null;
 };

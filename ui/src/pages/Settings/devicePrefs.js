@@ -1,4 +1,4 @@
-const localStorageKey = 'preferences';
+const localStorageKey = "preferences";
 
 function parseStoredPrefs() {
   const prefStr = localStorage.getItem(localStorageKey);
@@ -7,7 +7,7 @@ function parseStoredPrefs() {
     try {
       json = JSON.parse(prefStr);
     } catch (error) {
-      console.error('Unable to parse device preferences from localStorage: ');
+      console.error("Unable to parse device preferences from localStorage: ");
       console.error(error);
     }
   }

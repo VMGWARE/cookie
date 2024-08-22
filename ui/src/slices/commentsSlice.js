@@ -1,5 +1,5 @@
-import { addComment, commentsTree, searchTree } from './commentsTree.js';
-import { commentsCountIncremented } from './postsSlice.js';
+import { addComment, commentsTree, searchTree } from "./commentsTree.js";
+import { commentsCountIncremented } from "./postsSlice.js";
 
 const initialState = {
   ids: [],
@@ -16,18 +16,24 @@ const initialState = {
   },
 };
 
+// biome-ignore lint: Name follows allowed syntax
 export const defaultCommentZIndex = 100000;
 
-const typeCommentsAdded = 'comments/commentsAdded';
-const typeNewCommentAdded = 'comments/newCommentAdded';
-const typeReplyCommentsAdded = 'comments/replyCommentsAdded';
-const typeMoreCommentsAdded = 'comments/moreCommentsAdded';
+const typeCommentsAdded = "comments/commentsAdded";
+const typeNewCommentAdded = "comments/newCommentAdded";
+const typeReplyCommentsAdded = "comments/replyCommentsAdded";
+const typeMoreCommentsAdded = "comments/moreCommentsAdded";
 
-export default function commentsReducer(state = initialState, action) {
+export default function commentsReducer(
+  state = initialState,
+  action = undefined,
+) {
   switch (action.type) {
     case typeCommentsAdded: {
       const { postId, comments: commentsList, next } = action.payload;
-      if (state.ids.includes(postId)) return state;
+      if (state.ids.includes(postId)) {
+        return state;
+      }
       return {
         ...state,
         items: {
@@ -58,6 +64,7 @@ export default function commentsReducer(state = initialState, action) {
     }
     case typeNewCommentAdded: {
       const { comment, postId } = action.payload;
+      // biome-ignore lint: Name follows allowed syntax
       let updateZIndex = false;
       const root = state.items[postId].comments;
       const node = addComment(root, comment);
@@ -68,11 +75,11 @@ export default function commentsReducer(state = initialState, action) {
         }
         const children = root.children;
         const newChildren = [];
-        for (let i = 0; i < children.length; i++) {
-          if (children[i].comment.id === rootNode.comment.id) {
+        for (const child of children) {
+          if (child.comment.id === rootNode.comment.id) {
             newChildren.push({ ...rootNode });
           } else {
-            newChildren.push(children[i]);
+            newChildren.push(child);
           }
         }
         root.children = newChildren;
@@ -97,9 +104,11 @@ export default function commentsReducer(state = initialState, action) {
       const { postId, comments } = action.payload;
       const newComments = [];
       const root = state.items[postId].comments;
-      comments.forEach((comment) => {
-        if (searchTree(root, comment.id) === null) newComments.push(comment);
-      });
+      for (const comment of comments) {
+        if (searchTree(root, comment.id) === null) {
+          newComments.push(comment);
+        }
+      }
       return {
         ...state,
         items: {

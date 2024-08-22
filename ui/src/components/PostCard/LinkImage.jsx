@@ -1,8 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { useImageLoaded } from '../../hooks';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useImageLoaded } from "../../hooks";
 
-const LinkImage = ({ link, loading = 'lazy' }) => {
+const LinkImage = ({ link, loading = "lazy" }) => {
   const { image } = link;
 
   // let size;
@@ -14,12 +15,14 @@ const LinkImage = ({ link, loading = 'lazy' }) => {
   // const src = image.url + `?size=${size.width}x${size.height}&fit=cover`; // desktop
 
   const { src, size } = (() => {
-    const imageCopyName = window.innerWidth > 768 ? 'desktop' : 'mobile';
+    const imageCopyName = window.innerWidth > 768 ? "desktop" : "mobile";
     const matches = image.copies.filter((copy) => copy.name === imageCopyName);
     let copy;
     if (matches.length === 0) {
       copy = image;
-      console.error(`LinkImage.jsx: No matching image copy found (for image: ${image.url})`);
+      console.error(
+        `LinkImage.jsx: No matching image copy found (for image: ${image.url})`,
+      );
     } else {
       copy = matches[0];
     }
@@ -39,7 +42,7 @@ const LinkImage = ({ link, loading = 'lazy' }) => {
       className="post-card-link-image-img"
       style={{
         backgroundColor: image.averageColor,
-        backgroundImage: loaded ? `url('${src}')` : 'none',
+        backgroundImage: loaded ? `url('${src}')` : "none",
       }}
     >
       <img

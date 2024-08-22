@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { chatOpenToggled } from '../slices/mainSlice';
-import { ButtonClose } from './Button';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { chatOpenToggled } from "../slices/mainSlice";
+import { ButtonClose } from "./Button";
 
 const Chat = () => {
   const msgsRef = useRef(null);
@@ -65,8 +67,10 @@ const Chat = () => {
               id=""
               rows="1"
               onInput={handleReplyInput}
-            ></textarea>
-            <button className="button-main">Send</button>
+            />
+            <button type="button" className="button-main">
+              Send
+            </button>
           </div>
         </div>
       </div>

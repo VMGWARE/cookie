@@ -1,19 +1,21 @@
-import React, { useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import Favicon from "../../assets/imgs/favicon.png";
+import { mfetchjson, selectImageCopyUrl, stringCount } from "../../helper";
+import { badgeImage } from "../../pages/User/Badge";
 import {
   markNotificationAsSeen,
   notificationsDeleted,
   snackAlertError,
-} from '../../slices/mainSlice';
-import { mfetchjson, selectImageCopyURL, stringCount } from '../../helper';
-import { useHistory } from 'react-router';
-import TimeAgo from '../TimeAgo';
-import Dropdown from '../Dropdown';
-import { ButtonMore } from '../Button';
-import Image from '../Image';
-import Favicon from '../../assets/imgs/favicon.png';
-import { badgeImage } from '../../pages/User/Badge';
+} from "../../slices/mainSlice";
+import { ButtonMore } from "../Button";
+import Dropdown from "../Dropdown";
+import Image from "../Image";
+import TimeAgo from "../TimeAgo";
 
 const NotificationItem = ({ notification, ...rest }) => {
   const { type, seen, createdAt, notif } = notification;
@@ -24,10 +26,13 @@ const NotificationItem = ({ notification, ...rest }) => {
   const [dropdownActive, setDropdownActive] = useState(false);
 
   const dispatch = useDispatch();
-  const handleMarkAsSeen = () => dispatch(markNotificationAsSeen(notification, !seen));
+  const handleMarkAsSeen = () =>
+    dispatch(markNotificationAsSeen(notification, !seen));
   const handleDelete = async () => {
     try {
-      await mfetchjson(`/api/notifications/${notification.id}`, { method: 'DELETE' });
+      await mfetchjson(`/api/notifications/${notification.id}`, {
+        method: "DELETE",
+      });
       dispatch(notificationsDeleted(notification));
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -36,81 +41,82 @@ const NotificationItem = ({ notification, ...rest }) => {
 
   const renderText = () => {
     switch (type) {
-      case 'new_comment': {
+      case "new_comment": {
         if (notif.noComments === 1) {
           return (
             <>
-              <b>@{notif.commentAuthor}</b> commented on your post <b>{notif.post.title}</b>.
-            </>
-          );
-        } else {
-          return (
-            <>
-              {notif.noComments} new comments on your post <b>{notif.post.title}</b>.
-            </>
-          );
-        }
-      }
-      case 'comment_reply': {
-        if (notif.noComments === 1) {
-          return (
-            <>
-              <b>@{notif.commentAuthor}</b> replied to your comment on post{' '}
+              <b>@{notif.commentAuthor}</b> commented on your post{" "}
               <b>{notif.post.title}</b>.
             </>
           );
-        } else {
-          return (
-            <>
-              {notif.noComments} new replies to your comment on post <b>{notif.post.title}</b>.
-            </>
-          );
         }
-      }
-      case 'new_votes': {
-        if (notif.targetType === 'post') {
-          return (
-            <>
-              {stringCount(notif.noVotes, false, 'new upvote')} on your post{' '}
-              <b>{notif.post.title}</b>.
-            </>
-          );
-        } else {
-          return (
-            <>
-              {stringCount(notif.noVotes, false, 'new vote')} on your comment in{' '}
-              <b>{`~${notif.post.title}`}</b>.
-            </>
-          );
-        }
-      }
-      case 'deleted_post': {
         return (
           <>
-            Your post <b>{notif.post.title}</b> has been removed by{' '}
-            {notif.deletedAs === 'mods' ? (
+            {notif.noComments} new comments on your post{" "}
+            <b>{notif.post.title}</b>.
+          </>
+        );
+      }
+      case "comment_reply": {
+        if (notif.noComments === 1) {
+          return (
+            <>
+              <b>@{notif.commentAuthor}</b> replied to your comment on post{" "}
+              <b>{notif.post.title}</b>.
+            </>
+          );
+        }
+        return (
+          <>
+            {notif.noComments} new replies to your comment on post{" "}
+            <b>{notif.post.title}</b>.
+          </>
+        );
+      }
+      case "new_votes": {
+        if (notif.targetType === "post") {
+          return (
+            <>
+              {stringCount(notif.noVotes, false, "new upvote")} on your post{" "}
+              <b>{notif.post.title}</b>.
+            </>
+          );
+        }
+        return (
+          <>
+            {stringCount(notif.noVotes, false, "new vote")} on your comment in{" "}
+            <b>{`~${notif.post.title}`}</b>.
+          </>
+        );
+      }
+      case "deleted_post": {
+        return (
+          <>
+            Your post <b>{notif.post.title}</b> has been removed by{" "}
+            {notif.deletedAs === "mods" ? (
               <>
                 moderators of <b>{notif.post.communityName}</b>
               </>
             ) : (
-              'the admins'
+              "the admins"
             )}
             .
           </>
         );
       }
-      case 'mod_add': {
+      case "mod_add": {
         return (
           <>
-            You are added as a moderator of <b>{notif.communityName}</b> by <b>@{notif.addedBy}.</b>
+            You are added as a moderator of <b>{notif.communityName}</b> by{" "}
+            <b>@{notif.addedBy}.</b>
           </>
         );
       }
-      case 'new_badge': {
+      case "new_badge": {
         return (
           <>
-            You are awarded the <b>supporter</b> badge for your contribution to Discuit and for
-            sheer awesomeness!
+            You are awarded the <b>supporter</b> badge for your contribution to
+            Discuit and for sheer awesomeness!
           </>
         );
       }
@@ -120,28 +126,31 @@ const NotificationItem = ({ notification, ...rest }) => {
     }
   };
 
-  const defaultImage = { url: Favicon, backgroundColor: '#3d3d3d' };
+  const defaultImage = { url: Favicon, backgroundColor: "#3d3d3d" };
   const getNotifImage = (notif) => {
-    let image = Favicon,
-      background = '#3d3d3d';
+    let image = Favicon;
+    let background = "#3d3d3d";
     if (notif.post) {
       switch (notif.post.type) {
-        case 'image':
+        case "image":
           if (notif.post.image) {
-            image = selectImageCopyURL('tiny', notif.post.image);
+            image = selectImageCopyUrl("tiny", notif.post.image);
             background = notif.post.image.averageColor;
           }
           break;
-        case 'link':
-          if (notif.post.link && notif.post.link.image) {
-            image = selectImageCopyURL('tiny', notif.post.link.image);
+        case "link":
+          if (notif.post.link?.image) {
+            image = selectImageCopyUrl("tiny", notif.post.link.image);
             background = notif.post.link.image.averageColor;
           }
           break;
       }
-    } else if (typeof notif.community === 'object' && notif.community !== null) {
+    } else if (
+      typeof notif.community === "object" &&
+      notif.community !== null
+    ) {
       if (notif.community.proPic) {
-        image = selectImageCopyURL('small', notif.community.proPic);
+        image = selectImageCopyUrl("small", notif.community.proPic);
         background = notif.community.proPic.averageColor;
       }
     }
@@ -149,45 +158,57 @@ const NotificationItem = ({ notification, ...rest }) => {
   };
 
   let image = defaultImage;
-  let to = '';
+  let to = "";
   switch (type) {
-    case 'new_comment':
+    case "new_comment": {
       to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
-      if (notif.noComments === 1) to += `/${notif.commentId}`;
-      else to += `?notifId=${notification.id}`;
+      if (notif.noComments === 1) {
+        to += `/${notif.commentId}`;
+      } else {
+        to += `?notifId=${notification.id}`;
+      }
       image = getNotifImage(notif);
       break;
-    case 'comment_reply':
+    }
+    case "comment_reply": {
       to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
-      if (notif.noComments === 1) to += `/${notif.commentId}`;
-      else to += `?notifId=${notification.id}`;
+      if (notif.noComments === 1) {
+        to += `/${notif.commentId}`;
+      } else {
+        to += `?notifId=${notification.id}`;
+      }
       image = getNotifImage(notif);
       break;
-    case 'new_votes':
-      if (notif.targetType === 'post') {
+    }
+    case "new_votes": {
+      if (notif.targetType === "post") {
         to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
       } else {
         to = `/${CONFIG.communityPrefix}${notif.comment.communityName}/post/${notif.comment.postPublicId}/${notif.comment.id}`;
       }
       image = getNotifImage(notif);
       break;
-    case 'deleted_post':
+    }
+    case "deleted_post": {
       // Currently only deleted post notifications get here.
       to = `/${CONFIG.communityPrefix}${notif.post.communityName}/post/${notif.post.publicId}`;
       image = getNotifImage(notif);
       break;
-    case 'mod_add':
+    }
+    case "mod_add": {
       to = `/${CONFIG.communityPrefix}${notif.communityName}`;
       image = getNotifImage(notif);
       break;
-    case 'new_badge':
+    }
+    case "new_badge": {
       to = `/@${viewer.username}`;
       const { src } = badgeImage(notif.badgeType);
       image = {
         url: src,
-        backgroundColor: 'transparent',
+        backgroundColor: "transparent",
       };
       break;
+    }
   }
 
   const actionsRef = useRef();
@@ -195,10 +216,14 @@ const NotificationItem = ({ notification, ...rest }) => {
   const handleClick = (e) => {
     e.preventDefault();
     if (
-      !actionsRef.current.contains(e.target) &&
-      !document.querySelector('#modal-root').contains(e.target)
+      !(
+        actionsRef.current.contains(e.target) ||
+        document.querySelector("#modal-root").contains(e.target)
+      )
     ) {
-      if (!seen) handleMarkAsSeen();
+      if (!seen) {
+        handleMarkAsSeen();
+      }
       history.push(to, {
         fromNotifications: true,
       });
@@ -213,11 +238,7 @@ const NotificationItem = ({ notification, ...rest }) => {
   return (
     <a
       href={to}
-      className={
-        'link-reset notif' +
-        (seen ? ' is-seen' : '') +
-        (actionBtnHovering ? ' is-btn-hovering' : '')
-      }
+      className={`link-reset notif ${seen ? "is-seen" : ""} ${actionBtnHovering ? "is-btn-hovering" : ""}`}
       onClick={handleClick}
       {...rest}
     >
@@ -232,7 +253,7 @@ const NotificationItem = ({ notification, ...rest }) => {
       </div>
       <div
         ref={actionsRef}
-        className={'notif-action-btn' + (dropdownActive ? ' is-active' : '')}
+        className={`notif-action-btn ${dropdownActive ? "is-active" : ""}`}
         onMouseEnter={() => setActionBtnHovering(true)}
         onMouseLeave={() => setActionBtnHovering(false)}
       >
@@ -242,10 +263,18 @@ const NotificationItem = ({ notification, ...rest }) => {
           onActiveChange={(active) => setDropdownActive(active)}
         >
           <div className="dropdown-list">
-            <button className="button-clear dropdown-item" onClick={handleMarkAsSeen}>
-              {`Mark as ${seen ? 'un' : ''}seen`}
+            <button
+              type="button"
+              className="button-clear dropdown-item"
+              onClick={handleMarkAsSeen}
+            >
+              {`Mark as ${seen ? "un" : ""}seen`}
             </button>
-            <button className="button-clear dropdown-item" onClick={handleDelete}>
+            <button
+              type="button"
+              className="button-clear dropdown-item"
+              onClick={handleDelete}
+            >
               Delete
             </button>
           </div>

@@ -1,9 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { useHistory, useLocation } from 'react-router';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useHistory, useLocation } from "react-router";
 
 function locationToString(location) {
-  return `${location.pathname ?? ''}${location.search ?? ''}${location.hash ?? ''}`;
+  return `${location.pathname ?? ""}${location.search ?? ""}${location.hash ?? ""}`;
 }
 
 const Link = ({ to, replace = false, children, onClick, target, ...props }) => {
@@ -11,8 +12,12 @@ const Link = ({ to, replace = false, children, onClick, target, ...props }) => {
   const location = useLocation();
 
   const handleClick = (event) => {
-    if (onClick) onClick();
-    if ((target ?? '_self') !== '_self') return;
+    if (onClick) {
+      onClick();
+    }
+    if ((target ?? "_self") !== "_self") {
+      return;
+    }
     event.preventDefault();
     if (to === locationToString(location)) {
       window.scrollTo(0, 0);

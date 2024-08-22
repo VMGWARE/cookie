@@ -1,11 +1,11 @@
-import { combineReducers } from 'redux';
-import commentsReducer from './slices/commentsSlice.js';
-import communitiesReducer from './slices/communitiesSlice.js';
-import feedsReducer from './slices/feedsSlice.js';
-import mainReducer from './slices/mainSlice.js';
-import postsReducer from './slices/postsSlice.js';
-import usersReducer from './slices/usersSlice.js';
-import listsReducer from './slices/listsSlice.js';
+import { combineReducers } from "redux";
+import commentsReducer from "./slices/commentsSlice.js";
+import communitiesReducer from "./slices/communitiesSlice.js";
+import feedsReducer from "./slices/feedsSlice.js";
+import listsReducer from "./slices/listsSlice.js";
+import mainReducer from "./slices/mainSlice.js";
+import postsReducer from "./slices/postsSlice.js";
+import usersReducer from "./slices/usersSlice.js";
 
 const rootReducer = combineReducers({
   main: mainReducer,

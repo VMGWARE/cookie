@@ -1,8 +1,10 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { ButtonClose } from '../../components/Button';
-import { useWindowWidth } from '../../hooks';
-import Img from '../../components/Image';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useLayoutEffect, useRef, useState } from "react";
+import { ButtonClose } from "../../components/Button";
+import Img from "../../components/Image";
+import { useWindowWidth } from "../../hooks";
 
 const Image = ({ image, onClose, disabled = false }) => {
   const url = image.url ?? `/images/${image.fid}/${image.id}.jpg`;
@@ -19,11 +21,11 @@ const Image = ({ image, onClose, disabled = false }) => {
     }
   }, [image, windowWidth]);
 
-  let imgWidth = Math.floor(scale * width),
-    imgHeight = Math.floor(scale * height);
+  const imgWidth = Math.floor(scale * width);
+  const imgHeight = Math.floor(scale * height);
 
   let averageColor = image.averageColor;
-  if (typeof image.averageColor === 'object') {
+  if (typeof image.averageColor === "object") {
     const x = image.averageColor;
     averageColor = `rgb(${x.r}, ${x.g}, ${x.b})`;
   }
@@ -34,7 +36,7 @@ const Image = ({ image, onClose, disabled = false }) => {
         <ButtonClose
           className="button-close"
           onClick={() => onClose()}
-          style={{ padding: '6px' }}
+          style={{ padding: "6px" }}
         />
       )}
       <div className="contain-image">

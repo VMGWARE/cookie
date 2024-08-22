@@ -1,8 +1,9 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { ButtonNotifications } from '../Button';
-import Dropdown from '../Dropdown';
-import NotificationsView from './NotificationsView';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useSelector } from "react-redux";
+import { ButtonNotifications } from "../Button";
+import Dropdown from "../Dropdown";
+import NotificationsView from "./NotificationsView";
 
 const Notifications = () => {
   const user = useSelector((state) => state.main.user);

@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import { ButtonClose } from '../../components/Button';
-import { InputWithCount, useInputMaxLength } from '../../components/Input';
-import Modal from '../../components/Modal';
-import { mfetchjson } from '../../helper';
-import { useLoading } from '../../hooks';
-import { snackAlertError } from '../../slices/mainSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { ButtonClose } from "../../components/Button";
+import { InputWithCount, useInputMaxLength } from "../../components/Input";
+import Modal from "../../components/Modal";
+import { mfetchjson } from "../../helper";
+import { useLoading } from "../../hooks";
+import { snackAlertError } from "../../slices/mainSlice";
 
 const Rules = ({ community }) => {
   const dispatch = useDispatch();
@@ -22,12 +24,14 @@ const Rules = ({ community }) => {
   useEffect(() => {
     (async () => {
       try {
-        const rrules = await mfetchjson(`/api/communities/${community.id}/rules`);
+        const rrules = await mfetchjson(
+          `/api/communities/${community.id}/rules`,
+        );
         setRules(rrules);
-        setLoading('loaded');
+        setLoading("loaded");
       } catch (error) {
         dispatch(snackAlertError(error));
-        setLoading('failed');
+        setLoading("failed");
       }
     })();
   }, []);
@@ -39,8 +43,8 @@ const Rules = ({ community }) => {
 
   const handleEditClose = () => {
     setEditOpen(false);
-    setRule('');
-    setDescription('');
+    setRule("");
+    setDescription("");
   };
 
   const handleAddRule = () => {
@@ -60,20 +64,30 @@ const Rules = ({ community }) => {
   const handleSave = async () => {
     try {
       if (isEditRule) {
-        const rrule = await mfetchjson(`/api/communities/${community.id}/rules/${ruleEditing.id}`, {
-          method: 'PUT',
-          body: JSON.stringify({ zIndex: ruleEditing.zIndex, rule, description }),
-        });
+        const rrule = await mfetchjson(
+          `/api/communities/${community.id}/rules/${ruleEditing.id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              zIndex: ruleEditing.zIndex,
+              rule,
+              description,
+            }),
+          },
+        );
         const nrules = [...rules.filter((r) => r.id !== rrule.id), rrule];
         setRules(nrules);
       } else {
-        const rrules = await mfetchjson(`/api/communities/${community.id}/rules`, {
-          method: 'POST',
-          body: JSON.stringify({
-            rule,
-            description,
-          }),
-        });
+        const rrules = await mfetchjson(
+          `/api/communities/${community.id}/rules`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              rule,
+              description,
+            }),
+          },
+        );
         setRules(rrules);
       }
       handleEditClose();
@@ -83,10 +97,10 @@ const Rules = ({ community }) => {
   };
 
   const handleDeleteRule = async (rule) => {
-    if (confirm('Are you certain?')) {
+    if (confirm("Are you certain?")) {
       try {
         await mfetchjson(`/api/communities/${community.id}/rules/${rule.id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         });
         setRules(rules.filter((r) => r.id !== rule.id));
       } catch (error) {
@@ -95,12 +109,12 @@ const Rules = ({ community }) => {
     }
   };
 
-  if (loading !== 'loaded') {
+  if (loading !== "loaded") {
     return null;
   }
 
-  const modalTitle = isEditRule ? 'Edit rule' : 'Add rule';
-  const modalDisabled = rule === '';
+  const modalTitle = isEditRule ? "Edit rule" : "Add rule";
+  const modalDisabled = rule === "";
 
   return (
     <div className="modtools-content modtools-rules">
@@ -114,7 +128,9 @@ const Rules = ({ community }) => {
             className="modal-card-content"
             onSubmit={(e) => {
               e.preventDefault();
-              if (!modalDisabled) handleSave();
+              if (!modalDisabled) {
+                handleSave();
+              }
             }}
           >
             <InputWithCount
@@ -132,20 +148,27 @@ const Rules = ({ community }) => {
               maxLength={descriptionMaxLength}
               value={description}
               onChange={setDescription}
-              style={{ resize: 'vertical' }}
+              style={{ resize: "vertical" }}
             />
           </form>
           <div className="modal-card-actions">
-            <button className="button-main" disabled={modalDisabled} onClick={handleSave}>
+            <button
+              type="button"
+              className="button-main"
+              disabled={modalDisabled}
+              onClick={handleSave}
+            >
               Save
             </button>
-            <button onClick={handleEditClose}>Cancel</button>
+            <button type="button" onClick={handleEditClose}>
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>
       <div className="modtools-content-head">
         <div className="modtools-title">Rules</div>
-        <button className="button-main" onClick={handleAddRule}>
+        <button type="button" className="button-main" onClick={handleAddRule}>
           Add rule
         </button>
       </div>
@@ -156,13 +179,22 @@ const Rules = ({ community }) => {
               <div className="table column">{rule.zIndex}</div>
               <div className="table-column">{rule.rule}</div>
               <div className="table-column">{rule.description}</div>
-              <div className="table-column" style={{ display: 'flex', justifyContent: 'center' }}>
-                <button className="button-red" onClick={() => handleDeleteRule(rule)}>
+              <div
+                className="table-column"
+                style={{ display: "flex", justifyContent: "center" }}
+              >
+                <button
+                  type="button"
+                  className="button-red"
+                  onClick={() => handleDeleteRule(rule)}
+                >
                   Delete
                 </button>
               </div>
               <div className="table-column">
-                <button onClick={() => handleEditRule(rule)}>Edit</button>
+                <button type="button" onClick={() => handleEditRule(rule)}>
+                  Edit
+                </button>
               </div>
             </div>
           ))}

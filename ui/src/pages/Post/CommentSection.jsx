@@ -1,11 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { MemorizedComment } from './Comment';
-import { commentsTree, countChildrenReplies } from '../../slices/commentsTree';
-import { useDispatch, useSelector } from 'react-redux';
-import { mfetchjson } from '../../helper';
-import { snackAlertError } from '../../slices/mainSlice';
-import { defaultCommentZIndex, moreCommentsAdded } from '../../slices/commentsSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { mfetchjson } from "../../helper";
+import {
+  defaultCommentZIndex,
+  moreCommentsAdded,
+} from "../../slices/commentsSlice";
+import { commentsTree, countChildrenReplies } from "../../slices/commentsTree";
+import { snackAlertError } from "../../slices/mainSlice";
+import { MemorizedComment } from "./Comment";
 
 const CommentSection = ({
   post,
@@ -37,7 +42,9 @@ const CommentSection = ({
 
   const atOnce = isMobile ? 5 : 20;
   const interval = isMobile ? 250 : 100;
-  const [toRender, setToRender] = useState(noRootComments < atOnce ? noRootComments : atOnce);
+  const [toRender, setToRender] = useState(
+    noRootComments < atOnce ? noRootComments : atOnce,
+  );
   const updateToRender = () => {
     setToRender((r) => {
       if (r + atOnce > noRootComments) {
@@ -59,38 +66,42 @@ const CommentSection = ({
   //   return null;
   // });
   const commentsNext = commentsObj ? commentsObj.next : null;
-  const [moreCommentsLoading, setMoreCommentsLoading] = useState('pre');
+  const [moreCommentsLoading, setMoreCommentsLoading] = useState("pre");
   const handleMoreComments = async () => {
     try {
-      setMoreCommentsLoading('loading');
-      let res, rcomments;
+      setMoreCommentsLoading("loading");
+      let res;
+      let rcomments;
       let next = commentsNext;
       do {
-        res = await mfetchjson(`/api/posts/${post.publicId}/comments?next=${next}`);
+        res = await mfetchjson(
+          `/api/posts/${post.publicId}/comments?next=${next}`,
+        );
         rcomments = [];
         const rootIds = comments.children.map((c) => c.comment.id);
-        res.comments.forEach((c) => {
+        for (const c of res.comments) {
           if (c.depth === 0) {
-            if (!rootIds.includes(c.id)) rcomments.push(c);
-          } else {
-            if (!rootIds.includes(c.ancestors[0])) {
+            if (!rootIds.includes(c.id)) {
               rcomments.push(c);
             }
+          } else if (!rootIds.includes(c.ancestors[0])) {
+            rcomments.push(c);
           }
-        });
+        }
         next = res.next;
       } while (rcomments.length === 0 && next !== null);
       const newtree = commentsTree(rcomments);
       const merged = {
         ...comments,
-        noRepliesRendered: comments.noRepliesRendered + newtree.noRepliesRendered,
+        noRepliesRendered:
+          comments.noRepliesRendered + newtree.noRepliesRendered,
         children: [...comments.children, ...newtree.children],
       };
       dispatch(moreCommentsAdded(post.publicId, merged, next));
     } catch (error) {
       dispatch(snackAlertError(error));
     } finally {
-      setMoreCommentsLoading('pre');
+      setMoreCommentsLoading("pre");
     }
   };
 
@@ -120,7 +131,7 @@ const CommentSection = ({
           canVote={canVote}
           canComment={canComment}
           imageHeight={imageHeight}
-        />
+        />,
       );
     }
     if (noRootComments > _toRender) {
@@ -135,7 +146,9 @@ const CommentSection = ({
 
   // const totalRenders = useRef(0);
   const moreCommentsText =
-    moreCommentsLoading === 'loading' ? 'loading...' : `${noMoreReplies} more comments`;
+    moreCommentsLoading === "loading"
+      ? "loading..."
+      : `${noMoreReplies} more comments`;
 
   return (
     <div className="post-comments-comments">
@@ -143,9 +156,13 @@ const CommentSection = ({
       <h3>Total Renders: {totalRenders.current++}</h3>
       <h3>Total Rendered Comments: {comments.noRepliesRendered}</h3>
   */}
-      {comments && comments.children && renderComments()}
+      {comments?.children && renderComments()}
       {noMoreReplies > 0 && (
-        <button className="button-main post-comments-more-button" onClick={handleMoreComments}>
+        <button
+          type="button"
+          className="button-main post-comments-more-button"
+          onClick={handleMoreComments}
+        >
           {moreCommentsText}
         </button>
       )}

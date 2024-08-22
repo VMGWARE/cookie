@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import Badge from './Badge';
-import Modal from '../../components/Modal';
-import { ButtonClose } from '../../components/Button';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useState } from "react";
+import { ButtonClose } from "../../components/Button";
+import Modal from "../../components/Modal";
+import Badge from "./Badge";
 
 function BadgesList({ user }) {
   const { badges } = user;
@@ -16,13 +18,16 @@ function BadgesList({ user }) {
     setModalOpen(true);
   };
 
-  let modalTitle, modalDesc;
+  let modalTitle;
+  let modalDesc;
   if (selectedBadge) {
     switch (selectedBadge.type) {
-      case 'supporter':
-        modalTitle = 'Supporter';
-        modalDesc = 'This user is a Patreon supporter, helping to keep Discuit always free of ads.';
+      case "supporter": {
+        modalTitle = "Supporter";
+        modalDesc =
+          "This user is a Patreon supporter, helping to keep Discuit always free of ads.";
         break;
+      }
       default:
         throw new Error(`unkown badge type '${selectedBadge.type}'`);
     }
@@ -33,7 +38,10 @@ function BadgesList({ user }) {
       <Modal open={modalOpen} onClose={handleModalClose}>
         <div className="modal-card is-compact-mobile is-center modal-badges">
           <div className="modal-badges-head">
-            <ButtonClose className="modal-badges-close" onClick={handleModalClose} />
+            <ButtonClose
+              className="modal-badges-close"
+              onClick={handleModalClose}
+            />
             <Badge badge={selectedBadge} />
           </div>
           <div className="modal-badges-body">
@@ -44,7 +52,11 @@ function BadgesList({ user }) {
       </Modal>
       <div className="user-badges-items">
         {badges.map((badge) => (
-          <Badge key={badge.id} badge={badge} onClick={() => handleBadgeClick(badge)} />
+          <Badge
+            key={badge.id}
+            badge={badge}
+            onClick={() => handleBadgeClick(badge)}
+          />
         ))}
       </div>
     </div>

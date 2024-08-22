@@ -9,16 +9,27 @@ const node = {
 */
 
 export function searchTree(root, commentId, commentDepth) {
-  if (root.comment && root.comment.id === commentId) return root;
-  if (!root.children || root.children.length === 0) return null;
-  if (commentDepth !== undefined && root.children[0].comment.depth > commentDepth) return null;
-  for (let i = 0; i < root.children.length; i++) {
-    const node = root.children[i];
+  if (root.comment && root.comment.id === commentId) {
+    return root;
+  }
+  if (!root.children || root.children.length === 0) {
+    return null;
+  }
+  if (
+    commentDepth !== undefined &&
+    root.children[0].comment.depth > commentDepth
+  ) {
+    return null;
+  }
+  for (const node of root.children) {
     if (node.comment.id === commentId) {
       return node;
-    } else if (node.children) {
+    }
+    if (node.children) {
       const hit = searchTree(node, commentId, commentDepth);
-      if (hit) return hit;
+      if (hit) {
+        return hit;
+      }
     }
   }
   return null;
@@ -36,7 +47,9 @@ export function Node(comment, children = [], parent = null) {
 
 function pushComment(node, comment, pushToFront = false) {
   const newNode = new Node(comment, null, node);
-  if (!node.children) node.children = [];
+  if (!node.children) {
+    node.children = [];
+  }
   if (pushToFront) {
     node.children.unshift(newNode);
   } else {
@@ -45,26 +58,29 @@ function pushComment(node, comment, pushToFront = false) {
   return newNode;
 }
 
-export function commentsTree(comments = [], root) {
-  if (root === undefined) root = new Node(null);
-  if (comments === null || comments === undefined) return root;
+export function commentsTree(comments = [], root = new Node(null)) {
+  if (comments === null || comments === undefined) {
+    return root;
+  }
   const partials = []; // array of roots
-  for (let i = 0; i < comments.length; i++) {
-    const parentId = comments[i].parentId;
+  for (const comment of comments) {
+    const parentId = comment.parentId;
     if (parentId === null) {
-      pushComment(root, comments[i]);
+      pushComment(root, comment);
     } else {
-      let hit = searchTree(root, parentId, comments[i].depth);
+      let hit = searchTree(root, parentId, comment.depth);
       if (!hit) {
-        for (let j = 0; j < partials.length; j++) {
-          hit = searchTree(partials[j], parentId, comments[i].depth);
-          if (hit) break;
+        for (const partial of partials) {
+          hit = searchTree(partial, parentId, comment.depth);
+          if (hit) {
+            break;
+          }
         }
       }
       if (hit) {
-        pushComment(hit, comments[i]);
+        pushComment(hit, comment);
       } else {
-        partials.push(new Node(comments[i]));
+        partials.push(new Node(comment));
       }
     }
   }
@@ -74,10 +90,12 @@ export function commentsTree(comments = [], root) {
 }
 
 function updateNoRendered(root) {
-  if (!root.children) return 0;
+  if (!root.children) {
+    return 0;
+  }
   let no = root.children.length;
-  for (let i = 0; i < root.children.length; i++) {
-    no += updateNoRendered(root.children[i]);
+  for (const child of root.children) {
+    no += updateNoRendered(child);
   }
   root.noRepliesRendered = no;
   return no;
@@ -87,11 +105,15 @@ function mergeTrees(root, partials = []) {
   const all = [root, ...partials];
   for (let i = 0; i < partials.length; i++) {
     const { parentId, depth } = partials[i].comment;
-    for (let j = 0; j < all.length; j++) {
-      if (all[j] === undefined) continue;
-      const hit = searchTree(all[j], parentId, depth);
+    for (const item of all) {
+      if (item === undefined) {
+        continue;
+      }
+      const hit = searchTree(item, parentId, depth);
       if (hit) {
-        if (!hit.children) hit.children = [];
+        if (!hit.children) {
+          hit.children = [];
+        }
         partials[i].parent = hit;
         hit.children.push({ ...partials[i] });
         delete partials[i];
@@ -100,16 +122,20 @@ function mergeTrees(root, partials = []) {
     }
   }
   // check
-  partials.forEach((p) => {
-    if (p !== undefined) console.error('Comments tree: orphaned node');
-  });
+  for (const p of partials) {
+    if (p !== undefined) {
+      console.error("Comments tree: orphaned node");
+    }
+  }
   return root;
 }
 
 function updateNoReplies(node) {
   let parent = node.parent;
   while (parent) {
-    if (parent.comment) parent.comment.noReplies++; // could be root
+    if (parent.comment) {
+      parent.comment.noReplies++; // could be root
+    }
     parent.noRepliesRendered++;
     parent = parent.parent;
   }
@@ -148,8 +174,8 @@ export function countChildrenReplies(node) {
   let n = 0;
   if (node.children) {
     n = node.children.length;
-    for (let i = 0; i < node.children.length; i++) {
-      n += node.children[i].comment.noReplies;
+    for (const child of node.children) {
+      n += child.comment.noReplies;
     }
   }
   return n;

@@ -1,54 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { createCommunityModalOpened, signupModalOpened } from '../../slices/mainSlice';
-import Link from '../../components/Link';
-import MiniFooter from '../../components/MiniFooter';
-import Sidebar from '../../components/Sidebar';
-import PostsFeed from '../../views/PostsFeed';
-import LoginForm from '../../views/LoginForm';
-import WelcomeBanner from '../../views/WelcomeBanner';
-import { ButtonClose } from '../../components/Button';
-import { isDeviceIos, isDeviceStandalone } from '../../helper';
-import { showAppInstallButton } from '../../slices/mainSlice';
-import Modal from '../../components/Modal';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { ButtonClose } from "../../components/Button";
+import Link from "../../components/Link";
+import MiniFooter from "../../components/MiniFooter";
+import Modal from "../../components/Modal";
+import Sidebar from "../../components/Sidebar";
+import { isDeviceIos, isDeviceStandalone } from "../../helper";
+import { createCommunityModalOpened } from "../../slices/mainSlice";
+import { showAppInstallButton } from "../../slices/mainSlice";
+import LoginForm from "../../views/LoginForm";
+import PostsFeed from "../../views/PostsFeed";
+import WelcomeBanner from "../../views/WelcomeBanner";
 
 const Home = () => {
   const user = useSelector((state) => state.main.user);
   const loggedIn = user !== null;
-  const canCreateForum = loggedIn && (user.isAdmin || !CONFIG.disableForumCreation);
-  
+  const canCreateForum =
+    loggedIn && (user.isAdmin || !CONFIG.disableForumCreation);
+
   const location = useLocation();
   const feedType = (() => {
-    let f = 'all';
+    let f = "all";
     if (loggedIn) {
-      f = location.pathname === '/' ? user.homeFeed : location.pathname.substring(1);
+      f =
+        location.pathname === "/"
+          ? user.homeFeed
+          : location.pathname.substring(1);
     }
     return f;
   })();
 
   const { show: showInstallPrompt, deferredPrompt } = useSelector(
-    (state) => state.main.appInstallButton
+    (state) => state.main.appInstallButton,
   );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!isDeviceStandalone()) {
-      if ('onbeforeinstallprompt' in window) {
-        window.addEventListener('beforeinstallprompt', (e) => {
+      if ("onbeforeinstallprompt" in window) {
+        window.addEventListener("beforeinstallprompt", (e) => {
           e.preventDefault();
           dispatch(showAppInstallButton(true, e));
         });
-        if (window.appData && window.appData.deferredInstallPrompt) {
-          dispatch(showAppInstallButton(true, window.appData.deferredInstallPrompt));
+        if (window.appData?.deferredInstallPrompt) {
+          dispatch(
+            showAppInstallButton(true, window.appData.deferredInstallPrompt),
+          );
         }
-      } else {
-        // probably iOS
-        if (isDeviceIos()) {
-          dispatch(showAppInstallButton(true));
-        }
+      } else if (isDeviceIos()) {
+        dispatch(showAppInstallButton(true));
       }
     }
   }, []);
@@ -60,8 +65,13 @@ const Home = () => {
         {showInstallPrompt && (
           <div className="banner-install is-m">
             {/*<ButtonClose className="banner-button-close" />*/}
-            <div className="banner-install-text">Get the app for a better experience.</div>
-            <ButtonAppInstall className="banner-install-button" deferredPrompt={deferredPrompt}>
+            <div className="banner-install-text">
+              Get the app for a better experience.
+            </div>
+            <ButtonAppInstall
+              className="banner-install-button"
+              deferredPrompt={deferredPrompt}
+            >
               Install
             </ButtonAppInstall>
           </div>
@@ -75,7 +85,7 @@ const Home = () => {
           <>
             <Link
               onClick={() => dispatch(createCommunityModalOpened())}
-              className={'button button-main home-btn-new-post is-m'}
+              className={"button button-main home-btn-new-post is-m"}
             >
               Create community
             </Link>
@@ -137,11 +147,15 @@ export const ButtonAppInstall = ({ deferredPrompt, children, ...props }) => {
                 <li>2. Tap on "Add to Home Screen."</li>
                 <li>3. Tap on "Add."</li>
               </ol>
-              <p>Note that web apps on iOS can only be installed using Safari.</p>
+              <p>
+                Note that web apps on iOS can only be installed using Safari.
+              </p>
             </div>
           </div>
           <div className="modal-card-actions">
-            <button onClick={handleIosModalClose}>Close</button>
+            <button type="button" onClick={handleIosModalClose}>
+              Close
+            </button>
           </div>
         </div>
       </Modal>

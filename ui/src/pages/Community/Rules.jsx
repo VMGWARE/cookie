@@ -1,6 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import MarkdownBody from '../../components/MarkdownBody';
+import PropTypes from "prop-types";
+import React from "react";
+import MarkdownBody from "../../components/MarkdownBody";
 
 export const RulesItems = ({ rules, unordered = false }) => {
   let orules = rules;
@@ -19,7 +19,7 @@ export const RulesItems = ({ rules, unordered = false }) => {
         <React.Fragment key={rule.id}>
           <div>{i + 1}.</div>
           <div>{renderText(rule.rule)}</div>
-          <div></div>
+          <div />
           <div>{renderText(rule.description)}</div>
         </React.Fragment>
       ))}

@@ -1,11 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Link from '../../components/Link';
-import TimeAgo from '../../components/TimeAgo';
-import { kRound, stringCount } from '../../helper';
-import MarkdownBody from '../../components/MarkdownBody';
-import ShowMoreBox from '../../components/ShowMoreBox';
-import CommunityLink from '../../components/PostCard/CommunityLink';
+import PropTypes from "prop-types";
+import React from "react";
+import Link from "../../components/Link";
+import MarkdownBody from "../../components/MarkdownBody";
+import ShowMoreBox from "../../components/ShowMoreBox";
+import TimeAgo from "../../components/TimeAgo";
+import { kRound, stringCount } from "../../helper";
 
 const Comment = ({ comment, onRemoveFromList = null }) => {
   return (
@@ -23,7 +22,10 @@ const Comment = ({ comment, onRemoveFromList = null }) => {
         </Link>
         <span>in</span>
         {/*<CommunityLink name={comment.communityName} />*/}
-        <Link to={`/${CONFIG.communityPrefix}${comment.communityName}`} style={{ color: 'inherit', fontWeight: '600' }}>
+        <Link
+          to={`/${CONFIG.communityPrefix}${comment.communityName}`}
+          style={{ color: "inherit", fontWeight: "600" }}
+        >
           {comment.communityName}
         </Link>
         <span>
@@ -40,13 +42,17 @@ const Comment = ({ comment, onRemoveFromList = null }) => {
       </Link>
       <div className="comment-footer">
         <div className="comment-score">
-          {`${kRound(comment.upvotes)} ${stringCount(comment.upvotes, true, 'upvote')} • ${kRound(
-            comment.downvotes
-          )} ${stringCount(comment.downvotes, true, 'downvote')}`}
+          {`${kRound(comment.upvotes)} ${stringCount(comment.upvotes, true, "upvote")} • ${kRound(
+            comment.downvotes,
+          )} ${stringCount(comment.downvotes, true, "downvote")}`}
         </div>
         <div className="comment-remove">
           {onRemoveFromList && (
-            <button className="button-clear" onClick={() => onRemoveFromList(comment.id)}>
+            <button
+              type="button"
+              className="button-clear"
+              onClick={() => onRemoveFromList(comment.id)}
+            >
               Remove
             </button>
           )}

@@ -1,30 +1,41 @@
-/* eslint-disable react/display-name */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import AddComment from './AddComment';
-import { useDispatch } from 'react-redux';
-import { kRound, mfetchjson, stringCount, toTitleCase, userGroupSingular } from '../../helper';
-import Dropdown from '../../components/Dropdown';
+import PropTypes from "prop-types";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import Dropdown from "../../components/Dropdown";
+import MarkdownBody from "../../components/MarkdownBody";
+import ModalConfirm from "../../components/Modal/ModalConfirm";
+import ReportModal from "../../components/ReportModal";
+import ShowMoreBox from "../../components/ShowMoreBox";
+import TimeAgo from "../../components/TimeAgo";
+import UserProPic, {
+  GhostUserProPic,
+  UserLink,
+} from "../../components/UserProPic";
+import { LinkOrDiv } from "../../components/Utils";
+import {
+  kRound,
+  mfetchjson,
+  stringCount,
+  toTitleCase,
+  userGroupSingular,
+} from "../../helper";
+import { useVoting } from "../../hooks";
+import {
+  newCommentAdded,
+  replyCommentsAdded,
+} from "../../slices/commentsSlice";
+import { countChildrenReplies } from "../../slices/commentsTree";
 import {
   loginPromptToggled,
   saveToListModalOpened,
   snackAlert,
   snackAlertError,
-} from '../../slices/mainSlice';
-import TimeAgo from '../../components/TimeAgo';
-import ModalConfirm from '../../components/Modal/ModalConfirm';
-import ReportModal from '../../components/ReportModal';
-import { countChildrenReplies } from '../../slices/commentsTree';
-import MarkdownBody from '../../components/MarkdownBody';
-import ShowMoreBox from '../../components/ShowMoreBox';
-import { newCommentAdded, replyCommentsAdded } from '../../slices/commentsSlice';
-import { useVoting } from '../../hooks';
-import UserProPic, { GhostUserProPic, UserLink } from '../../components/UserProPic';
-import { LinkOrDiv } from '../../components/Utils';
-import { userHasSupporterBadge } from '../User';
-import CommentShareButton, { CommentShareDropdownItems } from './CommentShareButton';
+} from "../../slices/mainSlice";
+import { userHasSupporterBadge } from "../User";
+import AddComment from "./AddComment";
+import CommentShareButton, {
+  CommentShareDropdownItems,
+} from "./CommentShareButton";
 
 const Diagnostics = false; // process.env.NODE_ENV !== 'production';
 const MaxCommentDepth = 15;
@@ -64,7 +75,7 @@ const Comment = ({
     });
   };
 
-  const commentShareURL = `/${CONFIG.communityPrefix}${community.name}/post/${postId}/${comment.id}`;
+  const commentShareUrl = `/${CONFIG.communityPrefix}${community.name}/post/${postId}/${comment.id}`;
 
   const deleted = comment.deletedAt !== null;
 
@@ -98,11 +109,11 @@ const Comment = ({
     setComment(newComment);
   };
 
-  const [deleteAs, setDeleteAs] = useState('normal');
+  const [deleteAs, setDeleteAs] = useState("normal");
   const [confirmDeleteOpen, _setConfirmDeleteOpen] = useState(false);
-  const setConfirmDeleteOpen = (newConfirm, deleteAs = 'normal') => {
+  const setConfirmDeleteOpen = (newConfirm, deleteAs = "normal") => {
     if (newConfirm === false) {
-      setDeleteAs('normal');
+      setDeleteAs("normal");
     } else {
       setDeleteAs(deleteAs);
     }
@@ -113,8 +124,8 @@ const Comment = ({
       const rcomm = await mfetchjson(
         `/api/posts/${comment.postId}/comments/${comment.id}?deleteAs=${deleteAs}`,
         {
-          method: 'DELETE',
-        }
+          method: "DELETE",
+        },
       );
       _setComment(rcomm);
     } catch (error) {
@@ -125,9 +136,9 @@ const Comment = ({
   };
 
   const { upvotes, downvotes, vote, doVote } = useVoting(
-    comment.userVoted ? (comment.userVotedUp ? true : false) : null,
+    comment.userVoted ? comment.userVotedUp : null,
     comment.upvotes,
-    comment.downvotes
+    comment.downvotes,
   );
   const handleVote = (up = true) => {
     if (!loggedIn) {
@@ -135,14 +146,14 @@ const Comment = ({
       return;
     }
     if (deleted) {
-      dispatch(snackAlert("Can't vote on a deleted comment!", 'novotedeleted'));
+      dispatch(snackAlert("Can't vote on a deleted comment!", "novotedeleted"));
       return;
     }
     doVote(
       up,
       async () =>
-        mfetchjson('/api/_commentVote', {
-          method: 'POST',
+        mfetchjson("/api/_commentVote", {
+          method: "POST",
           body: JSON.stringify({
             commentId: comment.id,
             up,
@@ -153,20 +164,22 @@ const Comment = ({
       },
       (error) => {
         dispatch(snackAlertError(error));
-      }
+      },
     );
   };
 
   const [userGroup, setUserGroup] = useState(comment.userGroup);
   useEffect(() => {
-    if (comment.userGroup === userGroup) return;
+    if (comment.userGroup === userGroup) {
+      return;
+    }
     (async () => {
       try {
         const rcomm = await mfetchjson(
           `/api/posts/${comment.postId}/comments/${comment.id}?action=changeAsUser&userGroup=${userGroup}`,
           {
-            method: 'PUT',
-          }
+            method: "PUT",
+          },
         );
         setComment(rcomm);
       } catch (error) {
@@ -175,7 +188,7 @@ const Comment = ({
     })();
   }, [userGroup]);
 
-  const [collapsed, setCollapsed] = useState(node.collapsed || false);
+  const [collapsed, setCollapsed] = useState(!!node.collapsed);
   const collapsedRef = useRef(null);
   useEffect(() => {
     const navBarHeight = 100; // roughly
@@ -201,10 +214,14 @@ const Comment = ({
 
   const [isRepliesLoading, setIsRepliesLoading] = useState(false);
   const handleLoadReplies = async () => {
-    if (isRepliesLoading) return;
+    if (isRepliesLoading) {
+      return;
+    }
     try {
       setIsRepliesLoading(true);
-      const newComments = await mfetchjson(`/api/posts/${postId}/comments?parentId=${comment.id}`);
+      const newComments = await mfetchjson(
+        `/api/posts/${postId}/comments?parentId=${comment.id}`,
+      );
       dispatch(replyCommentsAdded(postId, newComments));
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -222,7 +239,9 @@ const Comment = ({
         window.scrollTo(0, pos);
       } else {
         const pos =
-          document.documentElement.scrollTop + div.current.getBoundingClientRect().top - 100;
+          document.documentElement.scrollTop +
+          div.current.getBoundingClientRect().top -
+          100;
         window.scrollTo(0, pos);
       }
     }
@@ -238,30 +257,39 @@ const Comment = ({
     }
   };
 
-  const isOP = (() => {
+  const isOp = (() => {
     const postAuthorId = post.userDeleted ? post.userGhostId : post.userId;
-    const commentAuthorId = comment.userDeleted ? comment.userGhostId : comment.userId;
+    const commentAuthorId = comment.userDeleted
+      ? comment.userGhostId
+      : comment.userId;
     return postAuthorId === commentAuthorId;
   })();
-  const isUsernameHidden = purged || mutedUserHidden || (comment.userDeleted && !isAdmin);
+  const isUsernameHidden =
+    purged || mutedUserHidden || (comment.userDeleted && !isAdmin);
   let username = comment.username;
   if (isUsernameHidden) {
     if (comment.isAuthorMuted) {
-      username = 'Muted';
+      username = "Muted";
     } else if (comment.userDeleted) {
-      username = 'Ghost';
+      username = "Ghost";
     } else {
-      username = 'Hidden';
+      username = "Hidden";
     }
   }
 
-  if (Diagnostics) console.log('Comment rendering.');
+  if (Diagnostics) {
+    console.info("Comment rendering.");
+  }
 
   const showAuthorProPic = user ? !user.hideUserProfilePictures : true;
   const proPicRef = useRef(null);
   const renderAuthorProPic = () => {
     if (!showAuthorProPic) {
-      return <div className={'post-comment-collapse-minus' + (collapsed ? ' is-plus' : '')}></div>;
+      return (
+        <div
+          className={`post-comment-collapse-minus ${collapsed ? "is-plus" : ""}`}
+        />
+      );
     }
     if (!comment.userDeleted && comment.author) {
       const { author } = comment;
@@ -289,11 +317,7 @@ const Comment = ({
     // username.
     return (
       <UserLink
-        className={
-          'post-comment-username' +
-          (isUsernameHidden ? ' is-hidden' : '') +
-          (comment.userDeleted && !isUsernameHidden ? ' is-red' : '')
-        }
+        className={`post-comment-username ${isUsernameHidden ? "is-hidden" : ""} ${comment.userDeleted && !isUsernameHidden ? "is-red" : ""}`}
         username={username}
         proPic={comment.author ? comment.author.proPic : null}
         proPicGhost={isUsernameHidden}
@@ -306,12 +330,12 @@ const Comment = ({
   };
 
   const isAuthorSupporter = userHasSupporterBadge(comment.author);
-  const topDivClassname = 'post-comment' + (showAuthorProPic ? ' has-propics' : '');
+  const topDivClassname = `post-comment ${showAuthorProPic ? "has-propics" : ""}`;
   if (collapsed) {
     return (
       <div
         ref={collapsedRef}
-        className={topDivClassname + ' is-collapsed'}
+        className={`${topDivClassname} is-collapsed`}
         onClick={() => handleCollapse(false)}
       >
         <div className="post-comment-left">
@@ -320,8 +344,11 @@ const Comment = ({
         <div className="post-comment-body">
           <div className="post-comment-body-head">
             {renderAuthorUsername()}
-            {isOP && (
-              <div className="post-comment-head-item post-comment-is-op" title="Original poster">
+            {isOp && (
+              <div
+                className="post-comment-head-item post-comment-is-op"
+                title="Original poster"
+              >
                 OP
               </div>
             )}
@@ -336,7 +363,7 @@ const Comment = ({
               'point'
             )}`}</div>*/}
             <div className="post-comment-head-item">
-              {stringCount(comment.noReplies, false, 'reply', 'replies')}
+              {stringCount(comment.noReplies, false, "reply", "replies")}
             </div>
             {/*{!deleted && comment.userGroup !== 'normal' && (
               <div className="post-comment-head-item post-comment-user-group">
@@ -346,7 +373,7 @@ const Comment = ({
             <div
               className="post-comment-head-item post-comment-collapse-minus is-plus"
               onClick={() => handleCollapse(false)}
-            ></div>
+            />
           </div>
         </div>
       </div>
@@ -354,23 +381,25 @@ const Comment = ({
   }
 
   const handleSave = () => {
-    dispatch(saveToListModalOpened(comment.id, 'comment'));
+    dispatch(saveToListModalOpened(comment.id, "comment"));
   };
 
   const upCls = {};
   const downCls = {};
   if (vote === true) {
-    upCls.color = 'var(--color-voted)';
-    upCls.background = 'rgba(var(--base-brand), 0.2)';
+    upCls.color = "var(--color-voted)";
+    upCls.background = "rgba(var(--base-brand), 0.2)";
   } else if (vote === false) {
-    downCls.color = 'var(--color-voted-down)';
-    downCls.background = 'rgba(var(--base-brand), 0.2)';
+    downCls.color = "var(--color-voted-down)";
+    downCls.background = "rgba(var(--base-brand), 0.2)";
   }
 
   const userMod = community ? community.userMod : false;
 
-  let deletedText = '';
-  if (deleted) deletedText = `Deleted by ${userGroupSingular(comment.deletedAs, true)}`;
+  let deletedText = "";
+  if (deleted) {
+    deletedText = `Deleted by ${userGroupSingular(comment.deletedAs, true)}`;
+  }
   const disabled = !(canVote && !comment.deletedAt);
   const noRepliesRenderedDirect = children ? children.length : 0;
   const noChildrenReplies = countChildrenReplies(node);
@@ -381,22 +410,28 @@ const Comment = ({
 
   const getModActionsItems = (disabled = false) => {
     const checkboxId = `ch-mods-${comment.id}`;
-    const cls = (str = '') => {
-      return 'dropdown-item' + (disabled ? ' is-disabled' : '') + (str ? ` ${str}` : '');
+    const cls = (str = "") => {
+      return `dropdown-item ${disabled ? "is-disabled" : ""} ${str ? str : ""}`;
     };
     return (
       <>
-        <div className={cls()} onClick={() => !disabled && setConfirmDeleteOpen(true, 'mods')}>
+        <div
+          className={cls()}
+          onClick={() => !disabled && setConfirmDeleteOpen(true, "mods")}
+        >
           Delete
         </div>
         {user.id === comment.userId && (
-          <div className={cls('is-non-reactive')}>
+          <div className={cls("is-non-reactive")}>
             <div className="checkbox">
               <input
                 id={checkboxId}
                 type="checkbox"
-                checked={comment.userGroup === 'mods' ? true : false}
-                onChange={(e) => !disabled && setUserGroup(e.target.checked ? 'mods' : 'normal')}
+                checked={comment.userGroup === "mods"}
+                onChange={(e) =>
+                  !disabled &&
+                  setUserGroup(e.target.checked ? "mods" : "normal")
+                }
                 disabled={disabled}
               />
               <label htmlFor={checkboxId}>Speaking officially</label>
@@ -411,7 +446,10 @@ const Comment = ({
     const checkboxId = `ch-admins-${comment.id}`;
     return (
       <>
-        <div className="dropdown-item" onClick={() => setConfirmDeleteOpen(true, 'admins')}>
+        <div
+          className="dropdown-item"
+          onClick={() => setConfirmDeleteOpen(true, "admins")}
+        >
           Delete
         </div>
         {user.id === comment.userId && (
@@ -420,14 +458,19 @@ const Comment = ({
               <input
                 id={checkboxId}
                 type="checkbox"
-                checked={comment.userGroup === 'admins' ? true : false}
-                onChange={(e) => setUserGroup(e.target.checked ? 'admins' : 'normal')}
+                checked={comment.userGroup === "admins"}
+                onChange={(e) =>
+                  setUserGroup(e.target.checked ? "admins" : "normal")
+                }
               />
               <label htmlFor={checkboxId}>Speaking officially</label>
             </div>
           </div>
         )}
-        <div className="dropdown-item" onClick={() => alert(`ID: ${comment.id}`)}>
+        <div
+          className="dropdown-item"
+          onClick={() => alert(`ID: ${comment.id}`)}
+        >
           Comment ID
         </div>
       </>
@@ -453,7 +496,7 @@ const Comment = ({
 
   return (
     <div
-      className={topDivClassname + ` is-depth-${comment.depth}`}
+      className={`${topDivClassname} is-depth-${comment.depth}`}
       style={style}
       id={comment.id}
       ref={div}
@@ -470,23 +513,32 @@ const Comment = ({
         <div className="post-comment-collapse" onClick={handleLineClick}>
           {/*<div className="post-comment-collapse-minus"></div>*/}
           {renderAuthorProPic()}
-          <div className="post-comment-line"></div>
+          <div className="post-comment-line" />
         </div>
       </div>
       <div className="post-comment-body">
         <div className="post-comment-body-head">
           {renderAuthorUsername()}
-          {isOP && (
-            <div className="post-comment-head-item post-comment-is-op" title="Original poster">
+          {isOp && (
+            <div
+              className="post-comment-head-item post-comment-is-op"
+              title="Original poster"
+            >
               OP
             </div>
           )}
-          <TimeAgo className="post-comment-head-item" time={comment.createdAt} short={isMobile} />
-          {!purged && ['normal', 'null'].find((v) => v === comment.userGroup) === undefined && (
-            <div className="post-comment-head-item post-comment-user-group">
-              {`${toTitleCase(userGroupSingular(comment.userGroup, isMobile))}`}
-            </div>
-          )}
+          <TimeAgo
+            className="post-comment-head-item"
+            time={comment.createdAt}
+            short={isMobile}
+          />
+          {!purged &&
+            ["normal", "null"].find((v) => v === comment.userGroup) ===
+              undefined && (
+              <div className="post-comment-head-item post-comment-user-group">
+                {`${toTitleCase(userGroupSingular(comment.userGroup, isMobile))}`}
+              </div>
+            )}
           {showEditedSign && (
             <TimeAgo
               className="post-comment-head-item"
@@ -499,7 +551,7 @@ const Comment = ({
           <div
             className="post-comment-head-item post-comment-collapse-minus"
             onClick={() => handleCollapse(true)}
-          ></div>
+          />
         </div>
         {isEditing && (
           <AddComment
@@ -514,23 +566,23 @@ const Comment = ({
         )}
         {!isEditing && (
           <div
-            className={
-              'post-comment-text' +
-              (focused ? ' is-focused' : '') +
-              (deleted && !purged ? ' is-red' : '')
-            }
+            className={`post-comment-text ${focused ? "is-focused" : ""} ${deleted && !purged ? "is-red" : ""}`}
             onClick={handleCommentTextClick}
             style={{
               opacity: mutedUserHidden ? 0.8 : 1,
-              cursor: mutedUserHidden ? 'pointer' : 'auto',
+              cursor: mutedUserHidden ? "pointer" : "auto",
             }}
           >
             {!purged && (
               <ShowMoreBox showButton maxHeight="500px">
-                <MarkdownBody>{mutedUserHidden ? mutedText : comment.body}</MarkdownBody>
+                <MarkdownBody>
+                  {mutedUserHidden ? mutedText : comment.body}
+                </MarkdownBody>
               </ShowMoreBox>
             )}
-            {deleted && <div className="post-comment-text-sign">{deletedText}</div>}
+            {deleted && (
+              <div className="post-comment-text-sign">{deletedText}</div>
+            )}
           </div>
         )}
         {Diagnostics && (
@@ -542,8 +594,12 @@ const Comment = ({
             <div>{`NoRenderedDirect: ${noRepliesRenderedDirect}`}</div>
           </div>
         )}
-        <div className="post-comment-buttons" style={{ position: 'relative', zIndex: 2000000 }}>
+        <div
+          className="post-comment-buttons"
+          style={{ position: "relative", zIndex: 2000000 }}
+        >
           <button
+            type="button"
             className="button-text post-comment-buttons-vote is-up"
             style={upCls}
             disabled={disabled}
@@ -566,10 +622,11 @@ const Comment = ({
               />
             </svg>
           </button>
-          <div className={'post-comment-points' + (deleted ? ' is-grayed' : '')}>
+          <div className={`post-comment-points ${deleted ? "is-grayed" : ""}`}>
             {kRound(upvotes)}
           </div>
           <button
+            type="button"
             className="button-text post-comment-buttons-vote"
             style={downCls}
             disabled={disabled}
@@ -592,12 +649,17 @@ const Comment = ({
               />
             </svg>
           </button>
-          <div className="post-comment-points is-grayed">{kRound(downvotes)}</div>
+          <div className="post-comment-points is-grayed">
+            {kRound(downvotes)}
+          </div>
           {!deleted && (
             <button
+              type="button"
               className="button-text"
               onClick={handleOnReply}
-              title={comment.depth === MaxCommentDepth ? 'Thread too deep.' : ''}
+              title={
+                comment.depth === MaxCommentDepth ? "Thread too deep." : ""
+              }
               disabled={!canComment || comment.depth === MaxCommentDepth}
             >
               Reply
@@ -615,21 +677,33 @@ const Comment = ({
                   noButton
                 />
               )}
-              <Dropdown target={<button className="button-text">More</button>}>
+              <Dropdown
+                target={
+                  <button type="button" className="button-text">
+                    More
+                  </button>
+                }
+              >
                 <div className="dropdown-list">
-                  <CommentShareDropdownItems url={commentShareURL} />
+                  <CommentShareDropdownItems url={commentShareUrl} />
                   {showEditDelete && (
                     <>
                       <div className="dropdown-item" onClick={handleOnEdit}>
                         Edit
                       </div>
-                      <div className="dropdown-item" onClick={() => setConfirmDeleteOpen(true)}>
+                      <div
+                        className="dropdown-item"
+                        onClick={() => setConfirmDeleteOpen(true)}
+                      >
                         Delete
                       </div>
                     </>
                   )}
                   {showReport && (
-                    <div className="dropdown-item" onClick={() => setReportModalOpen(true)}>
+                    <div
+                      className="dropdown-item"
+                      onClick={() => setReportModalOpen(true)}
+                    >
                       Report
                     </div>
                   )}
@@ -640,7 +714,9 @@ const Comment = ({
                   )}
                   {isAdmin && (
                     <>
-                      <div className="dropdown-item is-topic">Admin actions</div>
+                      <div className="dropdown-item is-topic">
+                        Admin actions
+                      </div>
                       {getAdminActionsItems()}
                     </>
                   )}
@@ -654,31 +730,51 @@ const Comment = ({
               </Dropdown>
             </>
           )}
-          {!deleted && !isMobile && (
+          {!(deleted || isMobile) && (
             <>
-              <CommentShareButton url={commentShareURL} prefix="Share via " />
+              <CommentShareButton url={commentShareUrl} prefix="Share via " />
               {showEditDelete && (
                 <>
-                  <button className="button-text" onClick={handleOnEdit}>
+                  <button
+                    type="button"
+                    className="button-text"
+                    onClick={handleOnEdit}
+                  >
                     Edit
                   </button>
-                  <button className="button-text" onClick={() => setConfirmDeleteOpen(true)}>
+                  <button
+                    type="button"
+                    className="button-text"
+                    onClick={() => setConfirmDeleteOpen(true)}
+                  >
                     Delete
                   </button>
                 </>
               )}
               {showReport && (
-                <ReportModal target={comment} targetType="comment" disabled={isBanned} />
+                <ReportModal
+                  target={comment}
+                  targetType="comment"
+                  disabled={isBanned}
+                />
               )}
               {loggedIn && (
-                <button className="button-text" onClick={handleSave}>
+                <button
+                  type="button"
+                  className="button-text"
+                  onClick={handleSave}
+                >
                   Save
                 </button>
               )}
               {isAdmin && (
                 <Dropdown
                   target={
-                    <button className="button-text" style={{ color: 'var(--color-red)' }}>
+                    <button
+                      type="button"
+                      className="button-text"
+                      style={{ color: "var(--color-red)" }}
+                    >
                       Admin actions
                     </button>
                   }
@@ -687,14 +783,22 @@ const Comment = ({
                 </Dropdown>
               )}
               {isAdmin && !userMod && (
-                <button className="button-text" style={{ color: 'rgb(var(--base-6))' }}>
+                <button
+                  type="button"
+                  className="button-text"
+                  style={{ color: "rgb(var(--base-6))" }}
+                >
                   Mod actions
                 </button>
               )}
               {userMod && (
                 <Dropdown
                   target={
-                    <button className="button-text" style={{ color: 'var(--color-red)' }}>
+                    <button
+                      type="button"
+                      className="button-text"
+                      style={{ color: "var(--color-red)" }}
+                    >
                       Mod actions
                     </button>
                   }
@@ -714,30 +818,30 @@ const Comment = ({
             onCancel={() => setIsReplying(false)}
           />
         )}
-        {children &&
-          children.map((n, i) => (
-            <Comment
-              post={post}
-              user={user}
-              community={community}
-              key={n.comment.id}
-              zIndex={1000000 - i}
-              focusId={focusId}
-              node={n}
-              isMobile={isMobile}
-              isAdmin={isAdmin}
-              isBanned={isBanned}
-              canVote={canVote}
-              canComment={canComment}
-            />
-          ))}
+        {children?.map((n, i) => (
+          <Comment
+            post={post}
+            user={user}
+            community={community}
+            key={n.comment.id}
+            zIndex={1000000 - i}
+            focusId={focusId}
+            node={n}
+            isMobile={isMobile}
+            isAdmin={isAdmin}
+            isBanned={isBanned}
+            canVote={canVote}
+            canComment={canComment}
+          />
+        ))}
         {noMoreComments > 0 && (
           <button
+            type="button"
             className="button-clear button-link post-comment-more"
             onClick={handleLoadReplies}
             disabled={isRepliesLoading}
           >
-            {isRepliesLoading ? 'loading...' : `${noMoreComments} more replies`}
+            {isRepliesLoading ? "loading..." : `${noMoreComments} more replies`}
           </button>
         )}
       </div>

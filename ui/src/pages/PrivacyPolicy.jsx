@@ -1,5 +1,6 @@
-import React from 'react';
-import StaticPage from '../components/StaticPage';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import StaticPage from "../components/StaticPage";
 
 const PrivacyPolicy = () => {
   return (
@@ -8,8 +9,8 @@ const PrivacyPolicy = () => {
         <h1>Privacy Policy</h1>
         <h2>What information we collect</h2>
         <p>
-          To make your experience using {CONFIG.siteName} better, we collect information from your
-          interactions with our website.
+          To make your experience using {CONFIG.siteName} better, we collect
+          information from your interactions with our website.
         </p>
         <p>Information we collect from all visitors to our website includes:</p>
         <ul>
@@ -19,9 +20,10 @@ const PrivacyPolicy = () => {
         </ul>
         <h2>What we do with your information</h2>
         <p>
-          Some of this information is neccessary for the website to work, and some improve existing
-          functionality and provide insight into future improvements, and some are neccessary for
-          security reasons like combating malicious user activity.
+          Some of this information is neccessary for the website to work, and
+          some improve existing functionality and provide insight into future
+          improvements, and some are neccessary for security reasons like
+          combating malicious user activity.
         </p>
         <h2>Changes to this policy</h2>
         <p>We reserve the right to revise this Privacy Policy at any time.</p>

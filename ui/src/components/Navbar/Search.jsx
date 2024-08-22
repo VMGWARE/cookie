@@ -1,42 +1,46 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { onKeyEnter } from '../../helper';
-import { ButtonClose, ButtonSearch } from '../Button';
-import Modal from '../Modal';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { onKeyEnter } from "../../helper";
+import { ButtonClose, ButtonSearch } from "../Button";
+import Modal from "../Modal";
 
-const Search = ({ autoFocus = false }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+const Search = () => {
+  const [searchQuery, setSearchQuery] = useState("");
 
   const inputRef = useRef(null);
   useEffect(() => {
     const onKeyDown = (e) => {
       const active = document.activeElement;
-      if (active.nodeName === 'BODY' && e.key === '/') {
+      if (active.nodeName === "BODY" && e.key === "/") {
         inputRef.current.focus();
         e.preventDefault();
       }
     };
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, []);
 
   const [searchModalOpen, setSearchModalOpen] = useState(false);
-  const getGoogleURL = (query) => {
+  const getGoogleUrl = (query) => {
     const q = encodeURIComponent(`${query} site:${window.location.hostname}`);
     return `https://www.google.com/search?q=${q}`;
   };
   // Fallback on Google search until search is implemented.
   const handleSearch = () => {
-    const win = window.open(getGoogleURL(searchQuery), '_blank');
-    if (!win || win.closed || typeof win.closed === 'undefined') {
+    const win = window.open(getGoogleUrl(searchQuery), "_blank");
+    if (!win || win.closed || typeof win.closed === "undefined") {
       // poppup was blocked
       setSearchModalOpen(true);
     }
   };
   const linkRef = useCallback((node) => {
-    if (node !== null) setTimeout(() => node.focus(), 10);
+    if (node !== null) {
+      setTimeout(() => node.focus(), 10);
+    }
   });
 
   return (
@@ -48,13 +52,13 @@ const Search = ({ autoFocus = false }) => {
             <ButtonClose onClick={() => setSearchModalOpen(false)} />
           </div>
           <div className="modal-card-content">
-            <p style={{ marginBottom: 'var(--gap)' }}>
+            <p style={{ marginBottom: "var(--gap)" }}>
               {`Search is yet to be implemented, but you can click the button below to search on
               Google. It'll show only results from this website.`}
             </p>
             <a
               className="button button-main"
-              href={getGoogleURL(searchQuery)}
+              href={getGoogleUrl(searchQuery)}
               target="_blank"
               rel="noreferrer"
               ref={linkRef}
@@ -67,7 +71,6 @@ const Search = ({ autoFocus = false }) => {
       </Modal>
       <div className="input-search">
         <input
-          autoFocus={autoFocus}
           ref={inputRef}
           type="text"
           placeholder="Search"

@@ -1,10 +1,12 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
 const YoutubeEmbed = ({ url }) => {
   // Render only if the div is in view.
   const [ref, inView] = useInView({
-    rootMargin: '200px 0px',
+    rootMargin: "200px 0px",
     threshold: 0,
     initialInView: false,
   });
@@ -33,28 +35,35 @@ const YoutubeEmbed = ({ url }) => {
     return null;
   }
 
-  let videoId = '';
+  let videoId = "";
   const u = new URL(url);
-  if (['youtube.com', 'www.youtube.com', 'm.youtube.com'].includes(u.hostname)) {
+  if (
+    ["youtube.com", "www.youtube.com", "m.youtube.com"].includes(u.hostname)
+  ) {
     // fix embeds for shorts/live, which seem to only appear on youtube.com and not youtu.be
-    let pathArray = u.pathname.split('/');
-    if (pathArray.includes('shorts') || pathArray.includes('live')) {
+    const pathArray = u.pathname.split("/");
+    if (pathArray.includes("shorts") || pathArray.includes("live")) {
       videoId = pathArray[2];
     } else {
       const params = new URLSearchParams(u.search);
-      videoId = params.get('v');
+      videoId = params.get("v");
     }
-  } else if (u.hostname === 'youtu.be' || u.hostname === 'www.youtu.be') {
+  } else if (u.hostname === "youtu.be" || u.hostname === "www.youtu.be") {
     videoId = u.pathname;
   }
 
   return (
-    <div className="post-card-embed" ref={outerRef} style={{ height: size.height }}>
+    <div
+      className="post-card-embed"
+      ref={outerRef}
+      style={{ height: size.height }}
+    >
       <div ref={ref}>
         {(inView || renderedOnce) && (
           <iframe
+            title="YouTube embed"
             style={{
-              visibility: iframeLoaded ? 'visible' : 'hidden',
+              visibility: iframeLoaded ? "visible" : "hidden",
             }}
             onLoad={() => setIframeLoaded(true)}
             width={size.width}
@@ -63,7 +72,7 @@ const YoutubeEmbed = ({ url }) => {
             frameBorder="0"
             allow="accelerometer; autoplay;clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-          ></iframe>
+          />
         )}
       </div>
     </div>
@@ -75,14 +84,19 @@ export default function getEmbedComponent(link) {
     isEmbed: false,
     render: null,
     hostnames: [],
-    url: '',
+    url: "",
   };
   if (!link) {
     return ret;
   }
   const mapping = {
     youtube: {
-      hostnames: ['youtube.com', 'www.youtube.com', 'youtu.be', 'm.youtube.com'],
+      hostnames: [
+        "youtube.com",
+        "www.youtube.com",
+        "youtu.be",
+        "m.youtube.com",
+      ],
       render: YoutubeEmbed,
     },
     // vimeo: {

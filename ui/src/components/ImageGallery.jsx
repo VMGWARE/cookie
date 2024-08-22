@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 
 const ImageGallery = ({
   className,
@@ -28,7 +30,9 @@ const ImageGallery = ({
   }, [currentImageIndex]);
 
   const renderImages = () => {
-    let img1, img2, img3;
+    let img1;
+    let img2;
+    let img3;
     if (Array.isArray(children)) {
       img2 = children[currentImageIndex];
       if (currentImageIndex > 0) {
@@ -42,9 +46,15 @@ const ImageGallery = ({
     }
     return (
       <div className="image-gallery-images">
-        <div className="image-gallery-image flex flex-center is-slot-1">{img1}</div>
-        <div className="image-gallery-image flex flex-center is-slot-2">{img2}</div>
-        <div className="image-gallery-image flex flex-center is-slot-3">{img3}</div>
+        <div className="image-gallery-image flex flex-center is-slot-1">
+          {img1}
+        </div>
+        <div className="image-gallery-image flex flex-center is-slot-2">
+          {img2}
+        </div>
+        <div className="image-gallery-image flex flex-center is-slot-3">
+          {img3}
+        </div>
       </div>
     );
   };
@@ -54,9 +64,9 @@ const ImageGallery = ({
     for (let i = 0; i < numImages; i++) {
       dots.push(
         <div
-          className={'image-gallery-dot' + (currentImageIndex === i ? ' is-highlighted' : '')}
+          className={`image-gallery-dot ${currentImageIndex === i ? "is-highlighted" : ""}`}
           key={`dot-${i}`}
-        ></div>
+        />,
       );
     }
     return <div className="image-gallery-dots">{dots}</div>;
@@ -69,31 +79,36 @@ const ImageGallery = ({
     if (keyboardControlsOn) {
       const f = (event) => {
         if (
-          event.target.nodeName === 'TEXTAREA' ||
-          event.target.nodeName === 'INPUT' ||
+          event.target.nodeName === "TEXTAREA" ||
+          event.target.nodeName === "INPUT" ||
           event.target.isContentEditable
         ) {
           return;
         }
-        if (showLeftArrow && event.key === 'ArrowLeft') {
+        if (showLeftArrow && event.key === "ArrowLeft") {
           setCurrentImageIndex((n) => n - 1);
         }
-        if (showRightArrow && event.key === 'ArrowRight') {
+        if (showRightArrow && event.key === "ArrowRight") {
           setCurrentImageIndex((n) => n + 1);
         }
       };
-      window.addEventListener('keydown', f);
+      window.addEventListener("keydown", f);
       return () => {
-        window.removeEventListener('keydown', f);
+        window.removeEventListener("keydown", f);
       };
     }
   }, [showLeftArrow, showRightArrow, keyboardControlsOn]);
 
   return (
-    <div className={'image-gallery' + (className ? ` ${className}` : '')} {...props}>
+    <div
+      className={`image-gallery ${className ? ` ${className}` : ""}`}
+      {...props}
+    >
       <div
         className="image-gallery-next-btn is-button is-previous"
-        onClick={() => setCurrentImageIndex(showLeftArrow ? (n) => n - 1 : numImages - 1)}
+        onClick={() =>
+          setCurrentImageIndex(showLeftArrow ? (n) => n - 1 : numImages - 1)
+        }
       >
         {nextIcon}
       </div>

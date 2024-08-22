@@ -1,4 +1,4 @@
-@use 'mixins';
+@use "mixins";
 
 :root {
     --profile-picture-hover-opacity: 0.3;
@@ -18,7 +18,7 @@
         border-radius: 50%;
     }
     &::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -147,7 +147,11 @@ a {
         }
     }
     &.is-guest {
-        background: radial-gradient(circle, rgb(106, 21, 217) 0%, rgb(110, 3, 247) 100%);
+        background: radial-gradient(
+            circle,
+            rgb(106, 21, 217) 0%,
+            rgb(110, 3, 247) 100%
+        );
         color: #fff;
         button,
         .button {
@@ -183,7 +187,9 @@ a {
         align-items: center;
         &.is-sticky {
             position: sticky;
-            top: calc(var(--navbar-height) + var(--gap)); // var(--page-top-margin);
+            top: calc(
+                var(--navbar-height) + var(--gap)
+            ); // var(--page-top-margin);
             left: 0;
         }
     }

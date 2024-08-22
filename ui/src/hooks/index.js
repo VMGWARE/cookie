@@ -1,8 +1,15 @@
-import { useInsertionEffect, useReducer, useRef } from 'react';
-import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
-import { useLocation } from 'react-router';
-import { APIError, mfetch, mfetchjson, usernameLegalLetters } from '../helper/index.js';
+import { useInsertionEffect, useReducer, useRef } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { useLocation } from "react-router";
+import {
+  ApiError,
+  mfetch,
+  mfetchjson,
+  usernameLegalLetters,
+} from "../helper/index.js";
+import { selectUsersLists, usersListsAdded } from "../slices/listsSlice.js";
 import {
   muteCommunity,
   muteUser,
@@ -11,10 +18,8 @@ import {
   snackAlertError,
   unmuteCommunity,
   unmuteUser,
-} from '../slices/mainSlice.js';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectUser, userAdded } from '../slices/usersSlice.js';
-import { selectUsersLists, usersListsAdded } from '../slices/listsSlice.js';
+} from "../slices/mainSlice.js";
+import { selectUser, userAdded } from "../slices/usersSlice.js";
 
 export function useDelayedEffect(callback, deps, delay = 1000) {
   const [timer, setTimer] = useState(null);
@@ -29,16 +34,21 @@ export function useDelayedEffect(callback, deps, delay = 1000) {
   }, deps);
 }
 
-export function useInputUsername(maxLength, initialUsername = '') {
+export function useInputUsername(maxLength, initialUsername = "") {
   const [value, setValue] = useState(initialUsername);
   const handleChange = (e) => {
     e.preventDefault();
     const { value } = e.target;
-    for (let i = 0; i < value.length; i++) {
+    for (const usernameChar of value) {
       let found = false;
-      for (let j = 0; j < usernameLegalLetters.length; j++)
-        if (value[i] === usernameLegalLetters[j]) found = true;
-      if (!found) return;
+      for (const legalLetter of usernameLegalLetters) {
+        if (usernameChar === legalLetter) {
+          found = true;
+        }
+      }
+      if (!found) {
+        return;
+      }
     }
     if (value.length <= maxLength) {
       setValue(value);
@@ -58,8 +68,8 @@ export function useWindowSize() {
   const [size, setSize] = useState(getSize());
   useEffect(() => {
     const listner = () => setSize(getSize());
-    window.addEventListener('resize', listner);
-    return () => window.removeEventListener('resize', listner);
+    window.addEventListener("resize", listner);
+    return () => window.removeEventListener("resize", listner);
   }, []);
 
   return size;
@@ -79,17 +89,19 @@ export function useIsMobile(breakpoint = mobileBreakpointWidth) {
   return useWindowWidth() <= breakpoint;
 }
 
-export function useLoading(initialState = 'initial', timeout = 80) {
+export function useLoading(initialState = "initial", timeout = 80) {
   const [loading, setLoading] = useState(initialState);
   useEffect(() => {
     if (loading === initialState) {
       setTimeout(
         () =>
           setLoading((loading) => {
-            if (loading === initialState) return 'loading';
+            if (loading === initialState) {
+              return "loading";
+            }
             return loading;
           }),
-        timeout
+        timeout,
       );
     }
   }, [loading]);
@@ -102,18 +114,20 @@ export function usePagination(initial = 1) {
 
   const query = useQuery();
   let page = initial;
-  if (query.has('page')) {
-    const n = parseInt(query.get('page'));
-    if (!isNaN(n)) page = n;
+  if (query.has("page")) {
+    const n = Number.parseInt(query.get("page"));
+    if (!Number.isNaN(n)) {
+      page = n;
+    }
   }
 
   const setPage = (n, clearOtherParms = false) => {
-    let path = '';
+    let path = "";
     if (clearOtherParms) {
       path = `${history.location.pathname}?page=${n}`;
     } else {
       const params = new URLSearchParams(history.location.search);
-      params.set('page', n);
+      params.set("page", n);
       path = `${history.location.pathname}?${params.toString()}`;
     }
     history.push(path);
@@ -129,7 +143,9 @@ export function useQuery() {
 export function useIsChanged(deps = []) {
   const [c, setC] = useState(0);
   useEffect(() => {
-    if (c < 3) setC((c) => c + 1);
+    if (c < 3) {
+      setC((c) => c + 1);
+    }
   }, deps);
   const resetChanged = () => setC(1);
   return [c > 1, resetChanged];
@@ -153,17 +169,22 @@ export function useVoting(initialVote, initialUpvotes, initialDownvotes) {
       let { upvotes, downvotes, vote } = prev;
       if (vote === null) {
         vote = up;
-        if (up) upvotes++;
-        else downvotes++;
-      } else {
-        if (vote === true) {
-          vote = up ? null : false;
-          upvotes--;
-          if (!up) downvotes++;
+        if (up) {
+          upvotes++;
         } else {
-          vote = up ? true : null;
-          downvotes--;
-          if (up) upvotes++;
+          downvotes++;
+        }
+      } else if (vote === true) {
+        vote = up ? null : false;
+        upvotes--;
+        if (!up) {
+          downvotes++;
+        }
+      } else {
+        vote = up ? true : null;
+        downvotes--;
+        if (up) {
+          upvotes++;
         }
       }
       return {
@@ -176,7 +197,9 @@ export function useVoting(initialVote, initialUpvotes, initialDownvotes) {
 
   const [requesting, setRequesting] = useState(false);
   const doVote = async (up, fetch, onSuccess, onFailure) => {
-    if (requesting) return;
+    if (requesting) {
+      return;
+    }
     setRequesting(true);
     const prev = {
       ...state,
@@ -207,24 +230,24 @@ export function useEscapeKeydown(callback, condition = true) {
   useEffect(() => {
     if (condition) {
       const listner = (e) => {
-        if (condition && e.key === 'Escape') {
+        if (condition && e.key === "Escape") {
           callback(e);
           e.stopPropagation();
         }
       };
-      window.addEventListener('keydown', listner);
+      window.addEventListener("keydown", listner);
       return () => {
-        window.removeEventListener('keydown', listner);
+        window.removeEventListener("keydown", listner);
       };
     }
   }, [condition]);
 }
 
 function removeCanonicalTag() {
-  const metaTags = Array.from(document.head.querySelectorAll('meta'));
-  for (let i = 0; i < metaTags.length; i++) {
-    if (metaTags[i].getAttribute('rel') === 'canonical') {
-      metaTags[i].remove();
+  const metaTags = Array.from(document.head.querySelectorAll("meta"));
+  for (const metaTag of metaTags) {
+    if (metaTag.getAttribute("rel") === "canonical") {
+      metaTag.remove();
       return true;
     }
   }
@@ -235,9 +258,9 @@ export function useCanonicalTag(href, deps) {
   useEffect(() => {
     removeCanonicalTag();
     if (href) {
-      const tag = document.createElement('meta');
-      tag.setAttribute('rel', 'canonical');
-      tag.setAttribute('href', href);
+      const tag = document.createElement("meta");
+      tag.setAttribute("rel", "canonical");
+      tag.setAttribute("href", href);
       document.head.append(tag);
     }
   }, deps);
@@ -269,13 +292,18 @@ export function useImageLoaded(imgSrc) {
   return [loaded, handleLoad];
 }
 
-function changeMetaColorTheme(theme = 'light') {
-  Array.from(document.head.querySelectorAll('meta[name="theme-color"]')).forEach((item) =>
-    item.remove()
+function changeMetaColorTheme() {
+  for (const item of Array.from(
+    document.head.querySelectorAll('meta[name="theme-color"]'),
+  )) {
+    item.remove();
+  }
+  const meta = document.createElement("meta");
+  meta.setAttribute("name", "theme-color");
+  meta.setAttribute(
+    "content",
+    getComputedStyle(document.body).getPropertyValue("--color-bg"),
   );
-  const meta = document.createElement('meta');
-  meta.setAttribute('name', 'theme-color');
-  meta.setAttribute('content', getComputedStyle(document.body).getPropertyValue('--color-bg'));
   document.head.appendChild(meta);
 }
 
@@ -283,45 +311,47 @@ function changeMetaColorTheme(theme = 'light') {
 // be bugs.
 export function useTheme() {
   const getUserColorSchemePreference = () => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
     }
-    return 'light';
+    return "light";
   };
   const getLocalStorageTheme = () => {
-    const t = localStorage.getItem('theme');
-    if (t === 'light' || t === 'dark') {
+    const t = localStorage.getItem("theme");
+    if (t === "light" || t === "dark") {
       return t;
     }
     return getUserColorSchemePreference();
   };
   const [theme, setTheme] = useState(getLocalStorageTheme()); // always either 'light' or 'dark'
   useEffect(() => {
-    if (theme === 'light') {
-      document.documentElement.classList.remove('theme-dark');
+    if (theme === "light") {
+      document.documentElement.classList.remove("theme-dark");
     } else {
-      document.documentElement.classList.add('theme-dark');
+      document.documentElement.classList.add("theme-dark");
     }
     if (theme === getUserColorSchemePreference()) {
       // No persistence is necessary if theme matches OS/browser preferences
-      localStorage.removeItem('theme');
+      localStorage.removeItem("theme");
     } else {
-      localStorage.setItem('theme', theme);
+      localStorage.setItem("theme", theme);
     }
     changeMetaColorTheme(theme);
   }, [theme]);
   useEffect(() => {
-    if (!window.matchMedia) return;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (!window.matchMedia) {
+      return;
+    }
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const listner = () => {
       setTheme(getLocalStorageTheme());
     };
-    mediaQuery.addEventListener('change', listner);
+    mediaQuery.addEventListener("change", listner);
     return () => {
-      mediaQuery.removeEventListener('change', listner);
+      mediaQuery.removeEventListener("change", listner);
     };
   }, []);
-  const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
+  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
   return { theme, setTheme, toggleTheme };
 }
 
@@ -340,7 +370,7 @@ export function useMuteUser({ userId, username }) {
   return {
     isMuted,
     toggleMute,
-    displayText: (isMuted ? 'Unmute' : 'Mute') + ` @${username}`,
+    displayText: `${isMuted ? "Unmute" : "Mute"} @${username}`,
   };
 }
 
@@ -354,7 +384,7 @@ export function useMuteCommunity({ communityId, communityName }) {
   return {
     isMuted,
     toggleMute,
-    displayText: (isMuted ? 'Unmute' : 'Mute') + ` /${communityName}`,
+    displayText: `${isMuted ? "Unmute" : "Mute"} /${communityName}`,
   };
 }
 
@@ -383,7 +413,7 @@ export function useFetchUser(username, showSnackAlertOnError = true) {
             setLoading(false);
             return;
           }
-          throw new APIError(res.status, await res.json());
+          throw new ApiError(res.status, await res.json());
         }
         dispatch(userAdded(await res.json()));
       } catch (error) {
@@ -418,7 +448,7 @@ export function useFetchUsersLists(username, showSnackAlertOnError = true) {
       try {
         setError(null);
         const lists = await mfetchjson(
-          `/api/users/${username}/lists?sort=${order}&filter=${filter}`
+          `/api/users/${username}/lists?sort=${order}&filter=${filter}`,
         );
         dispatch(usersListsAdded(username, lists, order, filter));
       } catch (error) {

@@ -1,6 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { useImageLoaded } from '../hooks';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useImageLoaded } from "../hooks";
 
 const Image = ({
   className,
@@ -13,8 +14,8 @@ const Image = ({
   ...props
 }) => {
   const [loaded, _handleLoad] = useImageLoaded(src);
-  const divStyle = {},
-    imgStyle = { ...style };
+  const divStyle = {};
+  const imgStyle = { ...style };
   if (!loaded) {
     if (backgroundColor) {
       divStyle.background = backgroundColor;
@@ -29,13 +30,23 @@ const Image = ({
     }
   };
 
-  let cls = 'image';
-  if (isFullSize) cls += ' is-fullsize';
-  if (!loaded) cls += ' is-loading';
+  let cls = "image";
+  if (isFullSize) {
+    cls += " is-fullsize";
+  }
+  if (!loaded) {
+    cls += " is-loading";
+  }
 
   return (
-    <div style={divStyle} className={cls + (className ? ` ${className}` : '')}>
-      <img alt={alt} style={imgStyle} onLoad={handleLoad} src={src} {...props} />
+    <div style={divStyle} className={cls + (className ? ` ${className}` : "")}>
+      <img
+        alt={alt}
+        style={imgStyle}
+        onLoad={handleLoad}
+        src={src}
+        {...props}
+      />
     </div>
   );
 };

@@ -1,20 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Modal from '.';
-import { ButtonClose } from '../Button';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import Modal from ".";
+import { ButtonClose } from "../Button";
 
 const ModalConfirm = ({
   open,
   onClose,
   onConfirm,
   title,
-  yesText = 'Yes',
-  noText = 'No',
+  yesText = "Yes",
+  noText = "No",
   children,
   disableEnter = false,
 }) => {
   const handleKeyDown = (e) => {
-    if (!disableEnter && e.key === 'Enter') {
+    if (!disableEnter && e.key === "Enter") {
       onConfirm();
     }
   };
@@ -28,10 +29,12 @@ const ModalConfirm = ({
         </div>
         <div className="modal-card-content">{children}</div>
         <div className="modal-card-actions">
-          <button className="button-main" onClick={onConfirm}>
+          <button type="button" className="button-main" onClick={onConfirm}>
             {yesText}
           </button>
-          <button onClick={onClose}>{noText}</button>
+          <button type="button" onClick={onClose}>
+            {noText}
+          </button>
         </div>
       </div>
     </Modal>

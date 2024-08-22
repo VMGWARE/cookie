@@ -1,7 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useCallback, useEffect, useState } from "react";
 
-const ShowMoreBox = ({ maxHeight = '300px', children, showButton = false, ...props }) => {
+const ShowMoreBox = ({
+  maxHeight = "300px",
+  children,
+  showButton = false,
+  ...props
+}) => {
   const [overflowing, setOverflowing] = useState(false);
   const [wasOverflowing, setWasOverflowing] = useState(false);
   useEffect(() => {
@@ -11,19 +18,19 @@ const ShowMoreBox = ({ maxHeight = '300px', children, showButton = false, ...pro
     if (node !== null) {
       const overflowing = node.scrollHeight > node.clientHeight;
       setOverflowing(overflowing);
-      if (overflowing && !wasOverflowing) setWasOverflowing(true);
+      if (overflowing && !wasOverflowing) {
+        setWasOverflowing(true);
+      }
     }
   });
   const [showAll, setShowAll] = useState(false);
   return (
     <div
-      className={
-        'showmorebox' + (overflowing ? ' is-overflowing' : '') + (showAll ? ' is-show-all' : '')
-      }
+      className={`showmorebox ${overflowing ? "is-overflowing" : ""} ${showAll ? "is-show-all" : ""}`}
     >
       <div
         className="showmorebox-body"
-        style={{ maxHeight: showAll ? 'none' : maxHeight }}
+        style={{ maxHeight: showAll ? "none" : maxHeight }}
         ref={divRef}
         {...props}
       >
@@ -31,8 +38,12 @@ const ShowMoreBox = ({ maxHeight = '300px', children, showButton = false, ...pro
       </div>
       {showButton && wasOverflowing && (
         <div className="showmorebox-button">
-          <button className="button-clear" onClick={() => setShowAll((x) => !x)}>
-            {showAll ? 'Show less' : 'Show more'}
+          <button
+            type="button"
+            className="button-clear"
+            onClick={() => setShowAll((x) => !x)}
+          >
+            {showAll ? "Show less" : "Show more"}
           </button>
         </div>
       )}

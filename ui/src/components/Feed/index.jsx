@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import FeedItem from './FeedItem';
-import Spinner from '../Spinner';
-import PostCardSkeleton from '../PostCard/PostCardSkeleton';
-import { useInView } from 'react-intersection-observer';
-import { useWindowWidth } from '../../hooks';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useRef } from "react";
+import { useInView } from "react-intersection-observer";
+import { useWindowWidth } from "../../hooks";
+import PostCardSkeleton from "../PostCard/PostCardSkeleton";
+import Spinner from "../Spinner";
+import FeedItem from "./FeedItem";
 
 const Feed = ({
   loading,
@@ -15,7 +17,7 @@ const Feed = ({
   onNext,
   onRenderItem,
   onItemHeightChange,
-  emptyItemsText = 'Nothing to show',
+  emptyItemsText = "Nothing to show",
   banner,
   onRemoveFromList = null,
 }) => {
@@ -37,14 +39,18 @@ const Feed = ({
   useEffect(() => {
     if (!loading) {
       return () => {
-        if (onSaveVisibleItems) onSaveVisibleItems([...itemsInView.current]);
+        if (onSaveVisibleItems) {
+          onSaveVisibleItems([...itemsInView.current]);
+        }
       };
     }
   }, [loading]);
   const handleItemViewChange = (key, inView) => {
     let list = itemsInView.current;
     if (inView) {
-      if (!list.includes(key)) list.push(key);
+      if (!list.includes(key)) {
+        list.push(key);
+      }
     } else {
       list = list.filter((k) => k !== key);
     }
@@ -67,13 +73,13 @@ const Feed = ({
           onRemoveFromList={onRemoveFromList}
         >
           {onRenderItem(item, index)}
-        </FeedItem>
+        </FeedItem>,
       );
       if (banner && index === 1) {
         nodes.push(
           <div key="banner" className="feed-banner is-m">
             {banner}
-          </div>
+          </div>,
         );
       }
     });
@@ -102,8 +108,12 @@ const Feed = ({
           <Spinner />
         </div>
       )}
-      {items.length > 0 && !hasMore && <div className="feed-no-more">No more posts</div>}
-      {items.length === 0 && <div className="card card-padding feed-none">{emptyItemsText}</div>}
+      {items.length > 0 && !hasMore && (
+        <div className="feed-no-more">No more posts</div>
+      )}
+      {items.length === 0 && (
+        <div className="card card-padding feed-none">{emptyItemsText}</div>
+      )}
     </div>
   );
 };

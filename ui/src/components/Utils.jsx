@@ -1,13 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Link from '../components/Link';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import Link from "../components/Link";
 
 const LinkOrDiv = ({
   isLink = true,
   useReactRouter = false,
   href,
-  target = '_blank',
-  rel = 'nofollow noreferrer',
+  target = "_blank",
+  rel = "nofollow noreferrer",
   children,
   ...props
 }) => {

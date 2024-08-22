@@ -1,13 +1,13 @@
-import PostCard from './PostCard.jsx';
-import getEmbedComponent from './embed.jsx';
+import PostCard from "./PostCard.jsx";
+import getEmbedComponent from "./embed.jsx";
 
 const templatePost = {
-  id: '0929348029384034',
-  title: 'This is a template, alright.',
-  body: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui harum pariatur quo et natus doloremque quam nisi ut, cumque, dolorem numquam adipisci totam. Facilis mollitia incidunt cupiditate nemo velit maxime.',
+  id: "0929348029384034",
+  title: "This is a template, alright.",
+  body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui harum pariatur quo et natus doloremque quam nisi ut, cumque, dolorem numquam adipisci totam. Facilis mollitia incidunt cupiditate nemo velit maxime.",
   noComments: 234,
-  communityName: 'funny',
-  createdAt: '2021-04-27T11:44:16.436Z',
+  communityName: "funny",
+  createdAt: "2021-04-27T11:44:16.436Z",
   points: 139,
 };
 

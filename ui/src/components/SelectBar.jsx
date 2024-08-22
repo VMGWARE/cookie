@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { useIsMobile } from '../hooks';
-import Dropdown from './Dropdown';
+import PropTypes from "prop-types";
+import React from "react";
+import { useIsMobile } from "../hooks";
+import Dropdown from "./Dropdown";
 
 const SelectBar = ({ name, options, value, onChange, ...rest }) => {
-  const [id] = useState(`select-${name}-${Date.now().toString().substr(-5)}`);
   const isMobile = useIsMobile();
 
   const handleClick = (value) => {
@@ -18,10 +17,20 @@ const SelectBar = ({ name, options, value, onChange, ...rest }) => {
     return (
       <nav className="select-bar-m">
         <div className="select-bar-name">{name}</div>
-        <Dropdown target={<button className="select-bar-dp-target">Sort: {text}</button>}>
+        <Dropdown
+          target={
+            <button type="button" className="select-bar-dp-target">
+              Sort: {text}
+            </button>
+          }
+        >
           <div className="dropdown-list">
             {options.map((option) => (
-              <div className="dropdown-item" key={option.id} onClick={() => handleClick(option.id)}>
+              <div
+                className="dropdown-item"
+                key={option.id}
+                onClick={() => handleClick(option.id)}
+              >
                 {option.text}
               </div>
             ))}
@@ -35,7 +44,7 @@ const SelectBar = ({ name, options, value, onChange, ...rest }) => {
     const props = {
       key: option.id,
       onClick: () => handleClick(option.id),
-      className: 'button button-text select-bar-item' + (value === option.id ? ' is-selected' : ''),
+      className: `button button-text select-bar-item ${value === option.id ? "is-selected" : ""}`,
     };
     if (option.to) {
       props.href = option.to;
@@ -44,13 +53,15 @@ const SelectBar = ({ name, options, value, onChange, ...rest }) => {
         handleClick(option.id);
       };
     }
-    return React.createElement(option.to ? 'a' : 'div', props, option.text);
+    return React.createElement(option.to ? "a" : "div", props, option.text);
   };
 
   return (
     <nav className="select-bar" {...rest}>
       <div className="select-bar-name">{name}</div>
-      <div className="select-bar-options">{options.map((option) => renderItem(option))}</div>
+      <div className="select-bar-options">
+        {options.map((option) => renderItem(option))}
+      </div>
     </nav>
   );
 };

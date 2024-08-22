@@ -4,11 +4,11 @@ const initialState = {
   feedWidth: 0,
 };
 
-const typePostsAdded = 'posts/typePostsAdded';
-const typeCommentsCountIncremented = 'posts/commentsCountIncremented';
-const typeImageGalleryIndexUpdated = 'posts/imageGalleryIndexUpdated';
+const typePostsAdded = "posts/typePostsAdded";
+const typeCommentsCountIncremented = "posts/commentsCountIncremented";
+const typeImageGalleryIndexUpdated = "posts/imageGalleryIndexUpdated";
 
-export default function postsReducer(state = initialState, action) {
+export default function postsReducer(state = initialState, action = undefined) {
   switch (action.type) {
     case typePostsAdded: {
       const posts = action.payload;
@@ -18,9 +18,9 @@ export default function postsReducer(state = initialState, action) {
       const newItems = {
         ...state.items,
       };
-      posts.forEach((post) => {
+      for (const post of posts) {
         newItems[post.publicId] = preparePost(post);
-      });
+      }
       return {
         ...state,
         ids: [...state.ids, ...newIds],
@@ -88,5 +88,8 @@ export const commentsCountIncremented = (postId) => {
 };
 
 export const postImageGalleryIndexUpdated = (postId, newIndex) => {
-  return { type: typeImageGalleryIndexUpdated, payload: { postId, imageGalleryIndex: newIndex } };
+  return {
+    type: typeImageGalleryIndexUpdated,
+    payload: { postId, imageGalleryIndex: newIndex },
+  };
 };

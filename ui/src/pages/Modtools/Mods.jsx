@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import Modal from '../../components/Modal';
-import { ButtonClose } from '../../components/Button';
-import Input from '../../components/Input';
-import { useSelector } from 'react-redux';
-import { mfetch } from '../../helper';
-import { useDispatch } from 'react-redux';
-import { snackAlertError } from '../../slices/mainSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { ButtonClose } from "../../components/Button";
+import Input from "../../components/Input";
+import Modal from "../../components/Modal";
+import { mfetch } from "../../helper";
+import { snackAlertError } from "../../slices/mainSlice";
 
 const Mods = ({ community }) => {
   const user = useSelector((state) => state.main.user);
@@ -14,17 +16,17 @@ const Mods = ({ community }) => {
 
   const [addModOpen, setAddModOpen] = useState(false);
   const handleAddModClose = () => setAddModOpen(false);
-  const [newModName, setNewModName] = useState('');
+  const [newModName, setNewModName] = useState("");
 
-  const baseURL = `/api/communities/${community.id}/mods`;
+  const baseUrl = `/api/communities/${community.id}/mods`;
 
   const handleAddMod = async (e) => {
     if (e) {
       e.preventDefault();
     }
     try {
-      const res = await mfetch(baseURL, {
-        method: 'POST',
+      const res = await mfetch(baseUrl, {
+        method: "POST",
         body: JSON.stringify({
           username: newModName,
         }),
@@ -33,7 +35,7 @@ const Mods = ({ community }) => {
         alert(`${newModName} added as a mod of ${community.name}`);
         window.location.reload();
       } else if (res.status === 404) {
-        alert('User not found');
+        alert("User not found");
       } else {
         throw new Error(await res.text());
       }
@@ -44,13 +46,15 @@ const Mods = ({ community }) => {
 
   const handleRemoveMod = async (username) => {
     if (
-      !confirm(`Are you sure you want to remove ${username} as a moderator of ${community.name}?`)
+      !confirm(
+        `Are you sure you want to remove ${username} as a moderator of ${community.name}?`,
+      )
     ) {
       return;
     }
     try {
-      const res = await mfetch(`${baseURL}/${username}`, {
-        method: 'DELETE',
+      const res = await mfetch(`${baseUrl}/${username}`, {
+        method: "DELETE",
       });
       if (res.ok) {
         alert(`${username} removed from moderators`);
@@ -89,16 +93,27 @@ const Mods = ({ community }) => {
             />
           </form>
           <div className="modal-card-actions">
-            <button className="button-main" disabled={newModName === ''} onClick={handleAddMod}>
+            <button
+              type="button"
+              className="button-main"
+              disabled={newModName === ""}
+              onClick={handleAddMod}
+            >
               Add mod
             </button>
-            <button onClick={handleAddModClose}>Cancel</button>
+            <button type="button" onClick={handleAddModClose}>
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>
       <div className="modtools-content-head">
         <div className="modtools-title">Mods</div>
-        <button className="button-main" onClick={() => setAddModOpen(true)}>
+        <button
+          type="button"
+          className="button-main"
+          onClick={() => setAddModOpen(true)}
+        >
           Add mod
         </button>
       </div>
@@ -110,7 +125,11 @@ const Mods = ({ community }) => {
               <div className="table-column">{mod.username}</div>
               <div className="table-column">
                 {(myPos <= index || user.isAdmin) && (
-                  <button className="button-red" onClick={() => handleRemoveMod(mod.username)}>
+                  <button
+                    type="button"
+                    className="button-red"
+                    onClick={() => handleRemoveMod(mod.username)}
+                  >
                     Remove
                   </button>
                 )}

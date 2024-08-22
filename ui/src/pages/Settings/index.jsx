@@ -1,9 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { useDispatch, useSelector } from 'react-redux';
-import Input from '../../components/Input';
-import { mfetch, mfetchjson, validEmail } from '../../helper';
-import { useIsChanged } from '../../hooks';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import {
+  getNotificationsPermissions,
+  shouldAskForNotificationsPermissions,
+} from "../../PushNotifications";
+import { ButtonUpload } from "../../components/Button";
+import CommunityProPic from "../../components/CommunityProPic";
+import Dropdown from "../../components/Dropdown";
+import Input from "../../components/Input";
+import CommunityLink from "../../components/PostCard/CommunityLink";
+import { mfetch, mfetchjson, validEmail } from "../../helper";
+import { useIsChanged } from "../../hooks";
 import {
   mutesAdded,
   settingsChanged,
@@ -12,19 +23,10 @@ import {
   unmuteCommunity,
   unmuteUser,
   userLoggedIn,
-} from '../../slices/mainSlice';
-import ChangePassword from './ChangePassword';
-import DeleteAccount from './DeleteAccount';
-import {
-  getNotificationsPermissions,
-  shouldAskForNotificationsPermissions,
-} from '../../PushNotifications';
-import Dropdown from '../../components/Dropdown';
-import CommunityLink from '../../components/PostCard/CommunityLink';
-import { Link } from 'react-router-dom/cjs/react-router-dom.min';
-import { ButtonUpload } from '../../components/Button';
-import CommunityProPic from '../../components/CommunityProPic';
-import { getDevicePreference, setDevicePreference } from './devicePrefs';
+} from "../../slices/mainSlice";
+import ChangePassword from "./ChangePassword";
+import DeleteAccount from "./DeleteAccount";
+import { getDevicePreference, setDevicePreference } from "./devicePrefs";
 
 const Settings = () => {
   const dispatch = useDispatch();
@@ -32,8 +34,8 @@ const Settings = () => {
   const loggedIn = user !== null;
 
   const mutes = useSelector((state) => state.main.mutes);
-  const [aboutMe, setAboutMe] = useState(user.aboutMe || '');
-  const [email, setEmail] = useState(user.email || '');
+  const [aboutMe, setAboutMe] = useState(user.aboutMe || "");
+  const [email, setEmail] = useState(user.email || "");
 
   const [notifsSettings, _setNotifsSettings] = useState({
     upvoteNotifs: !user.upvoteNotificationsOff,
@@ -49,22 +51,24 @@ const Settings = () => {
   };
 
   const homeFeedOptions = {
-    all: 'All',
-    subscriptions: 'Subscriptions',
+    all: "All",
+    subscriptions: "Subscriptions",
   };
   const [homeFeed, setHomeFeed] = useState(user.homeFeed);
 
-  const [rememberFeedSort, setRememberFeedSort] = useState(user.rememberFeedSort);
+  const [rememberFeedSort, setRememberFeedSort] = useState(
+    user.rememberFeedSort,
+  );
   const [enableEmbeds, setEnableEmbeds] = useState(!user.embedsOff);
   const [showUserProfilePictures, setShowUserProfilePictures] = useState(
-    !user.hideUserProfilePictures
+    !user.hideUserProfilePictures,
   );
 
   // Per-device preferences:
-  const [font, setFont] = useState(getDevicePreference('font') ?? 'custom');
+  const [font, setFont] = useState(getDevicePreference("font") ?? "custom");
   const fontOptions = {
-    custom: 'Custom', // value -> display name
-    system: 'System',
+    custom: "Custom", // value -> display name
+    system: "System",
   };
 
   const [changed, resetChanged] = useIsChanged([
@@ -78,37 +82,52 @@ const Settings = () => {
     font,
   ]);
 
-  const applicationServerKey = useSelector((state) => state.main.vapidPublicKey);
+  const applicationServerKey = useSelector(
+    (state) => state.main.vapidPublicKey,
+  );
   const [notificationsPermissions, setNotificationsPermissions] = useState(
-    window.Notification && Notification.permission
+    window.Notification && Notification.permission,
   );
   useEffect(() => {
-    let cleanupFunc,
-      cancelled = false;
+    let cleanupFunc;
+    let cancelled = false;
     const f = async () => {
-      if ('permissions' in navigator) {
-        const status = await navigator.permissions.query({ name: 'notifications' });
+      if ("permissions" in navigator) {
+        const status = await navigator.permissions.query({
+          name: "notifications",
+        });
         const listener = () => {
           if (!cancelled) {
             setNotificationsPermissions(status.state);
           }
         };
-        status.addEventListener('change', listener);
-        cleanupFunc = () => status.removeEventListener('change', listener);
+        status.addEventListener("change", listener);
+        cleanupFunc = () => status.removeEventListener("change", listener);
       }
     };
     f();
     return () => {
       cancelled = true;
-      if (cleanupFunc) cleanupFunc();
+      if (cleanupFunc) {
+        cleanupFunc();
+      }
     };
   }, []);
-  const [canEnableWebPushNotifications, setCanEnableWebPushNotifications] = useState(
-    shouldAskForNotificationsPermissions(loggedIn, applicationServerKey, false)
-  );
+  const [canEnableWebPushNotifications, setCanEnableWebPushNotifications] =
+    useState(
+      shouldAskForNotificationsPermissions(
+        loggedIn,
+        applicationServerKey,
+        false,
+      ),
+    );
   useEffect(() => {
     setCanEnableWebPushNotifications(
-      shouldAskForNotificationsPermissions(loggedIn, applicationServerKey, false)
+      shouldAskForNotificationsPermissions(
+        loggedIn,
+        applicationServerKey,
+        false,
+      ),
     );
   }, [notificationsPermissions]);
 
@@ -116,18 +135,16 @@ const Settings = () => {
     await getNotificationsPermissions(loggedIn, applicationServerKey);
   };
 
-  const handleDisablePushNotifications = () => {};
-
   const handleSave = async () => {
-    if (email !== '' && !validEmail(email)) {
-      dispatch(snackAlert('Please enter a valid email'));
+    if (email !== "" && !validEmail(email)) {
+      dispatch(snackAlert("Please enter a valid email"));
       return;
     }
     // Save device preferences first:
-    setDevicePreference('font', font);
+    setDevicePreference("font", font);
     try {
-      const ruser = await mfetchjson(`/api/_settings?action=updateProfile`, {
-        method: 'POST',
+      const ruser = await mfetchjson("/api/_settings?action=updateProfile", {
+        method: "POST",
         body: JSON.stringify({
           aboutMe,
           upvoteNotificationsOff: !notifsSettings.upvoteNotifs,
@@ -140,7 +157,7 @@ const Settings = () => {
         }),
       });
       dispatch(userLoggedIn(ruser));
-      dispatch(snackAlert('Settings saved.', 'settings_saved'));
+      dispatch(snackAlert("Settings saved.", "settings_saved"));
       resetChanged();
       dispatch(settingsChanged());
     } catch (error) {
@@ -148,7 +165,7 @@ const Settings = () => {
     }
   };
 
-  const proPicAPIEndpoint = `/api/users/${user.username}/pro_pic`;
+  const proPicApiEndpoint = `/api/users/${user.username}/pro_pic`;
   const [isProPicUploading, setIsProPicUploading] = useState(false);
   const handleProPicUpload = async (files) => {
     if (isProPicUploading) {
@@ -156,20 +173,21 @@ const Settings = () => {
     }
     try {
       const formData = new FormData();
-      formData.append('image', files[0]);
+      formData.append("image", files[0]);
       setIsProPicUploading(true);
-      const res = await mfetch(proPicAPIEndpoint, {
-        method: 'POST',
+      const res = await mfetch(proPicApiEndpoint, {
+        method: "POST",
         body: formData,
       });
       if (!res.ok) {
         if (res.status === 400) {
           const error = await res.json();
-          if (error.code === 'file_size_exceeded') {
-            dispatch(snackAlert('Maximum file size exceeded.'));
+          if (error.code === "file_size_exceeded") {
+            dispatch(snackAlert("Maximum file size exceeded."));
             return;
-          } else if (error.code === 'unsupported_image') {
-            dispatch(snackAlert('Unsupported image.'));
+          }
+          if (error.code === "unsupported_image") {
+            dispatch(snackAlert("Unsupported image."));
             return;
           }
           throw new APIError(res.status, await res.json());
@@ -188,7 +206,7 @@ const Settings = () => {
       return;
     }
     try {
-      const ruser = await mfetchjson(proPicAPIEndpoint, { method: 'DELETE' });
+      const ruser = await mfetchjson(proPicApiEndpoint, { method: "DELETE" });
       dispatch(userLoggedIn(ruser));
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -197,7 +215,7 @@ const Settings = () => {
     }
   };
 
-  const handleUnmute = async (mute) => {
+  const handleUnmute = (mute) => {
     // try {
     //   await mfetchjson(`/api/mutes/${mute.id}`, {
     //     method: 'DELETE',
@@ -220,7 +238,7 @@ const Settings = () => {
     // } catch (error) {
     //   dispatch(snackAlertError(error));
     // }
-    if (mute.type === 'community') {
+    if (mute.type === "community") {
       const community = mute.mutedCommunity;
       dispatch(unmuteCommunity(community.id, community.name));
     } else {
@@ -229,10 +247,10 @@ const Settings = () => {
     }
   };
 
-  const handleUnmuteAll = async (type = '') => {
+  const handleUnmuteAll = async (type = "") => {
     try {
       await mfetchjson(`/api/mutes?type=${type}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       // setMutes((mutes) => {
       //   const fieldName = type === 'community' ? 'communityMutes' : 'userMutes';
@@ -252,25 +270,29 @@ const Settings = () => {
   };
 
   const renderMute = (mute) => {
-    if (mute.type === 'community') {
+    if (mute.type === "community") {
       const community = mute.mutedCommunity;
       return (
         <div>
           <CommunityLink name={community.name} proPic={community.proPic} />
-          <button onClick={() => handleUnmute(mute)}>Unmute</button>
+          <button type="button" onClick={() => handleUnmute(mute)}>
+            Unmute
+          </button>
         </div>
       );
     }
-    if (mute.type === 'user') {
+    if (mute.type === "user") {
       const user = mute.mutedUser;
       return (
         <div>
           <Link to={`/@${user.username}`}>@{user.username}</Link>
-          <button onClick={() => handleUnmute(mute)}>Unmute</button>
+          <button type="button" onClick={() => handleUnmute(mute)}>
+            Unmute
+          </button>
         </div>
       );
     }
-    return 'Unkonwn muting type.';
+    return "Unkonwn muting type.";
   };
 
   return (
@@ -281,16 +303,27 @@ const Settings = () => {
       <div className="account-settings card">
         <h1>Account settings</h1>
         <div className="settings-propic">
-          <CommunityProPic name={user.username} proPic={user.proPic} size="standard" />
-          <ButtonUpload onChange={handleProPicUpload} disabled={isProPicUploading}>
+          <CommunityProPic
+            name={user.username}
+            proPic={user.proPic}
+            size="standard"
+          />
+          <ButtonUpload
+            onChange={handleProPicUpload}
+            disabled={isProPicUploading}
+          >
             Change
           </ButtonUpload>
-          <button onClick={handleProPicDelete} disabled={isProPicUploading}>
+          <button
+            type="button"
+            onClick={handleProPicDelete}
+            disabled={isProPicUploading}
+          >
             Delete
           </button>
         </div>
         <div className="flex-column">
-          <Input label="Username" value={user.username || ''} disabled />
+          <Input label="Username" value={user.username || ""} disabled />
           <p className="input-desc">Username cannot be changed.</p>
         </div>
         <div className="flex-column">
@@ -324,14 +357,20 @@ const Settings = () => {
               <Dropdown
                 aligned="right"
                 target={
-                  <button className="select-bar-dp-target">{homeFeedOptions[homeFeed]}</button>
+                  <button type="button" className="select-bar-dp-target">
+                    {homeFeedOptions[homeFeed]}
+                  </button>
                 }
               >
                 <div className="dropdown-list">
                   {Object.keys(homeFeedOptions)
-                    .filter((key) => key != homeFeed)
+                    .filter((key) => key !== homeFeed)
                     .map((key) => (
-                      <div key={key} className="dropdown-item" onClick={() => setHomeFeed(key)}>
+                      <div
+                        key={key}
+                        className="dropdown-item"
+                        onClick={() => setHomeFeed(key)}
+                      >
                         {homeFeedOptions[key]}
                       </div>
                     ))}
@@ -379,11 +418,19 @@ const Settings = () => {
               <div>Font</div>
               <Dropdown
                 aligned="right"
-                target={<button className="select-bar-dp-target">{fontOptions[font]}</button>}
+                target={
+                  <button type="button" className="select-bar-dp-target">
+                    {fontOptions[font]}
+                  </button>
+                }
               >
                 <div className="dropdown-list">
                   {Object.keys(fontOptions).map((key) => (
-                    <div key={key} className="dropdown-item" onClick={() => setFont(key)}>
+                    <div
+                      key={key}
+                      className="dropdown-item"
+                      onClick={() => setFont(key)}
+                    >
                       {fontOptions[key]}
                     </div>
                   ))}
@@ -404,7 +451,9 @@ const Settings = () => {
                 id="c1"
                 type="checkbox"
                 checked={notifsSettings.upvoteNotifs}
-                onChange={(e) => setNotifsSettings('upvoteNotifs', e.target.checked)}
+                onChange={(e) =>
+                  setNotifsSettings("upvoteNotifs", e.target.checked)
+                }
               />
             </div>
             <div className="checkbox is-check-last">
@@ -414,7 +463,9 @@ const Settings = () => {
                 id="c2"
                 type="checkbox"
                 checked={notifsSettings.replyNotifs}
-                onChange={(e) => setNotifsSettings('replyNotifs', e.target.checked)}
+                onChange={(e) =>
+                  setNotifsSettings("replyNotifs", e.target.checked)
+                }
               />
             </div>
             {/*notificationsPermissions === 'granted' && (
@@ -423,7 +474,11 @@ const Settings = () => {
               </button>
             )*/}
             {canEnableWebPushNotifications && (
-              <button onClick={handleEnablePushNotifications} style={{ alignSelf: 'flex-start' }}>
+              <button
+                type="button"
+                onClick={handleEnablePushNotifications}
+                style={{ alignSelf: "flex-start" }}
+              >
                 Enable push notifications
               </button>
             )}
@@ -438,8 +493,9 @@ const Settings = () => {
             {mutes.communityMutes.map((mute) => renderMute(mute))}
             {mutes.communityMutes.length > 0 && (
               <button
-                style={{ alignSelf: 'flex-end' }}
-                onClick={() => handleUnmuteAll('community')}
+                type="button"
+                style={{ alignSelf: "flex-end" }}
+                onClick={() => handleUnmuteAll("community")}
               >
                 Unmute all
               </button>
@@ -454,13 +510,22 @@ const Settings = () => {
             {mutes.userMutes.length === 0 && <div>None</div>}
             {mutes.userMutes.map((mute) => renderMute(mute))}
             {mutes.userMutes.length > 0 && (
-              <button style={{ alignSelf: 'flex-end' }} onClick={() => handleUnmuteAll('user')}>
+              <button
+                type="button"
+                style={{ alignSelf: "flex-end" }}
+                onClick={() => handleUnmuteAll("user")}
+              >
                 Unmute all
               </button>
             )}
           </div>
         </div>
-        <button className="button-main" disabled={!changed} onClick={handleSave}>
+        <button
+          type="button"
+          className="button-main"
+          disabled={!changed}
+          onClick={handleSave}
+        >
           Save
         </button>
       </div>

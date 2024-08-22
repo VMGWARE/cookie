@@ -1,19 +1,26 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { kRound, mfetchjson } from '../../helper';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginPromptToggled, snackAlertError } from '../../slices/mainSlice';
-import { postAdded } from '../../slices/postsSlice';
-import { useVoting } from '../../hooks';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { kRound, mfetchjson } from "../../helper";
+import { useVoting } from "../../hooks";
+import { loginPromptToggled, snackAlertError } from "../../slices/mainSlice";
+import { postAdded } from "../../slices/postsSlice";
 
-const PostVotes = ({ className = '', post, sticky = false, disabled = false, mobile = false }) => {
+const PostVotes = ({
+  className = "",
+  post,
+  sticky = false,
+  disabled = false,
+  mobile = false,
+}) => {
   const loggedIn = useSelector((state) => state.main.user) !== null;
   const dispatch = useDispatch();
 
   const { upvotes, downvotes, vote, doVote } = useVoting(
-    post.userVoted ? (post.userVotedUp ? true : false) : null,
+    post.userVoted ? post.userVotedUp : null,
     post.upvotes,
-    post.downvotes
+    post.downvotes,
   );
 
   const handleVote = (up = true) => {
@@ -24,8 +31,8 @@ const PostVotes = ({ className = '', post, sticky = false, disabled = false, mob
     doVote(
       up,
       async () =>
-        mfetchjson('/api/_postVote', {
-          method: 'POST',
+        mfetchjson("/api/_postVote", {
+          method: "POST",
           body: JSON.stringify({ postId: post.id, up }),
         }),
       (rPost) => {
@@ -33,19 +40,20 @@ const PostVotes = ({ className = '', post, sticky = false, disabled = false, mob
       },
       (error) => {
         dispatch(snackAlertError(error));
-      }
+      },
     );
   };
 
   const points = upvotes - downvotes;
-  const upCls = 'arrow-up' + (vote === true ? ' arrow-voted' : '');
-  const downCls = vote === false ? ' arrow-voted' : '';
+  const upCls = `arrow-up ${vote === true ? "arrow-voted" : ""}`;
+  const downCls = vote === false ? " arrow-voted" : "";
 
   if (mobile) {
     return (
       <div className="post-votes-m">
         <button
-          className={'button-icon post-votes-arrow ' + upCls}
+          type="button"
+          className={`button-icon post-votes-arrow ${upCls}`}
           onClick={() => handleVote()}
           disabled={disabled}
         >
@@ -73,7 +81,8 @@ const PostVotes = ({ className = '', post, sticky = false, disabled = false, mob
           {kRound(points)}
         </div>
         <button
-          className={'button-icon post-votes-arrow ' + downCls}
+          type="button"
+          className={`button-icon post-votes-arrow ${downCls}`}
           onClick={() => handleVote(false)}
           disabled={disabled}
         >
@@ -99,10 +108,11 @@ const PostVotes = ({ className = '', post, sticky = false, disabled = false, mob
   }
 
   return (
-    <div className={'post-votes' + (className === '' ? '' : ' ' + className)}>
-      <div className={'post-votes-content' + (sticky ? ' is-sticky' : '')}>
+    <div className={`post-votes ${className === "" ? "" : className}`}>
+      <div className={`post-votes-content ${sticky ? "is-sticky" : ""}`}>
         <button
-          className={'button-clear post-votes-arrow ' + upCls}
+          type="button"
+          className={`button-clear post-votes-arrow ${upCls}`}
           onClick={() => handleVote()}
           disabled={disabled}
         >
@@ -126,7 +136,8 @@ const PostVotes = ({ className = '', post, sticky = false, disabled = false, mob
           {kRound(points)}
         </div>
         <button
-          className={'button-clear post-votes-arrow ' + downCls}
+          type="button"
+          className={`button-clear post-votes-arrow ${downCls}`}
           onClick={() => handleVote(false)}
           disabled={disabled}
         >

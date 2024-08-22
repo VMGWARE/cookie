@@ -1,9 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { mfetchjson } from '../../helper';
-import { loginPromptToggled, snackAlertError } from '../../slices/mainSlice';
-import { communityAdded } from '../../slices/communitiesSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { mfetchjson } from "../../helper";
+import { communityAdded } from "../../slices/communitiesSlice";
+import { loginPromptToggled, snackAlertError } from "../../slices/mainSlice";
 
 const JoinButton = ({ className, community, ...rest }) => {
   const loggedIn = useSelector((state) => state.main.user) !== null;
@@ -20,8 +21,8 @@ const JoinButton = ({ className, community, ...rest }) => {
       return;
     }
     try {
-      const rcomm = await mfetchjson('/api/_joinCommunity', {
-        method: 'POST',
+      const rcomm = await mfetchjson("/api/_joinCommunity", {
+        method: "POST",
         body: JSON.stringify({ communityId: community.id, leave: joined }),
       });
       dispatch(communityAdded(rcomm));
@@ -30,12 +31,14 @@ const JoinButton = ({ className, community, ...rest }) => {
     }
   };
 
-  let cls = joined ? '' : 'button-main';
-  if (className) cls += ` ${className}`;
+  let cls = joined ? "" : "button-main";
+  if (className) {
+    cls += ` ${className}`;
+  }
 
   return (
     <button onClick={handleFollow} className={cls} {...rest}>
-      {joined ? 'Joined' : 'Join'}
+      {joined ? "Joined" : "Join"}
     </button>
   );
 };

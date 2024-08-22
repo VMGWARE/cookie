@@ -1,17 +1,28 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet-async';
-import Footer from './Footer';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
+import Footer from "./Footer";
 
-const StaticPage = ({ className, children, title, noWrap = false, ...props }) => {
+const StaticPage = ({
+  className,
+  children,
+  title,
+  noWrap = false,
+  ...props
+}) => {
   useEffect(() => {
-    document.body.classList.add('is-not-gray');
+    document.body.classList.add("is-not-gray");
     return () => {
-      document.body.classList.remove('is-not-gray');
+      document.body.classList.remove("is-not-gray");
     };
   }, []);
   return (
-    <div className={'page-content page-static' + (className ? ` ${className}` : '')} {...props}>
+    <div
+      className={`page-content page-static ${className ? className : ""}`}
+      {...props}
+    >
       <Helmet>
         <title>{title}</title>
       </Helmet>
@@ -23,7 +34,10 @@ const StaticPage = ({ className, children, title, noWrap = false, ...props }) =>
 
 StaticPage.propTypes = {
   className: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]).isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.arrayOf(PropTypes.node),
+  ]).isRequired,
   title: PropTypes.string,
   noWrap: PropTypes.bool,
   description: PropTypes.string,

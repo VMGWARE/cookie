@@ -1,5 +1,5 @@
-import React from 'react';
-
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
 export const HelpCardCommunity = () => {
   return (
     <div className="newpost-help card-gray">
