@@ -1,5 +1,6 @@
-import React from 'react';
-import StaticPage from '../components/StaticPage';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import StaticPage from "../components/StaticPage";
 
 const MarkdownGuide = () => {
   return (
@@ -7,19 +8,27 @@ const MarkdownGuide = () => {
       <div className="document">
         <h1>Markdown guide</h1>
         <p>
-          {'We use '}
-          <a href="https://en.wikipedia.org/wiki/Markdown" target="_blank" rel="noreferrer">
+          {"We use "}
+          <a
+            href="https://en.wikipedia.org/wiki/Markdown"
+            target="_blank"
+            rel="noreferrer"
+          >
             Markdown
           </a>
           {` to format posts and comments on ${CONFIG.siteName}. We support `}
           <a href="https://commonmark.org/" target="_blank" rel="noreferrer">
             CommonMark
           </a>
-          {' and '}
-          <a href="https://github.github.com/gfm/" target="_blank" rel="noreferrer">
+          {" and "}
+          <a
+            href="https://github.github.com/gfm/"
+            target="_blank"
+            rel="noreferrer"
+          >
             Github Flavored Markdown
           </a>
-          {' (with the exception of image tags and raw HTML).'}
+          {" (with the exception of image tags and raw HTML)."}
         </p>
         <h2>The Basics</h2>
         <table>
@@ -69,7 +78,7 @@ const MarkdownGuide = () => {
             </tr>
             <tr>
               <td>Blockquote</td>
-              <td>{'> blockquote'}</td>
+              <td>{"> blockquote"}</td>
             </tr>
           </tbody>
         </table>

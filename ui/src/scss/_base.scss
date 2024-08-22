@@ -1,11 +1,11 @@
-@use 'mixins';
+@use "mixins";
 
 @font-face {
     font-family: InterVariable;
     font-style: normal;
     font-weight: 100 900;
     font-display: swap;
-    src: url('../assets/fonts/InterVariable.woff2') format('woff2');
+    src: url("../assets/fonts/InterVariable.woff2") format("woff2");
     unicode-range: U+0-2B1B, U+2B1D-10FFF;
 }
 @font-face {
@@ -13,16 +13,17 @@
     font-style: italic;
     font-weight: 100 900;
     font-display: swap;
-    src: url('../assets/fonts/InterVariable-Italic.woff2') format('woff2');
+    src: url("../assets/fonts/InterVariable-Italic.woff2") format("woff2");
     unicode-range: U+0-2B1B, U+2B1D-10FFF;
 }
 
 :root {
-    --custom-font: InterVariable, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
-        sans-serif;
-    --system-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --custom-font: InterVariable, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Helvetica, Arial, sans-serif;
+    --system-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+        Arial, sans-serif;
     --font: var(--custom-font);
-    --font-features: 'ss04' 1, 'case' 1, 'cv10' 1, 'ccmp' 1;
+    --font-features: "ss04" 1, "case" 1, "cv10" 1, "ccmp" 1;
     --fs-base: 10px;
     --fs-xs: 1.2rem; // extra small
     --fs-s: 1.3rem; // small
@@ -123,7 +124,8 @@
         rgba(var(--base-fg), 0.05) 0px 0px 2px 0px;
 
     --dropdown-shadow: 2px 2px 3px rgba(var(--base-fg), 0.14),
-        -1px -1px 2px rgba(var(--base-fg), 0.1), 0 0 0 1px rgba(var(--base-fg), 0.05);
+        -1px -1px 2px rgba(var(--base-fg), 0.1),
+        0 0 0 1px rgba(var(--base-fg), 0.05);
 
     // .card and @mixins.card
     --card-border: 1px solid transparent;
@@ -388,7 +390,7 @@ ul {
 }
 
 .safari16 body {
-    font-variation-settings: 'opsz' 14;
+    font-variation-settings: "opsz" 14;
 }
 
 code {
@@ -529,10 +531,10 @@ code {
     all: unset;
 }
 
-input[type='text'],
-input[type='email'],
-input[type='search'],
-input[type='password'],
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="password"],
 textarea {
     color: inherit;
     background-color: var(--color-input);
@@ -835,7 +837,9 @@ a,
         .sidebar-left,
         .sidebar-right {
             position: sticky;
-            max-height: calc(100vh - var(--navbar-height) - calc(2 * var(--gap)));
+            max-height: calc(
+                100vh - var(--navbar-height) - calc(2 * var(--gap))
+            );
             overflow-y: auto;
             top: calc(var(--navbar-height) + var(--gap));
         }
@@ -858,8 +862,8 @@ a,
 }
 
 @supports (-webkit-appearance: none) or (-moz-appearance: none) {
-    input[type='checkbox'],
-    input[type='radio'] {
+    input[type="checkbox"],
+    input[type="radio"] {
         --active: var(--color-brand);
         --active-inner: var(--color-bg);
         --focus: 2px rgba(var(--base-brand), 0.3);
@@ -879,9 +883,12 @@ a,
         border: 1px solid var(--bc, var(--border));
         background: var(--b, var(--background));
         // transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
-        transition: background 0.2s, border-color 0.2s, box-shadow 0.14s;
+        transition:
+            background 0.2s,
+            border-color 0.2s,
+            box-shadow 0.14s;
         &:after {
-            content: '';
+            content: "";
             display: block;
             left: 0;
             top: 0;
@@ -933,7 +940,7 @@ a,
             margin-left: 8px;
         }
     }
-    input[type='checkbox'] {
+    input[type="checkbox"] {
         &:not(.switch) {
             border-radius: var(--border-radius);
             &:after {
@@ -975,7 +982,7 @@ a,
             }
         }
     }
-    input[type='radio'] {
+    input[type="radio"] {
         border-radius: 50%;
         &:after {
             width: 19px;
@@ -1122,7 +1129,7 @@ select {
     padding: 7px;
     padding-right: 26px;
     appearance: none;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ic2VsZWN0LWJhci1tLWFycm93IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMTZMNiAxMEgxOEwxMiAxNloiIGZpbGw9IiMwMDAiPjwvcGF0aD48L3N2Zz4=');
+    background-image: url("data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ic2VsZWN0LWJhci1tLWFycm93IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMTZMNiAxMEgxOEwxMiAxNloiIGZpbGw9IiMwMDAiPjwvcGF0aD48L3N2Zz4=");
     background-repeat: no-repeat;
     background-position: calc(100% - 4px) calc(50% - 1px);
     @include mixins.mobile() {
@@ -1131,7 +1138,7 @@ select {
 }
 
 html.theme-dark select {
-    background-image: url('data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ic2VsZWN0LWJhci1tLWFycm93IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMTZMNiAxMEgxOEwxMiAxNloiIGZpbGw9IiNmZmYiPjwvcGF0aD48L3N2Zz4=');
+    background-image: url("data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ic2VsZWN0LWJhci1tLWFycm93IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMTZMNiAxMEgxOEwxMiAxNloiIGZpbGw9IiNmZmYiPjwvcGF0aD48L3N2Zz4=");
 }
 
 .input-search {

@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
 
 const Pagination = ({ onClick, noPages, current }) => {
   const renderItems = () => {
@@ -7,22 +8,27 @@ const Pagination = ({ onClick, noPages, current }) => {
     const pushButton = (page) => {
       items.push(
         <button
+          type="button"
           key={`btn-${page}`}
-          className={'pagination-item' + (page === current ? ' is-selected' : '')}
+          className={`pagination-item ${page === current ? "is-selected" : ""}`}
           onClick={() => onClick(page)}
         >
           {page}
-        </button>
+        </button>,
       );
     };
     if (noPages < 10) {
-      for (let i = 1; i < noPages + 1; i++) pushButton(i);
+      for (let i = 1; i < noPages + 1; i++) {
+        pushButton(i);
+      }
     } else {
-      for (let i = 1; i < 9; i++) pushButton(i);
+      for (let i = 1; i < 9; i++) {
+        pushButton(i);
+      }
       items.push(
         <div key="dots" className="pagination-item">
           ...
-        </div>
+        </div>,
       );
       if (current > 8) {
         pushButton(current);
@@ -30,11 +36,13 @@ const Pagination = ({ onClick, noPages, current }) => {
           items.push(
             <div key="dots-2" className="pagination-item">
               ...
-            </div>
+            </div>,
           );
         }
       }
-      if (current !== noPages) pushButton(noPages);
+      if (current !== noPages) {
+        pushButton(noPages);
+      }
     }
     return items;
   };
@@ -44,6 +52,7 @@ const Pagination = ({ onClick, noPages, current }) => {
       <div className="left">{renderItems()}</div>
       <div className="right">
         <button
+          type="button"
           className="pagination-item"
           onClick={() => onClick(current - 1)}
           disabled={current - 1 < 1}
@@ -51,6 +60,7 @@ const Pagination = ({ onClick, noPages, current }) => {
           Previous
         </button>
         <button
+          type="button"
           className="pagination-item"
           onClick={() => onClick(current + 1)}
           disabled={current + 1 > noPages}

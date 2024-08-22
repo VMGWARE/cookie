@@ -1,18 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Image from './Image';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import Image from "./Image";
 
 const ServerImage = ({ onLoad, image, sizes, style = {}, ...props }) => {
-  let src = image.url,
-    srcset = '';
+  const src = image.url;
+  let srcset = "";
   if (image.copies) {
     for (let i = 0; i < image.copies.length; i++) {
       const copy = image.copies[i];
-      srcset += (i > 0 ? ', ' : '') + `${copy.url} ${copy.width}w`;
+      srcset += `${i > 0 ? ", " : ""}${copy.url} ${copy.width}w`;
     }
   }
-  srcset += (srcset !== '' ? ', ' : '') + `${src} ${image.width}w`;
-  if (!sizes) sizes = '(max-width: 768px) 358px, 647px';
+  srcset += `${srcset !== "" ? ", " : ""}${src} ${image.width}w`;
+  if (!sizes) {
+    sizes = "(max-width: 768px) 358px, 647px";
+  }
 
   return (
     <Image

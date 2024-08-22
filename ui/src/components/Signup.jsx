@@ -1,26 +1,30 @@
-/* eslint-disable react/jsx-no-target-blank */
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { ButtonClose } from './Button';
-import Input, { InputPassword, InputWithCount } from './Input';
-import Modal from './Modal';
-import { useDispatch } from 'react-redux';
-import { loginModalOpened, snackAlert, snackAlertError } from '../slices/mainSlice';
-import { APIError, mfetch, validEmail } from '../helper';
-import { useDelayedEffect, useInputUsername } from '../hooks';
-import { usernameMaxLength } from '../config';
-import ReCAPTCHA from 'react-google-recaptcha';
-import { useRef } from 'react';
-import { Helmet } from 'react-helmet-async';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useRef } from "react";
+import { Helmet } from "react-helmet-async";
+import { useDispatch } from "react-redux";
+import { usernameMaxLength } from "../config";
+import { ApiError, mfetch, validEmail } from "../helper";
+import { useDelayedEffect, useInputUsername } from "../hooks";
+import {
+  loginModalOpened,
+  snackAlert,
+  snackAlertError,
+} from "../slices/mainSlice";
+import { ButtonClose } from "./Button";
+import Input, { InputPassword, InputWithCount } from "./Input";
+import Modal from "./Modal";
 
 const errors = [
-  'Username cannot be empty.',
-  'Password cannot be empty.',
-  'Username too short.',
-  'Enter a valid email address.',
-  'Password too weak.',
-  'Repeat password cannot be empty.',
-  'Passwords do not match.',
+  "Username cannot be empty.",
+  "Password cannot be empty.",
+  "Username too short.",
+  "Enter a valid email address.",
+  "Password too weak.",
+  "Repeat password cannot be empty.",
+  "Passwords do not match.",
 ];
 
 const Signup = ({ open, onClose }) => {
@@ -29,7 +33,9 @@ const Signup = ({ open, onClose }) => {
   const [username, handleUsernameChange] = useInputUsername(usernameMaxLength);
   const [usernameError, setUsernameError] = useState(null);
   const checkUsernameExists = async () => {
-    if (username === '') return true;
+    if (username === "") {
+      return true;
+    }
     try {
       const res = await mfetch(`/api/users/${username}`);
       if (!res.ok) {
@@ -37,7 +43,7 @@ const Signup = ({ open, onClose }) => {
           setUsernameError(null);
           return false;
         }
-        throw new APIError(res.status, await res.json());
+        throw new ApiError(res.status, await res.json());
       }
       setUsernameError(`${username} is already taken.`);
       return true;
@@ -47,40 +53,42 @@ const Signup = ({ open, onClose }) => {
   };
   useDelayedEffect(checkUsernameExists, [username]);
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(null);
   useEffect(() => {
     setEmailError(null);
   }, [email]);
 
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(null);
   useEffect(() => {
     setPasswordError(null);
   }, [password]);
 
-  const [repeatPassword, setRepeatPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState("");
   const [repeatPasswordError, setRepeatPasswordError] = useState(null);
   useEffect(() => {
     setRepeatPasswordError(null);
   }, [repeatPassword]);
 
-  const CAPTCHA_ENABLED = CONFIG.captchaSiteKey ? true : false;
+  const captchaEnabled = !!CONFIG.captchaSiteKey;
   const captchaRef = useRef();
   const handleCaptchaVerify = (token) => {
     if (!token) {
-      dispatch(snackAlert('Something went wrong. Try again.'));
+      dispatch(snackAlert("Something went wrong. Try again."));
       return;
     }
     signInUser(username, email, password, token);
   };
   const signInUser = async (username, email, password, captchaToken) => {
     try {
-      const res = await mfetch('/api/_signup', {
-        method: 'POST',
+      const res = await mfetch("/api/_signup", {
+        method: "POST",
         body: JSON.stringify({ username, email, password, captchaToken }),
       });
-      if (!res.ok) throw new APIError(res.status, await res.json());
+      if (!res.ok) {
+        throw new ApiError(res.status, await res.json());
+      }
       window.location.reload();
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -125,12 +133,12 @@ const Signup = ({ open, onClose }) => {
     if (errFound) {
       return;
     }
-    if (!CAPTCHA_ENABLED) {
+    if (!captchaEnabled) {
       signInUser(username, email, password);
       return;
     }
     if (!captchaRef.current) {
-      dispatch(snackAlertError(new Error('captcha API not found')));
+      dispatch(snackAlertError(new Error("captcha API not found")));
       return;
     }
     captchaRef.current.execute();
@@ -145,7 +153,7 @@ const Signup = ({ open, onClose }) => {
   return (
     <>
       <Helmet>
-        <style>{`.grecaptcha-badge { visibility: hidden; }`}</style>
+        <style>{".grecaptcha-badge { visibility: hidden; }"}</style>
       </Helmet>
       <Modal open={open} onClose={onClose} noOuterClickClose={false}>
         <div className="modal-card modal-form modal-signup">
@@ -191,9 +199,9 @@ const Signup = ({ open, onClose }) => {
               style={{ marginBottom: 0 }}
               autoComplete="new-password"
             />
-            {CAPTCHA_ENABLED && (
+            {captchaEnabled && (
               <div style={{ margin: 0 }}>
-                <ReCAPTCHA
+                <reCaptcha
                   ref={captchaRef}
                   sitekey={CONFIG.captchaSiteKey}
                   onChange={handleCaptchaVerify}
@@ -203,29 +211,45 @@ const Signup = ({ open, onClose }) => {
               </div>
             )}
             <p className="modal-signup-terms">
-              {'By creating an account, you agree to our '}
-              <a target="_blank" href="/terms">
+              {"By creating an account, you agree to our "}
+              <a target="_blank" href="/terms" rel="noreferrer">
                 Terms
               </a>
-              {' and '}
-              <a target="_blank" href="/privacy-policy">
-                {' Privacy Policy'}
+              {" and "}
+              <a target="_blank" href="/privacy-policy" rel="noreferrer">
+                {" Privacy Policy"}
               </a>
               .
             </p>
             <p className="modal-signup-terms is-captcha">
-              This site is protected by reCAPTCHA and the Google{' '}
-              <a href="https://policies.google.com/privacy-policy" target="_blank">
+              This site is protected by reCAPTCHA and the Google{" "}
+              <a
+                href="https://policies.google.com/privacy-policy"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Privacy Policy
-              </a>{' '}
-              and{' '}
-              <a href="https://policies.google.com/terms" target="_blank">
+              </a>{" "}
+              and{" "}
+              <a
+                href="https://policies.google.com/terms"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Terms of Service
-              </a>{' '}
+              </a>{" "}
               apply.
             </p>
-            <input type="submit" className="button button-main" value="Signup" />
-            <button className="button-link modal-alt-link" onClick={handleOnLogin}>
+            <input
+              type="submit"
+              className="button button-main"
+              value="Signup"
+            />
+            <button
+              type="button"
+              className="button-link modal-alt-link"
+              onClick={handleOnLogin}
+            >
               Already have an account? Login
             </button>
           </form>

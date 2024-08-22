@@ -1,24 +1,31 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import favicon from '../assets/imgs/favicon.png';
-import { useImageLoaded } from '../hooks';
-import { selectImageCopyURL } from '../helper';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import favicon from "../assets/imgs/favicon.png";
+import { selectImageCopyUrl } from "../helper";
+import { useImageLoaded } from "../hooks";
 
-const CommunityProPic = ({ className, name, proPic, size = 'small', ...rest }) => {
+const CommunityProPic = ({
+  className,
+  name,
+  proPic,
+  size = "small",
+  ...rest
+}) => {
   let src = favicon;
-  let averageColor = '#3d3d3d';
+  let averageColor = "#3d3d3d";
   if (proPic) {
     averageColor = proPic.averageColor;
     src = proPic.url;
     switch (size) {
-      case 'small':
-        src = selectImageCopyURL('tiny', proPic);
+      case "small":
+        src = selectImageCopyUrl("tiny", proPic);
         break;
-      case 'standard':
-        src = selectImageCopyURL('small', proPic);
+      case "standard":
+        src = selectImageCopyUrl("small", proPic);
         break;
-      case 'large':
-        src = selectImageCopyURL('medium', proPic);
+      case "large":
+        src = selectImageCopyUrl("medium", proPic);
         break;
     }
   }
@@ -27,8 +34,11 @@ const CommunityProPic = ({ className, name, proPic, size = 'small', ...rest }) =
 
   return (
     <div
-      className={'profile-picture comm-propic' + (className ? ` ${className}` : '')}
-      style={{ backgroundColor: averageColor, backgroundImage: loaded ? `url('${src}')` : 'none' }}
+      className={`profile-picture comm-propic ${className ? className : ""}`}
+      style={{
+        backgroundColor: averageColor,
+        backgroundImage: loaded ? `url('${src}')` : "none",
+      }}
       {...rest}
     >
       <img alt={`${name}'s profile`} src={src} onLoad={handleLoad} />
@@ -40,7 +50,7 @@ CommunityProPic.propTypes = {
   className: PropTypes.string,
   name: PropTypes.string.isRequired,
   proPic: PropTypes.object,
-  size: PropTypes.oneOf(['small', 'standard', 'large']),
+  size: PropTypes.oneOf(["small", "standard", "large"]),
 };
 
 export default CommunityProPic;

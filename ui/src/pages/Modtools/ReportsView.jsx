@@ -1,21 +1,29 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Dropdown from '../../components/Dropdown';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import Dropdown from "../../components/Dropdown";
 
-const ReportsView = ({ title, noPosts, noComments, filter, setFilter, children }) => {
-  const noAll = typeof noPosts === 'number' ? noPosts + noComments : null;
+const ReportsView = ({
+  title,
+  noPosts,
+  noComments,
+  filter,
+  setFilter,
+  children,
+}) => {
+  const noAll = typeof noPosts === "number" ? noPosts + noComments : null;
   const filterButtons = [
     {
-      filter: 'all',
-      text: `Posts & comments` + (noAll == null ? '' : ` (${noAll})`),
+      filter: "all",
+      text: `Posts & comments${noAll == null ? "" : ` (${noAll})`}`,
     },
     {
-      filter: 'posts',
-      text: `Posts` + (noAll == null ? '' : ` (${noPosts})`),
+      filter: "posts",
+      text: `Posts${noAll == null ? "" : ` (${noPosts})`}`,
     },
     {
-      filter: 'comments',
-      text: `Comments` + (noAll == null ? '' : ` (${noComments})`),
+      filter: "comments",
+      text: `Comments${noAll == null ? "" : ` (${noComments})`}`,
     },
   ];
 
@@ -29,11 +37,12 @@ const ReportsView = ({ title, noPosts, noComments, filter, setFilter, children }
       {filter && (
         <div className="modtools-reports-filters">
           <Dropdown
-            containerStyle={{ minWidth: '200px' }}
+            containerStyle={{ minWidth: "200px" }}
             target={
               <button
-                style={{ width: '100%', justifyContent: 'flex-start' }}
-                className={'button-text' + (active ? ' is-active' : '') + ' modtools-reports-type'}
+                type="button"
+                style={{ width: "100%", justifyContent: "flex-start" }}
+                className={`button-text ${active ? "is-active" : ""} modtools-reports-type`}
               >
                 {active.text}
               </button>
@@ -44,6 +53,7 @@ const ReportsView = ({ title, noPosts, noComments, filter, setFilter, children }
                 .filter((item) => item.filter !== filter)
                 .map((item) => (
                   <button
+                    type="button"
                     key={item.filter}
                     className="button-clear dropdown-item"
                     onClick={() => setFilter(item.filter)}
@@ -67,8 +77,10 @@ ReportsView.propTypes = {
   noComments: PropTypes.number,
   filter: PropTypes.string,
   setFilter: PropTypes.func,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)])
-    .isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.arrayOf(PropTypes.element),
+  ]).isRequired,
 };
 
 export default ReportsView;

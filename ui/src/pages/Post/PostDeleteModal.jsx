@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { ButtonClose } from '../../components/Button';
-import Modal from '../../components/Modal';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useState } from "react";
+import { ButtonClose } from "../../components/Button";
+import Modal from "../../components/Modal";
 
-const PostDeleteModal = ({ open, onClose, onDelete, postType, canDeleteContent = false }) => {
+const PostDeleteModal = ({
+  open,
+  onClose,
+  onDelete,
+  postType,
+  canDeleteContent = false,
+}) => {
   const [deleteContent, setDeleteContent] = useState(false);
 
-  const showCheckbox = canDeleteContent && (postType === 'image' || postType === 'link');
-  let label = 'Delete ';
-  if (postType === 'image') label += 'image too.';
-  else if (postType === 'link') label += 'link too.';
+  const showCheckbox =
+    canDeleteContent && (postType === "image" || postType === "link");
+  let label = "Delete ";
+  if (postType === "image") {
+    label += "image too.";
+  } else if (postType === "link") {
+    label += "link too.";
+  }
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -21,7 +33,7 @@ const PostDeleteModal = ({ open, onClose, onDelete, postType, canDeleteContent =
         <div className="modal-card-content">
           <p>Are you sure you want to delete this post?</p>
           {showCheckbox && (
-            <div className="checkbox" style={{ marginTop: '5px' }}>
+            <div className="checkbox" style={{ marginTop: "5px" }}>
               <input
                 id="post_del_content"
                 type="checkbox"
@@ -33,10 +45,16 @@ const PostDeleteModal = ({ open, onClose, onDelete, postType, canDeleteContent =
           )}
         </div>
         <div className="modal-card-actions">
-          <button className="button-main" onClick={() => onDelete(deleteContent)}>
+          <button
+            type="button"
+            className="button-main"
+            onClick={() => onDelete(deleteContent)}
+          >
             Yes
           </button>
-          <button onClick={onClose}>No</button>
+          <button type="button" onClick={onClose}>
+            No
+          </button>
         </div>
       </div>
     </Modal>
@@ -53,7 +71,11 @@ PostDeleteModal.propTypes = {
 
 export const PostContentDeleteModal = ({ open, onClose, onDelete, post }) => {
   const postContentType =
-    post.type === 'image' ? (post.images.length > 1 ? 'images' : 'image') : post.type;
+    post.type === "image"
+      ? post.images.length > 1
+        ? "images"
+        : "image"
+      : post.type;
   return (
     <Modal open={open} onClose={onClose}>
       <div className="modal-card">
@@ -62,13 +84,18 @@ export const PostContentDeleteModal = ({ open, onClose, onDelete, post }) => {
           <ButtonClose onClick={onClose} />
         </div>
         <div className="modal-card-content">
-          <p>Are you sure you want to permanently delete the post's {postContentType}?</p>
+          <p>
+            Are you sure you want to permanently delete the post's{" "}
+            {postContentType}?
+          </p>
         </div>
         <div className="modal-card-actions">
-          <button className="button-main" onClick={onDelete}>
+          <button type="button" className="button-main" onClick={onDelete}>
             Yes
           </button>
-          <button onClick={onClose}>No</button>
+          <button type="button" onClick={onClose}>
+            No
+          </button>
         </div>
       </div>
     </Modal>

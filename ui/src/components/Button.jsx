@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
-import PropTypes from 'prop-types';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useRef } from "react";
 
 export const ButtonClose = ({ className, style = {}, ...props }) => {
-  const cls = 'button-icon' + (className ? ` ${className}` : '');
+  const cls = `button-icon ${className ? className : ""}`;
   return (
-    <button className={cls} style={{ padding: '9px', ...style }} {...props}>
+    <button className={cls} style={{ padding: "9px", ...style }} {...props}>
       <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
@@ -29,9 +31,14 @@ ButtonClose.propTypes = {
   style: PropTypes.object,
 };
 
-export const ButtonMore = ({ vertical = false, outlined = false, className, ...props }) => {
-  const style = { transform: vertical ? 'rotate(90deg)' : 'initial' };
-  const cls = 'button-icon' + (className ? ` ${className}` : '');
+export const ButtonMore = ({
+  vertical = false,
+  outlined = false,
+  className,
+  ...props
+}) => {
+  const style = { transform: vertical ? "rotate(90deg)" : "initial" };
+  const cls = `button-icon ${className ? className : ""}`;
   const svg = outlined ? (
     <svg
       style={style}
@@ -94,13 +101,13 @@ ButtonMore.propTypes = {
 };
 
 export const ButtonHamburger = ({ className, ...props }) => {
-  const cls = 'button-hamburger' + (className ? ` ${className}` : '');
+  const cls = `button-hamburger ${className ? className : ""}`;
   return (
     <button className={cls} {...props}>
       <div className="hamburger-lines">
-        <div></div>
-        <div></div>
-        <div></div>
+        <div />
+        <div />
+        <div />
       </div>
     </button>
   );
@@ -111,10 +118,7 @@ ButtonHamburger.propTypes = {
 };
 
 export const ButtonSearch = ({ className, noBackground = true, ...props }) => {
-  const cls =
-    (noBackground ? 'button-clear' : 'button-icon') +
-    ' button-search' +
-    (className ? ` ${className}` : '');
+  const cls = `${noBackground ? "button-clear" : "button-icon"} button-search ${className ? className : ""}`;
   return (
     <button className={cls} {...props}>
       <svg
@@ -198,7 +202,7 @@ export const ButtonUpload = ({ children, onChange, ...rest }) => {
         ref={inputRef}
         type="file"
         name="image"
-        style={{ visibility: 'hidden', width: 0, height: 0 }}
+        style={{ visibility: "hidden", width: 0, height: 0 }}
         onChange={handleInputChange}
       />
     </div>

@@ -1,34 +1,41 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
-import { ButtonClose } from './Button';
-import Modal from './Modal';
-import { InputWithCount, useInputMaxLength } from './Input';
-import { useDispatch, useSelector } from 'react-redux';
-import { sidebarCommunitiesUpdated, snackAlertError } from '../slices/mainSlice';
-import { mfetch, mfetchjson } from '../helper';
-import { useInputUsername } from '../hooks';
-import { communityAboutMaxLength, communityNameMaxLength } from '../config';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { communityAboutMaxLength, communityNameMaxLength } from "../config";
+import { mfetch } from "../helper";
+import { useInputUsername } from "../hooks";
+import {
+  sidebarCommunitiesUpdated,
+  snackAlertError,
+} from "../slices/mainSlice";
+import { ButtonClose } from "./Button";
+import { InputWithCount, useInputMaxLength } from "./Input";
+import Modal from "./Modal";
 
 const CreateCommunity = ({ open, onClose }) => {
   const [name, handleNameChange] = useInputUsername(communityNameMaxLength);
-  const [description, handleDescChange] = useInputMaxLength(communityAboutMaxLength);
+  const [description, handleDescChange] = useInputMaxLength(
+    communityAboutMaxLength,
+  );
 
   const communities = useSelector((state) => state.main.sidebarCommunities);
   const dispatch = useDispatch();
 
   const history = useHistory();
 
-  const [formError, setFormError] = useState('');
+  const [formError, setFormError] = useState("");
 
   const handleCreate = async () => {
     if (name.length < 3) {
-      alert('Name has to be at least 3 characters.');
+      alert("Name has to be at least 3 characters.");
       return;
     }
     try {
-      const res = await mfetch('/api/communities', {
-        method: 'POST',
+      const res = await mfetch("/api/communities", {
+        method: "POST",
         body: JSON.stringify({ name, about: description }),
       });
       if (res.ok) {
@@ -37,16 +44,16 @@ const CreateCommunity = ({ open, onClose }) => {
         onClose();
         history.push(`/${CONFIG.communityPrefix}${name}`);
       } else if (res.status === 409) {
-        setFormError('A community by that name already exists.');
+        setFormError("A community by that name already exists.");
       } else {
         const error = await res.json();
-        if (error.code === 'not_enough_points') {
+        if (error.code === "not_enough_points") {
           setFormError(
-            `You need at least ${CONFIG.forumCreationReqPoints} points to create a community.`
+            `You need at least ${CONFIG.forumCreationReqPoints} points to create a community.`,
           );
-        } else if (error.code === 'max_limit_reached') {
+        } else if (error.code === "max_limit_reached") {
           setFormError(
-            "You've reached your max limit of the number of communities you can moderate."
+            "You've reached your max limit of the number of communities you can moderate.",
           );
         } else {
           throw new Error(JSON.stringify(error));
@@ -71,7 +78,7 @@ const CreateCommunity = ({ open, onClose }) => {
             label="Community name"
             description="Community name cannot be changed."
             maxLength={communityNameMaxLength}
-            style={{ marginBottom: '0' }}
+            style={{ marginBottom: "0" }}
             autoFocus
           />
           <InputWithCount
@@ -83,8 +90,10 @@ const CreateCommunity = ({ open, onClose }) => {
             rows="4"
             maxLength={communityAboutMaxLength}
           />
-          {formError !== '' && <div className="form-error text-center">{formError}</div>}
-          <button onClick={handleCreate} className="button-main">
+          {formError !== "" && (
+            <div className="form-error text-center">{formError}</div>
+          )}
+          <button type="button" onClick={handleCreate} className="button-main">
             Create
           </button>
         </div>

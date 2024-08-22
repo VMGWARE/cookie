@@ -1,37 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { ButtonClose } from '../../components/Button';
-import { InputPassword } from '../../components/Input';
-import Modal from '../../components/Modal';
-import { APIError, mfetch } from '../../helper';
-import { snackAlert, snackAlertError } from '../../slices/mainSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { ButtonClose } from "../../components/Button";
+import { InputPassword } from "../../components/Input";
+import Modal from "../../components/Modal";
+import { ApiError, mfetch } from "../../helper";
+import { snackAlert, snackAlertError } from "../../slices/mainSlice";
 
 const ChangePassword = () => {
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
 
-  const [password, setPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [repeatPassword, setRepeatPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
   useEffect(() => {
-    setPassword('');
-    setNewPassword('');
-    setRepeatPassword('');
+    setPassword("");
+    setNewPassword("");
+    setRepeatPassword("");
   }, [open]);
 
   const dispatch = useDispatch();
   const changePassword = async () => {
     if (newPassword !== repeatPassword) {
-      alert('Passwords do not match.');
+      alert("Passwords do not match.");
       return;
     }
     if (newPassword.length < 8) {
-      alert('Password too short.');
+      alert("Password too short.");
       return;
     }
     try {
-      const res = await mfetch('/api/_settings?action=changePassword', {
-        method: 'POST',
+      const res = await mfetch("/api/_settings?action=changePassword", {
+        method: "POST",
         body: JSON.stringify({
           password,
           newPassword,
@@ -40,14 +42,13 @@ const ChangePassword = () => {
       });
       if (!res.ok) {
         if (res.status === 401) {
-          alert('Incorrect previous password');
+          alert("Incorrect previous password");
           return;
         }
-        throw new APIError(res.status, await res.json());
-      } else {
-        dispatch(snackAlert('Password changed succesfully.'));
-        setOpen(false);
+        throw new ApiError(res.status, await res.json());
       }
+      dispatch(snackAlert("Password changed succesfully."));
+      setOpen(false);
     } catch (error) {
       dispatch(snackAlertError(error));
     }
@@ -55,7 +56,11 @@ const ChangePassword = () => {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} style={{ alignSelf: 'flex-start' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{ alignSelf: "flex-start" }}
+      >
         Change Password
       </button>
       <Modal open={open} onClose={handleClose}>
@@ -66,8 +71,7 @@ const ChangePassword = () => {
           </div>
           <div
             className="modal-card-content"
-            onKeyDown={(e) => e.key === 'Enter' && changePassword()}
-            role="none"
+            onKeyDown={(e) => e.key === "Enter" && changePassword()}
           >
             <InputPassword
               value={password}
@@ -87,10 +91,16 @@ const ChangePassword = () => {
             />
           </div>
           <div className="modal-card-actions">
-            <button className="button-main" onClick={changePassword}>
+            <button
+              type="button"
+              className="button-main"
+              onClick={changePassword}
+            >
               Change password
             </button>
-            <button onClick={handleClose}>Cancel</button>
+            <button type="button" onClick={handleClose}>
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>

@@ -1,17 +1,17 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useEscapeKeydown, useIsMobile } from '../hooks';
-import Modal from './Modal';
-import { onEscapeKey } from '../helper';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useRef, useState } from "react";
+import { onEscapeKey } from "../helper";
+import { useIsMobile } from "../hooks";
+import Modal from "./Modal";
 
 const Dropdown = ({
-  className = '',
+  className = "",
   style = {},
   target,
   children,
-  aligned = 'left',
+  aligned = "left",
   containerStyle = {},
   onActiveChange,
   ...rest
@@ -24,35 +24,43 @@ const Dropdown = ({
   const ref = useRef(null); // .dropdown element
   const targetRef = useRef(null);
   const handleDocumentClick = (e) => {
-    if (targetRef.current.contains(e.target)) return;
-    const items = Array.from(ref.current.querySelectorAll('.is-non-reactive, .is-topic'));
+    if (targetRef.current.contains(e.target)) {
+      return;
+    }
+    const items = Array.from(
+      ref.current.querySelectorAll(".is-non-reactive, .is-topic"),
+    );
     let nonReactive = false;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].contains(e.target)) {
+    for (const item of items) {
+      if (item.contains(e.target)) {
         nonReactive = true;
         break;
       }
     }
-    if (!nonReactive) setActive(false);
+    if (!nonReactive) {
+      setActive(false);
+    }
   };
   useEffect(() => {
-    if (onActiveChange) onActiveChange(active);
+    if (onActiveChange) {
+      onActiveChange(active);
+    }
     if (active) {
-      document.addEventListener('click', handleDocumentClick);
+      document.addEventListener("click", handleDocumentClick);
       return () => {
-        document.removeEventListener('click', handleDocumentClick);
+        document.removeEventListener("click", handleDocumentClick);
       };
     }
   }, [active]);
 
   const menuCls = { ...style };
-  if (aligned === 'left') {
-    menuCls.left = '0';
-  } else if (aligned === 'right') {
-    menuCls.right = '0';
-  } else if (aligned === 'center') {
-    menuCls.left = '50%';
-    menuCls.transform = 'translateX(-50%)';
+  if (aligned === "left") {
+    menuCls.left = "0";
+  } else if (aligned === "right") {
+    menuCls.right = "0";
+  } else if (aligned === "center") {
+    menuCls.left = "50%";
+    menuCls.transform = "translateX(-50%)";
   }
 
   const isMobile = useIsMobile();
@@ -60,8 +68,11 @@ const Dropdown = ({
   const handleModalClick = (e) => {
     let target = e.target;
     let found = false;
-    while (target && !target.classList.contains('modal-dropdown')) {
-      if (target.classList.contains('is-non-reactive') || target.classList.contains('is-topic')) {
+    while (target && !target.classList.contains("modal-dropdown")) {
+      if (
+        target.classList.contains("is-non-reactive") ||
+        target.classList.contains("is-topic")
+      ) {
         found = true;
         break;
       }
@@ -73,7 +84,7 @@ const Dropdown = ({
   };
 
   const renderTargetElement = () => {
-    return typeof target === 'string' ? (
+    return typeof target === "string" ? (
       <DropdownDefaultTarget>{target}</DropdownDefaultTarget>
     ) : (
       target
@@ -82,11 +93,22 @@ const Dropdown = ({
 
   if (isMobile) {
     return (
-      <div ref={ref} className={'dropdown' + (className !== '' ? ` ${className}` : '')}>
-        <div ref={targetRef} className="dropdown-target" onClick={() => setOpen(true)}>
+      <div
+        ref={ref}
+        className={`dropdown ${className !== "" ? className : ""}`}
+      >
+        <div
+          ref={targetRef}
+          className="dropdown-target"
+          onClick={() => setOpen(true)}
+        >
           {renderTargetElement()}
         </div>
-        <Modal open={open} onClose={() => setOpen(false)} noOuterClickClose={false}>
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          noOuterClickClose={false}
+        >
           <div className="modal-dropdown" onClick={handleModalClick}>
             {children}
           </div>
@@ -98,9 +120,7 @@ const Dropdown = ({
   return (
     <div
       ref={ref}
-      className={
-        'dropdown' + (active ? ' is-active' : '') + (className !== '' ? ` ${className}` : '')
-      }
+      className={`dropdown ${active ? "is-active" : ""} ${className !== "" ? className : ""}`}
       style={containerStyle}
       {...rest}
       onKeyDown={(e) => onEscapeKey(e, () => setActive(false))}
@@ -125,7 +145,7 @@ Dropdown.propTypes = {
   target: PropTypes.element,
   children: PropTypes.element.isRequired,
   className: PropTypes.string,
-  aligned: PropTypes.oneOf(['left', 'right', 'center', 'none']),
+  aligned: PropTypes.oneOf(["left", "right", "center", "none"]),
   style: PropTypes.object,
   containerStyle: PropTypes.object,
   onActiveChange: PropTypes.func,
@@ -135,7 +155,7 @@ export default Dropdown;
 
 export const DropdownDefaultTarget = ({ children }) => {
   return (
-    <button className="button-with-icon is-text-first">
+    <button type="button" className="button-with-icon is-text-first">
       <svg
         width="24"
         height="24"

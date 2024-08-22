@@ -1,15 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { toTitleCase, userGroupSingular } from '../../helper';
-import CommunityLink from './CommunityLink';
-import TimeAgo from '../TimeAgo';
-import { useIsMobile, useMuteCommunity, useMuteUser } from '../../hooks';
-import Dropdown from '../Dropdown';
-import { ButtonMore } from '../Button';
-import { useDispatch, useSelector } from 'react-redux';
-import { UserLink } from '../UserProPic';
-import { userHasSupporterBadge } from '../../pages/User';
-import { saveToListModalOpened } from '../../slices/mainSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { toTitleCase, userGroupSingular } from "../../helper";
+import { useIsMobile, useMuteCommunity, useMuteUser } from "../../hooks";
+import { userHasSupporterBadge } from "../../pages/User";
+import { saveToListModalOpened } from "../../slices/mainSlice";
+import { ButtonMore } from "../Button";
+import Dropdown from "../Dropdown";
+import TimeAgo from "../TimeAgo";
+import { UserLink } from "../UserProPic";
+import CommunityLink from "./CommunityLink";
 
 const PostCardHeadingDetails = ({
   post,
@@ -23,7 +24,9 @@ const PostCardHeadingDetails = ({
   // Show if post was edited less than 5 mins ago.
   const showEditedSign =
     showEdited &&
-    (post.editedAt ? new Date(post.editedAt) - new Date(post.createdAt) > 5 * 60000 : false);
+    (post.editedAt
+      ? new Date(post.editedAt) - new Date(post.createdAt) > 5 * 60000
+      : false);
 
   const viewer = useSelector((state) => state.main.user);
   const viewerAdmin = viewer ? viewer.isAdmin : false;
@@ -45,15 +48,18 @@ const PostCardHeadingDetails = ({
   //   const f = isAuthorMuted ? unmuteUser : muteUser;
   //   dispatch(f(post.userId, post.username));
   // };
-  const { toggleMute: handleMuteUser, displayText: muteUserText } = useMuteUser({
-    userId: post.userId,
-    username: post.username,
-  });
+  const { toggleMute: handleMuteUser, displayText: muteUserText } = useMuteUser(
+    {
+      userId: post.userId,
+      username: post.username,
+    },
+  );
 
-  const { toggleMute: handleMuteCommunity, displayText: muteCommunityText } = useMuteCommunity({
-    communityId: post.communityId,
-    communityName: post.communityName,
-  });
+  const { toggleMute: handleMuteCommunity, displayText: muteCommunityText } =
+    useMuteCommunity({
+      communityId: post.communityId,
+      communityName: post.communityName,
+    });
 
   const isAuthorSupporter = userHasSupporterBadge(post.author);
   const isUsernameGhost = post.userDeleted && !viewerAdmin;
@@ -61,25 +67,32 @@ const PostCardHeadingDetails = ({
   return (
     <div className="post-card-heading-details">
       <div className="left">
-        <CommunityLink name={post.communityName} proPic={post.communityProPic} />
+        <CommunityLink
+          name={post.communityName}
+          proPic={post.communityProPic}
+        />
         <div className="post-card-heading-by">
           <span>Posted by </span>
           <UserLink
-            className={post.userDeleted && viewerAdmin ? 'is-red' : ''}
-            username={isUsernameGhost ? 'Ghost' : post.username}
+            className={post.userDeleted && viewerAdmin ? "is-red" : ""}
+            username={isUsernameGhost ? "Ghost" : post.username}
             proPic={post.author ? post.author.proPic : null}
             showProPic={showAuthorProPic}
             isSupporter={isAuthorSupporter}
             noLink={isUsernameGhost}
             proPicGhost={post.userDeleted}
           />
-          {userGroup !== 'normal' && (
+          {userGroup !== "normal" && (
             <span className="post-card-heading-user-group">{` ${toTitleCase(
-              userGroupSingular(userGroup)
+              userGroupSingular(userGroup),
             )}`}</span>
           )}
         </div>
-        <TimeAgo className="post-card-heading-ago" time={post.createdAt} short={isMobile} />
+        <TimeAgo
+          className="post-card-heading-ago"
+          time={post.createdAt}
+          short={isMobile}
+        />
         {showEditedSign && (
           <TimeAgo
             className="post-card-heading-ago"
@@ -95,22 +108,32 @@ const PostCardHeadingDetails = ({
         {loggedIn && (
           <Dropdown target={<ButtonMore />} aligned="right">
             <div className="dropdown-list">
-              <button className="button-clear dropdown-item" onClick={handleMuteCommunity}>
+              <button
+                type="button"
+                className="button-clear dropdown-item"
+                onClick={handleMuteCommunity}
+              >
                 {muteCommunityText}
               </button>
               {!post.userDeleted && (
-                <button className="button-clear dropdown-item" onClick={handleMuteUser}>
+                <button
+                  type="button"
+                  className="button-clear dropdown-item"
+                  onClick={handleMuteUser}
+                >
                   {muteUserText}
                 </button>
               )}
               <button
+                type="button"
                 className="button-clear dropdown-item"
-                onClick={() => dispatch(saveToListModalOpened(post.id, 'post'))}
+                onClick={() => dispatch(saveToListModalOpened(post.id, "post"))}
               >
                 Save to list
               </button>
               {onRemoveFromList && (
                 <button
+                  type="button"
                   className="button-clear dropdown-item"
                   onClick={() => onRemoveFromList(post.id)}
                 >

@@ -1,8 +1,15 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { ButtonHamburger, ButtonNotifications } from '../Button';
-import Dropdown from '../Dropdown';
-import { useDispatch, useSelector } from 'react-redux';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect } from "react";
+import { useRef } from "react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { clearNotificationsLocalStorage } from "../../PushNotifications";
+import Link from "../../components/Link";
+import { kRound, mfetch, onKeyEnter, stringCount } from "../../helper";
+import { mobileBreakpointWidth, useTheme, useWindowWidth } from "../../hooks";
 import {
   chatOpenToggled,
   loginModalOpened,
@@ -11,16 +18,11 @@ import {
   snackAlert,
   snackAlertError,
   toggleSidebarOpen,
-} from '../../slices/mainSlice';
-import Link from '../../components/Link';
-import { kRound, mfetch, onKeyEnter, stringCount } from '../../helper';
-import Search from './Search';
-import { useRef } from 'react';
-import { useState } from 'react';
-import { homeReloaded } from '../../views/PostsFeed';
-import { useLocation } from 'react-router-dom';
-import { mobileBreakpointWidth, useTheme, useWindowWidth } from '../../hooks';
-import { clearNotificationsLocalStorage } from '../../PushNotifications';
+} from "../../slices/mainSlice";
+import { homeReloaded } from "../../views/PostsFeed";
+import { ButtonHamburger, ButtonNotifications } from "../Button";
+import Dropdown from "../Dropdown";
+import Search from "./Search";
 
 const Navbar = ({ offline = false }) => {
   const dispatch = useDispatch();
@@ -28,17 +30,19 @@ const Navbar = ({ offline = false }) => {
   const user = useSelector((state) => state.main.user);
   const loggedIn = user !== null;
 
-  const homeFeed = loggedIn ? user.homeFeed : 'all';
-  const notifsNewCount = useSelector((state) => state.main.notifications.newCount);
+  const homeFeed = loggedIn ? user.homeFeed : "all";
+  const notifsNewCount = useSelector(
+    (state) => state.main.notifications.newCount,
+  );
 
   const handleLogout = async () => {
     clearNotificationsLocalStorage();
     try {
-      const res = await mfetch('/api/_login?action=logout', {
-        method: 'POST',
+      const res = await mfetch("/api/_login?action=logout", {
+        method: "POST",
       });
       if (!res.ok) {
-        snackAlert('Failed to logout. Something went wrong.');
+        snackAlert("Failed to logout. Something went wrong.");
         return;
       }
       window.location.reload();
@@ -48,7 +52,7 @@ const Navbar = ({ offline = false }) => {
   };
 
   const handleLogoClick = () => {
-    dispatch(homeReloaded(homeFeed, user && user.rememberFeedSort));
+    dispatch(homeReloaded(homeFeed, user?.rememberFeedSort));
     setTimeout(() => window.scrollTo(0, 0), 10);
   };
 
@@ -58,13 +62,14 @@ const Navbar = ({ offline = false }) => {
 
   const location = useLocation();
   const handleNotifIconClick = () => {
-    if (location.pathname === '/notifications') {
+    if (location.pathname === "/notifications") {
       dispatch(notificationsReloaded());
     }
   };
 
   // Only enable background blur when scrolled down.
-  const supportsBlur = () => window.CSS && window.CSS.supports('backdrop-filter', 'blur(10px)');
+  const supportsBlur = () =>
+    window.CSS?.supports("backdrop-filter", "blur(10px)");
   const [blur, setBlur] = useState(supportsBlur() && window.scrollY > 50);
   const blurRef = useRef(blur);
   const navbarRef = useRef();
@@ -76,29 +81,27 @@ const Navbar = ({ offline = false }) => {
             blurRef.current = true;
             setBlur(true);
           }
-        } else {
-          if (blurRef.current !== false) {
-            blurRef.current = false;
-            setBlur(false);
-          }
+        } else if (blurRef.current !== false) {
+          blurRef.current = false;
+          setBlur(false);
         }
       };
-      window.addEventListener('scroll', listner, { passive: true });
-      return () => window.removeEventListener('scroll', listner);
+      window.addEventListener("scroll", listner, { passive: true });
+      return () => window.removeEventListener("scroll", listner);
     }
   }, []);
 
   const { theme, setTheme } = useTheme();
   const handleDarkModeChange = (e) => {
     const checked = e.target.checked;
-    setTheme(checked ? 'dark' : 'light');
+    setTheme(checked ? "dark" : "light");
   };
 
   const windowWidth = useWindowWidth();
   const isMobile = windowWidth <= mobileBreakpointWidth;
 
   return (
-    <header className={'navbar' + (blur ? ' is-blured' : '')} ref={navbarRef}>
+    <header className={`navbar ${blur ? "is-blured" : ""}`} ref={navbarRef}>
       <div className="wrap">
         <div className="left">
           <div className="hamburger-m">
@@ -107,7 +110,7 @@ const Navbar = ({ offline = false }) => {
           <Link
             to="/"
             className="navbar-logo"
-            style={{ fontSize: '1.65rem' }}
+            style={{ fontSize: "1.65rem" }}
             onClick={handleLogoClick}
           >
             {CONFIG.siteName}
@@ -115,8 +118,9 @@ const Navbar = ({ offline = false }) => {
           <Search />
         </div>
         <div className="right">
-          {process.env.NODE_ENV !== 'production' && (
+          {process.env.NODE_ENV !== "production" && (
             <button
+              type="button"
               className="button-text is-no-m"
               onClick={() => dispatch(chatOpenToggled())}
               disabled={offline}
@@ -124,7 +128,7 @@ const Navbar = ({ offline = false }) => {
               Chat
             </button>
           )}
-          {process.env.NODE_ENV !== 'production' && (
+          {process.env.NODE_ENV !== "production" && (
             <Link className="is-no-m" to="/elements">
               Elements
             </Link>
@@ -132,6 +136,7 @@ const Navbar = ({ offline = false }) => {
           {!loggedIn && (
             <>
               <button
+                type="button"
                 className="button-text"
                 onClick={() => dispatch(loginModalOpened())}
                 disabled={offline}
@@ -139,6 +144,7 @@ const Navbar = ({ offline = false }) => {
                 Login
               </button>
               <button
+                type="button"
                 className="button-main"
                 onClick={() => dispatch(signupModalOpened())}
                 disabled={offline}
@@ -160,12 +166,13 @@ const Navbar = ({ offline = false }) => {
                 <div className="navbar-profile-target">
                   <span className="navbar-points">{`${kRound(user.points)} ${stringCount(
                     user.points,
-                    true
+                    true,
                   )}`}</span>
                   <span className="navbar-name">
                     @
-                    {windowWidth < 400 || (isMobile && user.username.length > 10)
-                      ? 'me'
+                    {windowWidth < 400 ||
+                    (isMobile && user.username.length > 10)
+                      ? "me"
                       : user.username}
                   </span>
                 </div>
@@ -176,23 +183,26 @@ const Navbar = ({ offline = false }) => {
                 <Link className="link-reset dropdown-item" to="/settings">
                   Settings
                 </Link>
-                <Link className="link-reset dropdown-item" to={`/@${user.username}`}>
+                <Link
+                  className="link-reset dropdown-item"
+                  to={`/@${user.username}`}
+                >
                   Profile
                 </Link>
                 {/*<div className="dropdown-item">Darkmode</div>*/}
                 <div className="dropdown-item is-non-reactive">
                   <div className="checkbox">
                     <input
-                      id={'ch-nav-dark'}
+                      id={"ch-nav-dark"}
                       className="switch"
                       type="checkbox"
-                      checked={theme === 'dark'}
+                      checked={theme === "dark"}
                       onChange={handleDarkModeChange}
                     />
-                    <label htmlFor={'ch-nav-dark'}>Dark mode</label>
+                    <label htmlFor={"ch-nav-dark"}>Dark mode</label>
                   </div>
                 </div>
-                <div className="dropdown-list-sep"></div>
+                <div className="dropdown-list-sep" />
                 <div
                   role="button"
                   tabIndex="0"

@@ -1,65 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import { ButtonClose } from '../../components/Button';
-import Input from '../../components/Input';
-import Modal from '../../components/Modal';
-import { APIError, mfetch, mfetchjson } from '../../helper';
-import { snackAlert, snackAlertError } from '../../slices/mainSlice';
-import { useLoading } from '../../hooks';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { ButtonClose } from "../../components/Button";
+import Input from "../../components/Input";
+import Modal from "../../components/Modal";
+import { ApiError, mfetch, mfetchjson } from "../../helper";
+import { useLoading } from "../../hooks";
+import { snackAlert, snackAlertError } from "../../slices/mainSlice";
 
 const Banned = ({ community }) => {
   const dispatch = useDispatch();
 
-  const baseURL = `/api/communities/${community.id}`;
+  const baseUrl = `/api/communities/${community.id}`;
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useLoading();
   useEffect(() => {
     (async () => {
       try {
-        const banned = await mfetchjson(`${baseURL}/banned`);
+        const banned = await mfetchjson(`${baseUrl}/banned`);
         setUsers(banned);
-        setLoading('loaded');
+        setLoading("loaded");
       } catch (error) {
-        setLoading('failed');
+        console.error(error);
+        setLoading("failed");
       }
     })();
   }, [community.id]);
 
-  const [modalError, setModalError] = useState('');
-  const [username, _setUsername] = useState('');
+  const [modalError, setModalError] = useState("");
+  const [username, _setUsername] = useState("");
   const setUsername = (name) => {
-    if (name === '') setModalError('');
+    if (name === "") {
+      setModalError("");
+    }
     _setUsername(name);
   };
   const [banModalOpen, setBanModalOpen] = useState(false);
   const handleBanModalClose = () => {
     setBanModalOpen(false);
-    setUsername('');
+    setUsername("");
   };
   const handleBanClick = async () => {
     try {
-      const res = await mfetch(`${baseURL}/banned`, {
-        method: 'POST',
+      const res = await mfetch(`${baseUrl}/banned`, {
+        method: "POST",
         body: JSON.stringify({
           username,
         }),
       });
-      if (!res.ok) {
-        if (res.status === 404) {
-          setModalError('No user with username exists.');
-        } else if (res.status === 409) {
-          setModalError(`${username} is already banned.`);
-        } else if (res.status === 403) {
-          dispatch(snackAlert('Forbidden.', 'forbidden'));
-        } else {
-          throw new APIError(res.status, await res.json());
-        }
-      } else {
+      if (res.ok) {
         dispatch(snackAlert(`@${username} is banned.`));
         const user = await res.json();
         setUsers((users) => [...users, user]);
         handleBanModalClose();
+      } else if (res.status === 404) {
+        setModalError("No user with username exists.");
+      } else if (res.status === 409) {
+        setModalError(`${username} is already banned.`);
+      } else if (res.status === 403) {
+        dispatch(snackAlert("Forbidden.", "forbidden"));
+      } else {
+        throw new ApiError(res.status, await res.json());
       }
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -68,8 +71,8 @@ const Banned = ({ community }) => {
 
   const handleUnbanClick = async (username) => {
     try {
-      const user = await mfetchjson(`${baseURL}/banned`, {
-        method: 'DELETE',
+      const user = await mfetchjson(`${baseUrl}/banned`, {
+        method: "DELETE",
         body: JSON.stringify({
           username,
         }),
@@ -80,7 +83,7 @@ const Banned = ({ community }) => {
     }
   };
 
-  if (loading !== 'loaded') {
+  if (loading !== "loaded") {
     return null;
   }
 
@@ -108,16 +111,27 @@ const Banned = ({ community }) => {
             />
           </form>
           <div className="modal-card-actions">
-            <button className="button-main" disabled={username === ''} onClick={handleBanClick}>
+            <button
+              type="button"
+              className="button-main"
+              disabled={username === ""}
+              onClick={handleBanClick}
+            >
               Ban
             </button>
-            <button onClick={handleBanModalClose}>Cancel</button>
+            <button type="button" onClick={handleBanModalClose}>
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>
       <div className="modtools-content-head">
         <div className="modtools-title">Banned ({users.length})</div>
-        <button className="button-main" onClick={() => setBanModalOpen(true)}>
+        <button
+          type="button"
+          className="button-main"
+          onClick={() => setBanModalOpen(true)}
+        >
           Ban user
         </button>
       </div>
@@ -126,9 +140,14 @@ const Banned = ({ community }) => {
           {users.map((user) => (
             <div key={user.id} className="table-row">
               <div className="table-column">@{user.username}</div>
-              <div className="table-column"></div>
+              <div className="table-column" />
               <div className="table-column">
-                <button onClick={() => handleUnbanClick(user.username)}>Unban</button>
+                <button
+                  type="button"
+                  onClick={() => handleUnbanClick(user.username)}
+                >
+                  Unban
+                </button>
               </div>
             </div>
           ))}

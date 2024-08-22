@@ -1,23 +1,25 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router';
-import { APIError, isValidHttpUrl, mfetch, mfetchjson } from '../../helper';
-import { useLoading, useQuery } from '../../hooks';
-import { snackAlert, snackAlertError } from '../../slices/mainSlice';
-import SelectCommunity from './SelectCommunity';
-import { ButtonClose } from '../../components/Button';
-import { Helmet } from 'react-helmet-async';
-import Rules from '../Community/Rules';
-import PageLoading from '../../components/PageLoading';
-import Link from '../../components/Link';
-import AsUser from '../Post/AsUser';
-import Textarea from '../../components/Textarea';
-import Image from './Image';
-import Spinner from '../../components/Spinner';
-import { postAdded } from '../../slices/postsSlice';
-import { useLocation } from 'react-router-dom/cjs/react-router-dom.min';
-import CommunityCard from '../Post/CommunityCard';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { useLocation } from "react-router-dom";
+import { ButtonClose } from "../../components/Button";
+import Link from "../../components/Link";
+import PageLoading from "../../components/PageLoading";
+import Spinner from "../../components/Spinner";
+import Textarea from "../../components/Textarea";
+import { ApiError, isValidHttpUrl, mfetch, mfetchjson } from "../../helper";
+import { useLoading, useQuery } from "../../hooks";
+import { snackAlert, snackAlertError } from "../../slices/mainSlice";
+import { postAdded } from "../../slices/postsSlice";
+import Rules from "../Community/Rules";
+import AsUser from "../Post/AsUser";
+import CommunityCard from "../Post/CommunityCard";
+import Image from "./Image";
+import SelectCommunity from "./SelectCommunity";
 
 const NewPost = () => {
   const dispatch = useDispatch();
@@ -27,16 +29,18 @@ const NewPost = () => {
   const user = useSelector((state) => state.main.user);
   const loggedIn = user !== null;
   useEffect(() => {
-    if (!loggedIn) history.push('/login');
+    if (!loggedIn) {
+      history.push("/login");
+    }
   }, [loggedIn]);
 
   const query = useQuery();
-  const isEditPost = query.has('edit');
-  const editPostId = query.get('edit');
+  const isEditPost = query.has("edit");
+  const editPostId = query.get("edit");
   const [changed, setChanged] = useState(false);
 
-  const [postType, setPostType] = useState('text');
-  const [userGroup, setUserGroup] = useState('normal');
+  const [postType, setPostType] = useState("text");
+  const [userGroup, setUserGroup] = useState("normal");
 
   const bannedFrom = useSelector((state) => state.main.bannedFrom);
   const [community, setCommunity] = useState(null);
@@ -44,7 +48,8 @@ const NewPost = () => {
   const [isMod, setIsMod] = useState(false);
   useEffect(() => {
     if (community !== null) {
-      const _isBanned = bannedFrom.find((id) => id === community.id) !== undefined;
+      const _isBanned =
+        bannedFrom.find((id) => id === community.id) !== undefined;
       if (_isBanned) {
         alert(`You are banned from ${community.name}`);
       }
@@ -60,8 +65,8 @@ const NewPost = () => {
       const rcomm = await mfetchjson(`/api/communities/${ncomm.id}`);
       setCommunity(rcomm);
       const query = new URLSearchParams(history.location.search);
-      if (query.get('community') !== ncomm.name) {
-        query.set('community', ncomm.name);
+      if (query.get("community") !== ncomm.name) {
+        query.set("community", ncomm.name);
         history.replace(`${history.location.pathname}?${query.toString()}`);
       }
     } catch (error) {
@@ -69,10 +74,11 @@ const NewPost = () => {
     }
   };
 
-  const [title, _setTitle] = useState('');
-  const setTitle = (title) => _setTitle(title.length > 255 ? title.substr(0, 256) : title);
-  const [body, setBody] = useState('');
-  const [link, setLink] = useState('');
+  const [title, _setTitle] = useState("");
+  const setTitle = (title) =>
+    _setTitle(title.length > 255 ? title.substr(0, 256) : title);
+  const [body, setBody] = useState("");
+  const [link, setLink] = useState("");
   const [images, SetImages] = useState([]);
   const maxNumOfImages = CONFIG.maxImagesPerPost;
 
@@ -82,31 +88,33 @@ const NewPost = () => {
     if (isEditPost) {
       (async () => {
         try {
-          const post = await mfetchjson(`/api/posts/${editPostId}?fetchCommunity=true`);
+          const post = await mfetchjson(
+            `/api/posts/${editPostId}?fetchCommunity=true`,
+          );
           setCommunity(post.community);
           setTitle(post.title);
           setBody(post.body);
           setPost(post);
-          if (post.type === 'image') {
+          if (post.type === "image") {
             SetImages(post.images);
-          } else if (post.type === 'link') {
-            setLink(post.deletedContent ? 'Deleted link' : post.link.url);
+          } else if (post.type === "link") {
+            setLink(post.deletedContent ? "Deleted link" : post.link.url);
           }
           setPostType(post.type);
-          setLoading('loaded');
+          setLoading("loaded");
         } catch (error) {
           dispatch(snackAlertError(error));
         }
       })();
     } else {
-      setLoading('loaded');
+      setLoading("loaded");
     }
   }, [editPostId]);
 
   useLayoutEffect(() => {
-    document.body.style.overflowY = 'hidden';
+    document.body.style.overflowY = "hidden";
     return () => {
-      document.body.style.overflowY = 'scroll';
+      document.body.style.overflowY = "scroll";
     };
   }, []);
 
@@ -119,7 +127,7 @@ const NewPost = () => {
     // Check to see if uploading these images would reach the max image limit.
     if (images.length + files.length > maxNumOfImages) {
       alert(
-        `Image posts cannot contain more than ${maxNumOfImages} images. Please select fewer images and continue.`
+        `Image posts cannot contain more than ${maxNumOfImages} images. Please select fewer images and continue.`,
       );
       return;
     }
@@ -127,31 +135,32 @@ const NewPost = () => {
     for (const file of files) {
       try {
         const data = new FormData();
-        data.append('image', file);
-        const res = await mfetch('/api/_uploads', {
+        data.append("image", file);
+        const res = await mfetch("/api/_uploads", {
           signal: abortController.current.signal,
-          method: 'POST',
+          method: "POST",
           body: data,
         });
         if (!res.ok) {
           if (res.status === 400) {
             const error = await res.json();
-            if (error.code === 'file_size_exceeded') {
-              dispatch(snackAlert('Maximum file size exceeded.'));
+            if (error.code === "file_size_exceeded") {
+              dispatch(snackAlert("Maximum file size exceeded."));
               return;
-            } else if (error.code === 'unsupported_image') {
-              dispatch(snackAlert('Unsupported image.'));
+            }
+            if (error.code === "unsupported_image") {
+              dispatch(snackAlert("Unsupported image."));
               return;
             }
           }
-          throw new APIError(res.status, await res.json());
+          throw new ApiError(res.status, await res.json());
         }
         const resImage = await res.json();
         SetImages((images) => {
           return [...images, resImage];
         });
       } catch (error) {
-        if (!(error instanceof DOMException && error.name === 'AbortError')) {
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
           dispatch(snackAlertError(error));
         }
         break;
@@ -167,43 +176,47 @@ const NewPost = () => {
   // For only when editing a post.
   const returnToWhence = (post) => {
     const state = location.state;
-    if (state && state.fromPostPage) {
+    if (state?.fromPostPage) {
       // fromPostPage property is set manually upon edit button click.
       history.goBack();
     } else {
-      history.replace(`/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`);
+      history.replace(
+        `/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`,
+      );
     }
   };
 
   const [_isSubmitDisabled, setIsSubmitting] = useState(false);
   const isSubmitDisabled = _isSubmitDisabled || isUploading;
   const handleSubmit = async () => {
-    if (isSubmitDisabled) return;
+    if (isSubmitDisabled) {
+      return;
+    }
     if (isBanned) {
-      alert('You are banned from community');
+      alert("You are banned from community");
       return;
     }
     if (community === null) {
-      alert('Select a community first');
+      alert("Select a community first");
       return;
     }
     if (title.length < 3) {
       if (title.length === 0) {
-        alert('Your post needs a title');
+        alert("Your post needs a title");
         return;
       }
-      alert('Title is too short');
+      alert("Title is too short");
       return;
     }
-    if (postType === 'image') {
+    if (postType === "image") {
       if (images.length === 0) {
         alert("You haven't uploaded an image");
         return;
       }
     }
-    if (postType === 'link') {
-      if (link === '') {
-        alert('Please submit a valid URL');
+    if (postType === "link") {
+      if (link === "") {
+        alert("Please submit a valid URL");
         return;
       }
     }
@@ -212,12 +225,12 @@ const NewPost = () => {
       let newPost;
       if (isEditPost) {
         newPost = await mfetchjson(`/api/posts/${editPostId}`, {
-          method: 'PUT',
+          method: "PUT",
           body: JSON.stringify({ title, body, userGroup }),
         });
       } else {
-        const res = await mfetch('/api/posts', {
-          method: 'POST',
+        const res = await mfetch("/api/posts", {
+          method: "POST",
           body: JSON.stringify({
             type: postType,
             title,
@@ -225,26 +238,26 @@ const NewPost = () => {
             community: community.name,
             userGroup,
             images:
-              postType === 'image'
+              postType === "image"
                 ? images.map((image) => {
                     return {
                       imageId: image.id,
-                      caption: '',
+                      caption: "",
                     };
                   })
                 : undefined,
-            url: postType === 'link' ? link : undefined,
+            url: postType === "link" ? link : undefined,
           }),
         });
         if (!res.ok) {
           if (res.status === 400) {
             const error = await res.json();
-            if (error.code === 'invalid_url') {
-              dispatch(snackAlert('The URL you provided is not a valid URL.'));
+            if (error.code === "invalid_url") {
+              dispatch(snackAlert("The URL you provided is not a valid URL."));
               return;
             }
           }
-          throw new APIError(res.status, await res.json());
+          throw new ApiError(res.status, await res.json());
         }
         newPost = await res.json();
       }
@@ -258,54 +271,73 @@ const NewPost = () => {
   };
   useEffect(() => {
     const listner = (e) => {
-      if (e.key === 'Enter' && e.ctrlKey) {
+      if (e.key === "Enter" && e.ctrlKey) {
         handleSubmit();
       }
     };
-    window.addEventListener('keydown', listner);
-    return () => window.removeEventListener('keydown', listner);
+    window.addEventListener("keydown", listner);
+    return () => window.removeEventListener("keydown", listner);
   }, [handleSubmit]);
   const handleCancel = () => {
-    if (((changed || isUploading) && confirm('Are you sure you want to leave?')) || !changed) {
-      if (isUploading) abortController.current.abort();
+    if (
+      ((changed || isUploading) &&
+        confirm("Are you sure you want to leave?")) ||
+      !changed
+    ) {
+      if (isUploading) {
+        abortController.current.abort();
+      }
       if (window.appData.historyLength > 1) {
         history.goBack();
       } else {
-        history.replace('/');
+        history.replace("/");
       }
     }
   };
 
   const overrideTitle = useRef(true);
   const handleTitleChange = (e) => {
-    overrideTitle.current = e.target.value === '';
-    if (!changed) setChanged(true);
+    overrideTitle.current = e.target.value === "";
+    if (!changed) {
+      setChanged(true);
+    }
     setTitle(e.target.value);
   };
 
   const handleBodyChange = (e) => {
-    if (!changed) setChanged(true);
+    if (!changed) {
+      setChanged(true);
+    }
     setBody(e.target.value);
   };
   const handleBodyPaste = (e) => {
-    let paste = (e.clipboardData || window.clipboardData).getData('text');
-    if (body.trim() === '' && !isEditPost && isValidHttpUrl(paste) && overrideTitle.current) {
-      setPostType('link');
+    const paste = (e.clipboardData || window.clipboardData).getData("text");
+    if (
+      body.trim() === "" &&
+      !isEditPost &&
+      isValidHttpUrl(paste) &&
+      overrideTitle.current
+    ) {
+      setPostType("link");
       handleLinkChange({ target: { value: paste } });
       autoFillTitle(paste);
     }
   };
 
   const handleLinkChange = (e) => {
-    if (!changed) setChanged(true);
+    if (!changed) {
+      setChanged(true);
+    }
     setLink(e.target.value);
   };
   const autoFillTitle = async (url) => {
     // overrideTitle.current = true;
     try {
-      const res = await mfetchjson(`/api/_link_info?url=${encodeURIComponent(url)}`);
+      const res = await mfetchjson(
+        `/api/_link_info?url=${encodeURIComponent(url)}`,
+      );
       setChanged(true);
-      if (overrideTitle.current === true && res.title !== '') {
+      if (overrideTitle.current === true && res.title !== "") {
         setTitle(res.title);
       }
     } catch (error) {
@@ -313,13 +345,13 @@ const NewPost = () => {
     }
   };
   const handleLinkPaste = (e) => {
-    let paste = (e.clipboardData || window.clipboardData).getData('text');
+    const paste = (e.clipboardData || window.clipboardData).getData("text");
     if (isValidHttpUrl(paste) && overrideTitle.current) {
       autoFillTitle(paste);
     }
   };
 
-  if (loading !== 'loaded') {
+  if (loading !== "loaded") {
     return (
       <div className="page-new">
         <PageLoading />
@@ -332,10 +364,12 @@ const NewPost = () => {
   return (
     <div className="page-new">
       <Helmet>
-        <title>{isEditPost ? 'Edit Post' : 'New Post'}</title>
+        <title>{isEditPost ? "Edit Post" : "New Post"}</title>
       </Helmet>
       <div className="page-new-topbar">
-        <div className="page-new-topbar-title">{isEditPost ? 'Edit post' : 'Create a post'}</div>
+        <div className="page-new-topbar-title">
+          {isEditPost ? "Edit post" : "Create a post"}
+        </div>
         <ButtonClose onClick={handleCancel} />
       </div>
       <div className="page-new-content">
@@ -343,16 +377,16 @@ const NewPost = () => {
           <SelectCommunity
             onChange={handleCommunityChange}
             disabled={isEditPost}
-            initial={community ? community.name : ''}
+            initial={community ? community.name : ""}
           />
           <div className="card page-new-form">
-            <div className={'page-new-tabs' + (isImagePostsDisabled ? ' is-two-tabs' : '')}>
+            <div
+              className={`page-new-tabs ${isImagePostsDisabled ? "is-two-tabs" : ""}`}
+            >
               <button
-                className={
-                  'button-clear button-with-icon pn-tabs-item' +
-                  (postType === 'text' ? ' is-selected' : '')
-                }
-                onClick={() => setPostType('text')}
+                type="button"
+                className={`button-clear button-with-icon pn-tabs-item ${postType === "text" ? "is-selected" : ""}`}
+                onClick={() => setPostType("text")}
                 disabled={isEditPost}
               >
                 <svg
@@ -370,11 +404,9 @@ const NewPost = () => {
               </button>
               {!isImagePostsDisabled && (
                 <button
-                  className={
-                    'button-clear button-with-icon pn-tabs-item' +
-                    (postType === 'image' ? ' is-selected' : '')
-                  }
-                  onClick={() => setPostType('image')}
+                  type="button"
+                  className={`button-clear button-with-icon pn-tabs-item ${postType === "image" ? " is-selected" : ""}`}
+                  onClick={() => setPostType("image")}
                   disabled={isEditPost}
                 >
                   <svg
@@ -392,11 +424,9 @@ const NewPost = () => {
                 </button>
               )}
               <button
-                className={
-                  'button-clear button-with-icon pn-tabs-item' +
-                  (postType === 'link' ? ' is-selected' : '')
-                }
-                onClick={() => setPostType('link')}
+                type="button"
+                className={`button-clear button-with-icon pn-tabs-item ${postType === "link" ? " is-selected" : ""}`}
+                onClick={() => setPostType("link")}
                 disabled={isEditPost}
               >
                 <svg
@@ -421,7 +451,7 @@ const NewPost = () => {
               rows="1"
               adjustable
             />
-            {postType === 'text' && (
+            {postType === "text" && (
               <Textarea
                 className="page-new-post-body"
                 placeholder="Post content goes here (optional)..."
@@ -432,24 +462,25 @@ const NewPost = () => {
                 disabled={isEditPost ? post.deletedContent : false}
               />
             )}
-            {postType === 'image' && (
+            {postType === "image" && (
               <div className="page-new-image-upload">
                 {images.length > 0 &&
                   images.map((image) => (
                     <Image
+                      key={image.id}
                       image={image}
                       onClose={() => deleteImage(image.id)}
                       disabled={isEditPost}
                     />
                   ))}
-                {!isEditPost && !(post && post.deletedContent) && (
+                {!(isEditPost || post?.deletedContent) && (
                   <ImageUploadArea
                     isUploading={isUploading}
                     onImagesUpload={handleImagesUpload}
                     disabled={images.length >= maxNumOfImages}
                   />
                 )}
-                {post && post.deletedContent && (
+                {post?.deletedContent && (
                   <div className="page-new-image-deleted flex flex-column flex-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -466,7 +497,7 @@ const NewPost = () => {
                 )}
               </div>
             )}
-            {postType === 'link' && (
+            {postType === "link" && (
               <Textarea
                 className="page-new-post-body"
                 placeholder="Paste URL here..."
@@ -484,32 +515,50 @@ const NewPost = () => {
             </div>
           )}
           <div className="new-page-help">
-            {'Use '}
+            {"Use "}
             <Link to="/markdown_guide" target="_blank">
               Markdown
             </Link>
-            {' to format posts.'}
+            {" to format posts."}
           </div>
           <div className="page-new-buttons is-no-m">
-            <button className="button-main" onClick={handleSubmit} disabled={isSubmitDisabled}>
+            <button
+              type="button"
+              className="button-main"
+              onClick={handleSubmit}
+              disabled={isSubmitDisabled}
+            >
               Submit
             </button>
-            <button onClick={handleCancel}>Cancel</button>
+            <button type="button" onClick={handleCancel}>
+              Cancel
+            </button>
           </div>
         </div>
         <div className="new-page-sidebar">
           {community && (
             <>
               <CommunityCard community={community} />
-              <Rules rules={community.rules} communityName={community.name} unordered />
+              <Rules
+                rules={community.rules}
+                communityName={community.name}
+                unordered
+              />
             </>
           )}
         </div>
         <div className="page-new-buttons is-m">
-          <button className="button-main" onClick={handleSubmit} disabled={isSubmitDisabled}>
+          <button
+            type="button"
+            className="button-main"
+            onClick={handleSubmit}
+            disabled={isSubmitDisabled}
+          >
             Submit
           </button>
-          <button onClick={handleCancel}>Cancel</button>
+          <button type="button" onClick={handleCancel}>
+            Cancel
+          </button>
         </div>
       </div>
     </div>
@@ -540,25 +589,23 @@ const ImageUploadArea = ({ isUploading, onImagesUpload, disabled = false }) => {
   // Prevent image load on missing drop-zone.
   useEffect(() => {
     const handleDrop = (e) => {
-      if (!['TEXTAREA', 'INPUT'].includes(e.target.nodeName)) e.preventDefault();
+      if (!["TEXTAREA", "INPUT"].includes(e.target.nodeName)) {
+        e.preventDefault();
+      }
     };
     const handleDragOver = (e) => e.preventDefault();
-    window.addEventListener('drop', handleDrop);
-    window.addEventListener('dragover', handleDragOver);
+    window.addEventListener("drop", handleDrop);
+    window.addEventListener("dragover", handleDragOver);
     return () => {
-      window.removeEventListener('drop', handleDrop);
-      window.removeEventListener('dragover', handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+      window.removeEventListener("dragover", handleDragOver);
     };
   }, []);
 
   return (
     <div
       ref={dropzoneRef}
-      className={
-        'page-new-image-drop' +
-        (isDraggingOver ? ' is-dropping' : '') +
-        (disabled ? +' is-disabled' : '')
-      }
+      className={`page-new-image-drop ${isDraggingOver ? "is-dropping" : ""} ${disabled ? +"is-disabled" : ""}`}
       onClick={handleAddPhoto}
       onDragEnter={() => {
         setIsDraggingOver(true);
@@ -579,14 +626,14 @@ const ImageUploadArea = ({ isUploading, onImagesUpload, disabled = false }) => {
       }}
     >
       <div className="page-new-image-text">
-        {!disabled && !isUploading && (
+        {!(disabled || isUploading) && (
           <>
             <input
               ref={fileInputRef}
               type="file"
               multiple
               name="image"
-              style={{ visibility: 'hidden', width: 0, height: 0 }}
+              style={{ visibility: "hidden", width: 0, height: 0 }}
               onChange={handleFileChange}
               disabled={disabled}
             />

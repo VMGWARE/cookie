@@ -1,5 +1,6 @@
-import React from 'react';
-import Navbar from '../components/Navbar';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import Navbar from "../components/Navbar";
 
 const Offline = () => {
   const handleRetry = () => window.location.reload();
@@ -9,7 +10,9 @@ const Offline = () => {
       <div className="page-content page-notfound page-offline">
         <h1>You're offline</h1>
         <p>Check your internet connection.</p>
-        <button onClick={handleRetry}>Retry</button>
+        <button type="button" onClick={handleRetry}>
+          Retry
+        </button>
       </div>
     </>
   );

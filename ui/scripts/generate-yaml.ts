@@ -1,4 +1,4 @@
-import { $ } from 'bun';
+import { $ } from "bun";
 
 const { stdout } = await $`cd .. && ./discuit inject-config`.quiet();
-Bun.write('../ui-config.yaml', stdout);
+Bun.write("../ui-config.yaml", stdout);

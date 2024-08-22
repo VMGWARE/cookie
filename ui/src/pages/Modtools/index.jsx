@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { useDispatch, useSelector } from 'react-redux';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Link,
   Redirect,
@@ -9,22 +11,21 @@ import {
   useLocation,
   useParams,
   useRouteMatch,
-} from 'react-router-dom';
-import Sidebar from '../../components/Sidebar';
-import { APIError, mfetch } from '../../helper';
-import { useLoading } from '../../hooks';
-import { communityAdded, selectCommunity } from '../../slices/communitiesSlice';
-import { snackAlertError } from '../../slices/mainSlice';
-import PageNotLoaded from '../PageNotLoaded';
-import Banned from './Banned';
-import Removed from './Removed';
-import Reports from './Reports';
-import Rules from './Rules';
-import Settings from './Settings';
-import Mods from './Mods';
+} from "react-router-dom";
+import Sidebar from "../../components/Sidebar";
+import { ApiError, mfetch } from "../../helper";
+import { communityAdded, selectCommunity } from "../../slices/communitiesSlice";
+import { snackAlertError } from "../../slices/mainSlice";
+import PageNotLoaded from "../PageNotLoaded";
+import Banned from "./Banned";
+import Mods from "./Mods";
+import Removed from "./Removed";
+import Reports from "./Reports";
+import Rules from "./Rules";
+import Settings from "./Settings";
 
-function isActiveCls(className, isActive, activeClass = 'is-active') {
-  return className + (isActive ? ` ${activeClass}` : '');
+function isActiveCls(className, isActive, activeClass = "is-active") {
+  return className + (isActive ? ` ${activeClass}` : "");
 }
 
 const Modtools = () => {
@@ -34,38 +35,42 @@ const Modtools = () => {
   const user = useSelector((state) => state.main.user);
 
   const community = useSelector(selectCommunity(communityName));
-  const [loading, setLoading] = useState(community ? 'loaded' : 'loading');
+  const [loading, setLoading] = useState(community ? "loaded" : "loading");
   useEffect(() => {
-    if (community) return;
+    if (community) {
+      return;
+    }
     (async () => {
-      setLoading('loading');
+      setLoading("loading");
       try {
-        const res = await mfetch(`/api/communities/${communityName}?byName=true`);
+        const res = await mfetch(
+          `/api/communities/${communityName}?byName=true`,
+        );
         if (!res.ok) {
           if (res.status === 404) {
-            setLoading('notfound');
+            setLoading("notfound");
             return;
           }
-          throw new APIError(res.status, await res.json());
+          throw new ApiError(res.status, await res.json());
         }
         const rcomm = await res.json();
         dispatch(communityAdded(rcomm));
-        setLoading('loaded');
+        setLoading("loaded");
       } catch (error) {
-        setLoading('error');
+        setLoading("error");
         dispatch(snackAlertError(error));
       }
     })();
   }, [name, community]);
 
-  let { path } = useRouteMatch();
+  const { path } = useRouteMatch();
   const { pathname } = useLocation();
 
-  if (loading !== 'loaded') {
+  if (loading !== "loaded") {
     return <PageNotLoaded loading={loading} />;
   }
 
-  if (!(community.userMod || (user && user.isAdmin))) {
+  if (!(community.userMod || user?.isAdmin)) {
     return (
       <div className="page-content page-full">
         <h1>Forbidden!</h1>
@@ -84,52 +89,76 @@ const Modtools = () => {
       <Sidebar />
       <div className="modtools-head">
         <h1>
-          <Link to={`/${CONFIG.communityPrefix}${communityName}`}>{communityName} </Link>Modtools
+          <Link to={`/${CONFIG.communityPrefix}${communityName}`}>
+            {communityName}{" "}
+          </Link>
+          Modtools
         </h1>
       </div>
       <div className="modtools-dashboard">
         <div className="sidebar">
           <Link
-            className={isActiveCls('sidebar-item', pathname === '/modtools/settings')}
+            className={isActiveCls(
+              "sidebar-item",
+              pathname === "/modtools/settings",
+            )}
             to={`/${CONFIG.communityPrefix}${communityName}/modtools/settings`}
           >
             Community settings
           </Link>
           <div className="sidebar-topic">Content</div>
           <Link
-            className={isActiveCls('sidebar-item', pathname === '/modtools/reports')}
+            className={isActiveCls(
+              "sidebar-item",
+              pathname === "/modtools/reports",
+            )}
             to={`/${CONFIG.communityPrefix}${communityName}/modtools/reports`}
           >
             Reports
           </Link>
           <Link
-            className={isActiveCls('sidebar-item', pathname === '/modtools/removed')}
+            className={isActiveCls(
+              "sidebar-item",
+              pathname === "/modtools/removed",
+            )}
             to={`/${CONFIG.communityPrefix}${communityName}/modtools/removed`}
           >
             Removed
           </Link>
           <Link
-            className={isActiveCls('sidebar-item', pathname === '/modtools/locked')}
+            className={isActiveCls(
+              "sidebar-item",
+              pathname === "/modtools/locked",
+            )}
             to={`/${CONFIG.communityPrefix}${communityName}/modtools/locked`}
           >
             Locked
           </Link>
           <div className="sidebar-topic">Users</div>
           <Link
-            className={isActiveCls('sidebar-item', pathname === '/modtools/banned')}
+            className={isActiveCls(
+              "sidebar-item",
+              pathname === "/modtools/banned",
+            )}
             to={`/${CONFIG.communityPrefix}${communityName}/modtools/banned`}
           >
             Banned
           </Link>
           <Link
-            className={isActiveCls('sidebar-item', pathname === '/modtools/mods')}
+            className={isActiveCls(
+              "sidebar-item",
+              pathname === "/modtools/mods",
+            )}
             to={`/${CONFIG.communityPrefix}${communityName}/modtools/mods`}
           >
             Moderators
           </Link>
           <div className="sidebar-topic">Rules</div>
           <Link
-            className={isActiveCls('sidebar-item', pathname === '/modtools/rules')}
+            className={isActiveCls(
+              "sidebar-item",
+              pathname === "/modtools/rules",
+            )}
             to={`/${CONFIG.communityPrefix}${communityName}/modtools/rules`}
           >
             Rules
@@ -137,7 +166,9 @@ const Modtools = () => {
         </div>
         <Switch>
           <Route exact path={path}>
-            <Redirect to={`/${CONFIG.communityPrefix}${communityName}/modtools/settings`} />
+            <Redirect
+              to={`/${CONFIG.communityPrefix}${communityName}/modtools/settings`}
+            />
           </Route>
           <Route exact path={`${path}/settings`}>
             <Settings community={community} />

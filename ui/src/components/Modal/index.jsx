@@ -1,10 +1,10 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
-import { getScrollbarWidth } from '../../helper';
-import { useHistory } from 'react-router-dom';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useLayoutEffect, useState } from "react";
+import reactDom from "react-dom";
+import { useHistory } from "react-router-dom";
+import { getScrollbarWidth } from "../../helper";
 
 const Modal = ({
   open,
@@ -32,39 +32,45 @@ const Modal = ({
 
   useEffect(() => {
     if (open) {
-      const unlisten = history.listen((location, action) => {
-        if (action === 'POP') onClose();
+      const unlisten = history.listen((action) => {
+        if (action === "POP") {
+          onClose();
+        }
       });
       return () => unlisten();
     }
   }, [open]);
 
-  const [el] = useState(document.createElement('el'));
+  const [el] = useState(document.createElement("el"));
   useEffect(() => {
-    document.getElementById('modal-root').appendChild(el);
+    document.getElementById("modal-root").appendChild(el);
     return () => {
-      document.getElementById('modal-root').removeChild(el);
+      document.getElementById("modal-root").removeChild(el);
     };
   }, []);
 
   const handleKeyDown = (e) => {
-    if (!noEscapeClose && e.key === 'Escape') onClose();
-    if (onKeyDown) onKeyDown(e);
+    if (!noEscapeClose && e.key === "Escape") {
+      onClose();
+    }
+    if (onKeyDown) {
+      onKeyDown(e);
+    }
   };
   useEffect(() => {
     if (open) {
-      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener("keydown", handleKeyDown);
       return () => {
-        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener("keydown", handleKeyDown);
       };
     }
   }, [open]);
 
   useLayoutEffect(() => {
     const width = getScrollbarWidth();
-    const navbarEl = document.querySelector('.navbar');
+    const navbarEl = document.querySelector(".navbar");
     if (open) {
-      document.body.classList.add('is-clipped');
+      document.body.classList.add("is-clipped");
       // Scrollbar always visible now
       // if (isScrollbarVisible()) {
       document.body.style.paddingRight = `${width}px`;
@@ -75,17 +81,17 @@ const Modal = ({
     }
     return () => {
       if (open) {
-        document.body.classList.remove('is-clipped');
-        document.body.style.paddingRight = '0';
+        document.body.classList.remove("is-clipped");
+        document.body.style.paddingRight = "0";
         if (navbarEl) {
-          navbarEl.style.paddingRight = `0`;
+          navbarEl.style.paddingRight = "0";
         }
       }
     };
   });
 
   const handleBgClick = (e) => {
-    if (!noOuterClickClose && e.target.classList.contains('modal-bg')) {
+    if (!noOuterClickClose && e.target.classList.contains("modal-bg")) {
       onClose();
     }
   };
@@ -94,14 +100,14 @@ const Modal = ({
     return null;
   }
 
-  return ReactDOM.createPortal(
+  return reactDom.createPortal(
     <div className="modal" onClick={handleBgClick}>
       <div className="modal-container">
         <div className="modal-modal">{children}</div>
-        <div className="modal-bg"></div>
+        <div className="modal-bg" />
       </div>
     </div>,
-    el
+    el,
   );
 };
 

@@ -1,4 +1,4 @@
-@use 'mixins';
+@use "mixins";
 
 .page-post {
     display: grid;
@@ -18,7 +18,9 @@
             }
             &.is-sticky {
                 position: sticky;
-                top: calc(var(--navbar-height) + var(--gap)); // var(--page-top-margin);
+                top: calc(
+                    var(--navbar-height) + var(--gap)
+                ); // var(--page-top-margin);
                 left: 0;
             }
         }
@@ -92,7 +94,7 @@
                 margin-bottom: var(--gap);
                 .post-card-link-image-img {
                     &::after {
-                        content: '';
+                        content: "";
                         position: absolute;
                         top: 0;
                         right: 0;
@@ -438,11 +440,11 @@
                 transform: translate(-50%, -50%);
             }
             &::after {
-                content: '';
+                content: "";
             }
             &.is-plus {
                 &::before {
-                    content: '';
+                    content: "";
                     height: 50%;
                     width: 1px;
                 }
@@ -537,7 +539,11 @@
                             var(--color-fg) 90%,
                             transparent
                         );
-                        mask-image: linear-gradient(180deg, var(--color-fg) 90%, transparent);
+                        mask-image: linear-gradient(
+                            180deg,
+                            var(--color-fg) 90%,
+                            transparent
+                        );
                     }
                 }
             }
@@ -743,8 +749,8 @@
                     cursor: unset;
                 }
             }
-            input[type='checkbox'],
-            input[type='radio'] {
+            input[type="checkbox"],
+            input[type="radio"] {
                 // --disabled: var(--active);
                 // --disabled-inner: var(--active-inner);
             }
@@ -755,7 +761,7 @@
         li {
             &:not(.task-list-item):before {
                 display: inline-block;
-                content: '– ';
+                content: "– ";
                 margin-right: calc(var(--gap) / 2);
             }
         }

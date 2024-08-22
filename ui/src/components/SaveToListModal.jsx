@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import Modal from './Modal';
-import { ButtonClose } from './Button';
-import Input from './Input';
-import { useDispatch, useSelector } from 'react-redux';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { mfetchjson } from "../helper";
+import { EditListForm } from "../pages/Lists/List";
 import {
-  listsAdded,
   saveToListModalClosed,
   snackAlert,
   snackAlertError,
-} from '../slices/mainSlice';
-import { mfetchjson } from '../helper';
-import { EditListForm } from '../pages/Lists/List';
+} from "../slices/mainSlice";
+import { ButtonClose } from "./Button";
+import Modal from "./Modal";
 
 const SaveToListModal = () => {
   const dispatch = useDispatch();
-  const { open, toSaveItemId, toSaveItemType } = useSelector((state) => state.main.saveToListModal);
+  const { open, toSaveItemId, toSaveItemType } = useSelector(
+    (state) => state.main.saveToListModal,
+  );
   const handleClose = () => dispatch(saveToListModalClosed());
 
   if (open) {
@@ -37,15 +39,14 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
 
   const dispatch = useDispatch();
 
-  const user = useSelector((state) => state.main.user);
-  const [page, setPage] = useState('list'); // One of: list, new.
+  const [page, setPage] = useState("list"); // One of: list, new.
 
   const [prevCheckedLists, setPrevCheckedLists] = useState(null); // List of list ids.
   useEffect(() => {
     const f = async () => {
       try {
         const ids = await mfetchjson(
-          `/api/lists/_saved_to?id=${toSaveItemId}&type=${toSaveItemType}`
+          `/api/lists/_saved_to?id=${toSaveItemId}&type=${toSaveItemType}`,
         );
         setPrevCheckedLists(ids);
       } catch (error) {
@@ -57,7 +58,8 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
 
   const lists = useSelector((state) => state.main.lists.lists);
   const [listState, setListState] = useState({});
-  const listsLoading = lists && listState && lists.length !== Object.keys(listState).length;
+  const listsLoading =
+    lists && listState && lists.length !== Object.keys(listState).length;
   useEffect(() => {
     if (prevCheckedLists === null) {
       return;
@@ -96,15 +98,20 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
     });
     try {
       await mfetchjson(`/api/lists/${list.id}/items`, {
-        method: checked ? 'POST' : 'DELETE',
+        method: checked ? "POST" : "DELETE",
         body: JSON.stringify({
           targetId: toSaveItemId,
           targetType: toSaveItemType,
         }),
       });
-      const alertText = checked ? `Saved to ${list.name}` : `Removed from ${list.name}`;
+      const alertText = checked
+        ? `Saved to ${list.name}`
+        : `Removed from ${list.name}`;
       dispatch(
-        snackAlert(alertText, `${checked ? 'add' : 'remove'}_listitem_${list.name}_${toSaveItemId}`)
+        snackAlert(
+          alertText,
+          `${checked ? "add" : "remove"}_listitem_${list.name}_${toSaveItemId}`,
+        ),
       );
     } catch (error) {
       setListItemState(list.id, {
@@ -121,11 +128,11 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
         <>
           <div className="modal-card-content">
             <div className="skeleton">
-              <div className="skeleton-bar"></div>
-              <div className="skeleton-bar"></div>
-              <div className="skeleton-bar"></div>
-              <div className="skeleton-bar"></div>
-              <div className="skeleton-bar"></div>
+              <div className="skeleton-bar" />
+              <div className="skeleton-bar" />
+              <div className="skeleton-bar" />
+              <div className="skeleton-bar" />
+              <div className="skeleton-bar" />
             </div>
           </div>
         </>
@@ -156,38 +163,38 @@ const TheModal = ({ open, onClose, toSaveItemId, toSaveItemType }) => {
     return (
       <>
         <div className="modal-card-content">
-          <div className="save-modal-list is-custom-scrollbar is-v2">{renderList()}</div>
+          <div className="save-modal-list is-custom-scrollbar is-v2">
+            {renderList()}
+          </div>
         </div>
         <div className="modal-card-actions">
-          <button onClick={() => setPage('new')}>Create new list</button>
+          <button type="button" onClick={() => setPage("new")}>
+            Create new list
+          </button>
         </div>
       </>
     );
   };
 
   const renderNewPage = () => {
-    const switchTab = () => setPage('list');
+    const switchTab = () => setPage("list");
     return <EditListForm onCancel={switchTab} onSuccess={switchTab} />;
   };
 
   return (
     <Modal open={open} onClose={handleClose}>
       <div
-        className={
-          'modal-card save-modal is-compact-mobile' +
-          (page === 'new' ? ' is-page-new' : '') +
-          (page === 'list' ? ' is-page-list' : '')
-        }
+        className={`modal-card save-modal is-compact-mobile ${page === "new" ? "is-page-new" : ""} ${page === "list" ? "is-page-list" : ""}`}
       >
         <div className="modal-card-head">
           <div className="modal-card-title">
-            {page === 'list' && 'Save to'}
-            {page === 'new' && 'Create list'}
+            {page === "list" && "Save to"}
+            {page === "new" && "Create list"}
           </div>
           <ButtonClose onClick={handleClose} />
         </div>
-        {page === 'list' && renderListPage()}
-        {page === 'new' && renderNewPage()}
+        {page === "list" && renderListPage()}
+        {page === "new" && renderNewPage()}
       </div>
     </Modal>
   );

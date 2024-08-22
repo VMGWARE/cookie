@@ -1,19 +1,17 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import Link from '../Link';
-import { omitWWWFromHostname, stringCount } from '../../helper';
-import MarkdownBody from '../MarkdownBody';
-import ShowMoreBox from '../ShowMoreBox';
-import PostVotes from './PostVotes';
-import PostCardHeadingDetails from './PostCardHeadingDetails';
-import Image from './Image';
-import LinkImage from './LinkImage';
-import { useIsMobile } from '../../hooks';
-import getEmbedComponent from './embed';
-import PostImageGallery from '../PostImageGallery';
+import PropTypes from "prop-types";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { omitWwwFromHostname, stringCount } from "../../helper";
+import { useIsMobile } from "../../hooks";
+import Link from "../Link";
+import MarkdownBody from "../MarkdownBody";
+import PostImageGallery from "../PostImageGallery";
+import ShowMoreBox from "../ShowMoreBox";
+import Image from "./Image";
+import LinkImage from "./LinkImage";
+import PostCardHeadingDetails from "./PostCardHeadingDetails";
+import PostVotes from "./PostVotes";
+import getEmbedComponent from "./embed";
 
 const PostCard = ({
   index = 100, // index in feed
@@ -32,26 +30,32 @@ const PostCard = ({
     setPost(initialPost);
   }, [initialPost]);
 
-  const postURL = `/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`;
-  const target = openInTab ? '_blank' : '_self';
+  const postUrl = `/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`;
+  const target = openInTab ? "_blank" : "_self";
   const disabled = inModTools || post.locked;
 
-  const handlePostCardClick = (e, target = '_blank') => {
+  const handlePostCardClick = (e, target = "_blank") => {
     let isButtonClick = false;
     let el = e.target;
-    while (el && !el.classList.contains('post-card-card')) {
-      if (el.nodeName === 'BUTTON' || el.nodeName === 'A' || el.classList.contains('is-button')) {
+    while (el && !el.classList.contains("post-card-card")) {
+      if (
+        el.nodeName === "BUTTON" ||
+        el.nodeName === "A" ||
+        el.classList.contains("is-button")
+      ) {
         isButtonClick = true;
         break;
       }
       el = el.parentElement;
-      if (!el.parentElement) isButtonClick = true; // Clicked somewhere outside .post-card-card.
+      if (!el.parentElement) {
+        isButtonClick = true;
+      } // Clicked somewhere outside .post-card-card.
     }
     if (!isButtonClick) {
-      if (target !== '_self') {
-        window.open(postURL);
+      if (target !== "_self") {
+        window.open(postUrl);
       } else {
-        history.push(postURL);
+        history.push(postUrl);
       }
     }
   };
@@ -59,7 +63,7 @@ const PostCard = ({
   const handleAuxClick = (e) => {
     // mouse middle button
     if (e.button === 1) {
-      handlePostCardClick(e, '_blank');
+      handlePostCardClick(e, "_blank");
     }
   };
 
@@ -67,23 +71,21 @@ const PostCard = ({
 
   const isMobile = useIsMobile();
   const isPinned = post.isPinned || post.isPinnedSite;
-  const showLink = !post.deletedContent && post.type === 'link';
+  const showLink = !post.deletedContent && post.type === "link";
 
-  const { isEmbed: _isEmbed, render: Embed, url: embedURL } = getEmbedComponent(post.link);
+  const {
+    isEmbed: _isEmbed,
+    render: Embed,
+    url: embedUrl,
+  } = getEmbedComponent(post.link);
   const isEmbed = !disableEmbeds && _isEmbed;
 
-  const showImage = !post.deletedContent && post.type === 'image' && post.image;
-  const imageLoadingStyle = index < 3 ? 'eager' : 'lazy';
+  const showImage = !post.deletedContent && post.type === "image" && post.image;
+  const imageLoadingStyle = index < 3 ? "eager" : "lazy";
 
   return (
     <div
-      className={
-        'post-card' +
-        (inModTools ? ' is-in-modtools' : '') +
-        (hideVoting ? ' no-voting' : '') +
-        (compact ? ' is-compact' : '') +
-        (isPinned ? ' is-pinned' : '')
-      }
+      className={`post-card ${inModTools ? "is-in-modtools" : ""} ${hideVoting ? "no-voting" : ""} ${compact ? "is-compact" : ""} ${isPinned ? "is-pinned" : ""}`}
     >
       {!hideVoting && <PostVotes post={post} disabled={disabled} />}
       <div
@@ -92,12 +94,22 @@ const PostCard = ({
         onAuxClick={handleAuxClick}
       >
         <div className="post-card-heading">
-          <PostCardHeadingDetails post={post} target={target} onRemoveFromList={onRemoveFromList} />
+          <PostCardHeadingDetails
+            post={post}
+            target={target}
+            onRemoveFromList={onRemoveFromList}
+          />
         </div>
-        <div className={'post-card-body' + (isDomainHovering ? ' is-domain-hover' : '')}>
+        <div
+          className={`post-card-body ${isDomainHovering ? "is-domain-hover" : ""}`}
+        >
           <div className="post-card-title">
             <div className="post-card-title-text">
-              <Link className="post-card-title-main" to={postURL} target={target}>
+              <Link
+                className="post-card-title-main"
+                to={postUrl}
+                target={target}
+              >
                 {post.title}
               </Link>
               {showLink && (
@@ -109,7 +121,7 @@ const PostCard = ({
                   onMouseEnter={() => setIsDomainHovering(true)}
                   onMouseLeave={() => setIsDomainHovering(false)}
                 >
-                  <span>{omitWWWFromHostname(post.link.hostname)}</span>
+                  <span>{omitWwwFromHostname(post.link.hostname)}</span>
                   <svg
                     fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
@@ -123,13 +135,17 @@ const PostCard = ({
               )}
             </div>
             {showLink && !isEmbed && post.link.image && (
-              <Link className="post-card-link-image" to={postURL} target={target}>
+              <Link
+                className="post-card-link-image"
+                to={postUrl}
+                target={target}
+              >
                 <LinkImage link={post.link} loading={imageLoadingStyle} />
               </Link>
             )}
           </div>
-          {isEmbed && <Embed url={embedURL} />}
-          {post.type === 'text' && (
+          {isEmbed && <Embed url={embedUrl} />}
+          {post.type === "text" && (
             <div className="post-card-text">
               <ShowMoreBox maxHeight="200px">
                 <MarkdownBody noLinks>{post.body}</MarkdownBody>
@@ -139,7 +155,7 @@ const PostCard = ({
           {showImage && post.images.length === 1 && (
             <Image
               image={post.images[0]}
-              to={postURL}
+              to={postUrl}
               target={target}
               isMobile={isMobile}
               loading={imageLoadingStyle}
@@ -151,7 +167,11 @@ const PostCard = ({
         </div>
         <div className="post-card-bottom">
           <div className="left">
-            <Link to={postURL} className="button button-text button-with-icon" target={target}>
+            <Link
+              to={postUrl}
+              className="button button-text button-with-icon"
+              target={target}
+            >
               <svg
                 width="24"
                 height="24"
@@ -172,11 +192,13 @@ const PostCard = ({
                   fill="currentColor"
                 />
               </svg>
-              <span>{stringCount(post.noComments, false, 'comment')}</span>
+              <span>{stringCount(post.noComments, false, "comment")}</span>
             </Link>
           </div>
           <div className="right">
-            {!hideVoting && <PostVotes post={post} disabled={disabled} mobile />}
+            {!hideVoting && (
+              <PostVotes post={post} disabled={disabled} mobile />
+            )}
           </div>
         </div>
       </div>

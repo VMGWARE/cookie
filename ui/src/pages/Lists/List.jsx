@@ -1,16 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
-import Sidebar from '../../components/Sidebar';
-import MiniFooter from '../../components/MiniFooter';
-import { Helmet } from 'react-helmet-async';
-import Link from '../../components/Link';
-import Modal from '../../components/Modal';
-import { ButtonClose, ButtonMore } from '../../components/Button';
-import Input, { InputWithCount } from '../../components/Input';
-import { APIError, dateString1, mfetch, mfetchjson, stringCount, timeAgo } from '../../helper';
-import { useDispatch, useSelector } from 'react-redux';
-import { listsAdded, snackAlertError } from '../../slices/mainSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { ButtonClose, ButtonMore } from "../../components/Button";
+import Dropdown from "../../components/Dropdown";
+import Feed from "../../components/Feed";
+import Input, { InputWithCount } from "../../components/Input";
+import Link from "../../components/Link";
+import MiniFooter from "../../components/MiniFooter";
+import Modal from "../../components/Modal";
+import PageLoading from "../../components/PageLoading";
+import { MemorizedPostCard } from "../../components/PostCard/PostCard";
+import Sidebar from "../../components/Sidebar";
+import { usernameMaxLength } from "../../config";
+import {
+  ApiError,
+  dateString1,
+  mfetch,
+  mfetchjson,
+  stringCount,
+  timeAgo,
+} from "../../helper";
+import { useInputUsername } from "../../hooks";
 import {
   FeedItem,
   feedInViewItemsUpdated,
@@ -19,18 +34,12 @@ import {
   feedUpdated,
   selectFeed,
   selectFeedInViewItems,
-} from '../../slices/feedsSlice';
-import Feed from '../../components/Feed';
-import { MemorizedPostCard } from '../../components/PostCard/PostCard';
-import { selectUser } from '../../slices/usersSlice';
-import { MemorizedComment } from '../User/Comment';
-import PageLoading from '../../components/PageLoading';
-import NotFound from '../NotFound';
-import { listAdded, selectList } from '../../slices/listsSlice';
-import { useInputUsername } from '../../hooks';
-import { usernameMaxLength } from '../../config';
-import { useHistory } from 'react-router-dom';
-import Dropdown from '../../components/Dropdown';
+} from "../../slices/feedsSlice";
+import { listAdded, selectList } from "../../slices/listsSlice";
+import { listsAdded, snackAlertError } from "../../slices/mainSlice";
+import { selectUser } from "../../slices/usersSlice";
+import NotFound from "../NotFound";
+import { MemorizedComment } from "../User/Comment";
 
 const List = () => {
   const dispatch = useDispatch();
@@ -39,11 +48,11 @@ const List = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   const list = useSelector(selectList(username, listname));
-  const [listLoading, setListLoading] = useState(list ? 'loaded' : 'loading');
+  const [listLoading, setListLoading] = useState(list ? "loaded" : "loading");
 
   const listEndpoint = `/api/users/${username}/lists/${listname}`;
   useEffect(() => {
-    if (listLoading !== 'loading') {
+    if (listLoading !== "loading") {
       return;
     }
     const f = async () => {
@@ -51,23 +60,23 @@ const List = () => {
         const res = await mfetch(listEndpoint);
         if (!res.ok) {
           if (res.status === 404) {
-            setListLoading('notfound');
+            setListLoading("notfound");
             return;
           }
           throw new Error(await res.text());
         }
         dispatch(listAdded(username, await res.json()));
-        setListLoading('loaded');
+        setListLoading("loaded");
       } catch (error) {
         dispatch(snackAlertError(error));
-        setListLoading('error');
+        setListLoading("error");
       }
     };
     f();
   }, [listLoading]);
   useEffect(() => {
     if (!list || list.name !== listname || list.username !== username) {
-      setListLoading('loading');
+      setListLoading("loading");
     }
   }, [list, username, listname]);
 
@@ -75,7 +84,7 @@ const List = () => {
   const feed = useSelector(selectFeed(feedEndpoint));
   const setFeed = (res) => {
     const feedItems = (res.items ?? []).map(
-      (item) => new FeedItem(item.targetItem, item.targetType, item.id)
+      (item) => new FeedItem(item.targetItem, item.targetType, item.id),
     );
     dispatch(feedUpdated(feedEndpoint, feedItems, res.next ?? null));
   };
@@ -92,7 +101,7 @@ const List = () => {
         const res = await mfetch(feedEndpoint);
         if (!res.ok) {
           if (res.status === 404) {
-            setFeedLoadingError(new Error('feed not found'));
+            setFeedLoadingError(new Error("feed not found"));
             return;
           }
         }
@@ -107,7 +116,9 @@ const List = () => {
 
   const [feedReloading, setFeedReloading] = useState(false);
   const fetchNextItems = async () => {
-    if (feedReloading) return;
+    if (feedReloading) {
+      return;
+    }
     try {
       setFeedReloading(true);
       const res = await mfetchjson(`${feedEndpoint}?next=${feed.next}`);
@@ -123,7 +134,7 @@ const List = () => {
     const endpoint = `/api/lists/${list.id}/items`;
     try {
       await mfetchjson(endpoint, {
-        method: 'DELETE',
+        method: "DELETE",
         body: JSON.stringify({ targetId: item.id, targetType: type }),
       });
       dispatch(feedReloaded(feedEndpoint));
@@ -137,21 +148,27 @@ const List = () => {
 
   const user = useSelector(selectUser(username));
   const handleRenderItem = (item) => {
-    if (item.type === 'post') {
+    if (item.type === "post") {
       return (
         <MemorizedPostCard
           initialPost={item.item}
-          disableEmbeds={user && user.embedsOff}
-          onRemoveFromList={viewerListOwner ? () => handleRemoveFromList(item.item, 'post') : null}
+          disableEmbeds={user?.embedsOff}
+          onRemoveFromList={
+            viewerListOwner
+              ? () => handleRemoveFromList(item.item, "post")
+              : null
+          }
         />
       );
     }
-    if (item.type === 'comment') {
+    if (item.type === "comment") {
       return (
         <MemorizedComment
           comment={item.item}
           onRemoveFromList={
-            viewerListOwner ? () => handleRemoveFromList(item.item, 'comment') : null
+            viewerListOwner
+              ? () => handleRemoveFromList(item.item, "comment")
+              : null
           }
         />
       );
@@ -168,11 +185,11 @@ const List = () => {
   };
 
   const handleRemoveAllItems = async () => {
-    if (!confirm('Are you sure you want to remove all items from the list?')) {
+    if (!confirm("Are you sure you want to remove all items from the list?")) {
       return;
     }
     try {
-      await mfetchjson(feedEndpoint, { method: 'DELETE' });
+      await mfetchjson(feedEndpoint, { method: "DELETE" });
       dispatch(feedReloaded(feedEndpoint));
     } catch (error) {
       dispatch(snackAlertError(error));
@@ -181,12 +198,12 @@ const List = () => {
 
   const history = useHistory();
   const handleDeleteList = async () => {
-    if (!confirm('Are you sure you want to delete the list?')) {
+    if (!confirm("Are you sure you want to delete the list?")) {
       return;
     }
     try {
-      await mfetchjson(listEndpoint, { method: 'DELETE' });
-      const res = await mfetchjson('/api/_initial');
+      await mfetchjson(listEndpoint, { method: "DELETE" });
+      const res = await mfetchjson("/api/_initial");
       dispatch(listsAdded(res.lists));
       history.replace(`/@${list.username}/lists/${name}`);
     } catch (error) {
@@ -194,8 +211,8 @@ const List = () => {
     }
   };
 
-  if (feedLoading || feedLoadingError || listLoading !== 'loaded' || !list) {
-    if (listLoading === 'notfound') {
+  if (feedLoading || feedLoadingError || listLoading !== "loaded" || !list) {
+    if (listLoading === "notfound") {
       return <NotFound />;
     }
     return <PageLoading />;
@@ -203,7 +220,11 @@ const List = () => {
 
   return (
     <div className="page-content wrap page-grid page-list">
-      <EditListModal list={list} open={editModalOpen} onClose={() => setEditModalOpen(false)} />
+      <EditListModal
+        list={list}
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+      />
       <Helmet>
         <title>{`${listname} of @${username}`}</title>
       </Helmet>
@@ -222,13 +243,25 @@ const List = () => {
           </div>
           {viewerListOwner && (
             <div className="list-head-actions">
-              <button onClick={() => setEditModalOpen(true)}>Edit list</button>
-              <Dropdown target={<ButtonMore style={{ background: 'var(--color-button)' }} />}>
+              <button type="button" onClick={() => setEditModalOpen(true)}>
+                Edit list
+              </button>
+              <Dropdown
+                target={
+                  <ButtonMore style={{ background: "var(--color-button)" }} />
+                }
+              >
                 <div className="dropdown-list">
-                  <div className="button-clear dropdown-item" onClick={handleRemoveAllItems}>
+                  <div
+                    className="button-clear dropdown-item"
+                    onClick={handleRemoveAllItems}
+                  >
                     Remove all items
                   </div>
-                  <div className="button-clear dropdown-item" onClick={handleDeleteList}>
+                  <div
+                    className="button-clear dropdown-item"
+                    onClick={handleDeleteList}
+                  >
                     Delete list
                   </div>
                 </div>
@@ -259,15 +292,15 @@ const List = () => {
           </div>
           <div className="card-content">
             <div className="card-list-item">
-              {SVGs.comment}
-              <div>{stringCount(list.numItems, false, 'total item')}</div>
+              {svGs.comment}
+              <div>{stringCount(list.numItems, false, "total item")}</div>
             </div>
             <div className="card-list-item">
-              {SVGs.calendar}
+              {svGs.calendar}
               <div>{`Created on ${dateString1(list.createdAt)}`}</div>
             </div>
             <div className="card-list-item">
-              {SVGs.clock}
+              {svGs.clock}
               <div>{`Last updated ${timeAgo(list.lastUpdatedAt)}`}</div>
             </div>
           </div>
@@ -300,9 +333,15 @@ EditListModal.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-const SVGs = {
+const svGs = {
   comment: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M21 7V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V7C3 4 4.5 2 8 2H16C19.5 2 21 4 21 7Z"
         stroke="currentColor"
@@ -338,7 +377,13 @@ const SVGs = {
     </svg>
   ),
   calendar: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M8 5.75C7.59 5.75 7.25 5.41 7.25 5V2C7.25 1.59 7.59 1.25 8 1.25C8.41 1.25 8.75 1.59 8.75 2V5C8.75 5.41 8.41 5.75 8 5.75Z"
         fill="currentColor"
@@ -382,7 +427,13 @@ const SVGs = {
     </svg>
   ),
   clock: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M12 22.75C6.07 22.75 1.25 17.93 1.25 12C1.25 6.07 6.07 1.25 12 1.25C17.93 1.25 22.75 6.07 22.75 12C22.75 17.93 17.93 22.75 12 22.75ZM12 2.75C6.9 2.75 2.75 6.9 2.75 12C2.75 17.1 6.9 21.25 12 21.25C17.1 21.25 21.25 17.1 21.25 12C21.25 6.9 17.1 2.75 12 2.75Z"
         fill="currentColor"
@@ -401,7 +452,10 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
 
   const [isPublic, setIsPublic] = useState(list ? list.public : false);
 
-  const [name, handleNameChange] = useInputUsername(usernameMaxLength, list ? list.name : '');
+  const [name, handleNameChange] = useInputUsername(
+    usernameMaxLength,
+    list ? list.name : "",
+  );
   const [nameError, setNameError] = useState(null);
   const handleNameBlur = async () => {
     if (list && list.name === name) {
@@ -415,7 +469,7 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
           setNameError(null);
           return;
         }
-        throw new APIError(res.status, await res.json());
+        throw new ApiError(res.status, await res.json());
       }
       setNameError(`List with name ${name} already exists.`);
     } catch (error) {
@@ -423,12 +477,12 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
     }
   };
 
-  const [displayName, setDisplayName] = useState(list ? list.displayName : '');
-  const [description, setDescription] = useState(list ? list.description : '');
+  const [displayName, setDisplayName] = useState(list ? list.displayName : "");
+  const [description, setDescription] = useState(list ? list.description : "");
 
   const createNewList = async () => {
     const newLists = await mfetchjson(`/api/users/${user.username}/lists`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({
         name,
         displayName,
@@ -442,7 +496,7 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
   const history = useHistory();
   const updateList = async () => {
     const newList = await mfetchjson(`/api/lists/${list.id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({
         name,
         displayName,
@@ -450,7 +504,7 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
         public: isPublic,
       }),
     });
-    const res = await mfetchjson('/api/_initial');
+    const res = await mfetchjson("/api/_initial");
     dispatch(listsAdded(res.lists));
     history.replace(`/@${list.username}/lists/${name}`);
     dispatch(listAdded(list.username, newList));
@@ -464,8 +518,8 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
     if (formDisabled) {
       return;
     }
-    if (name === '') {
-      setNameError('Name cannot be empty.');
+    if (name === "") {
+      setNameError("Name cannot be empty.");
       return;
     }
     setFormDisabled(true);
@@ -529,10 +583,17 @@ export const EditListForm = ({ list, onCancel, onSuccess }) => {
         </div>
       </form>
       <div className="modal-card-actions">
-        <button className="button-main" onClick={handleSubmit} disabled={formDisabled}>
-          {list ? 'Save' : 'Create'}
+        <button
+          type="button"
+          className="button-main"
+          onClick={handleSubmit}
+          disabled={formDisabled}
+        >
+          {list ? "Save" : "Create"}
         </button>
-        <button onClick={onCancel}>Cancel</button>
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
       </div>
     </>
   );

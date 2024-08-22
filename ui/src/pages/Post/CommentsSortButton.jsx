@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import Dropdown from '../../components/Dropdown';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useState } from "react";
+import Dropdown from "../../components/Dropdown";
 
-const options = ['Top', 'Latest', 'Oldest'];
+const options = ["Top", "Latest", "Oldest"];
 
 const CommentsSortButton = ({ defaultSort = options[0], onSortChange }) => {
   const [sort, _setSort] = useState(defaultSort);
   const setSort = (newVal) => {
     _setSort(newVal);
-    if (onSortChange) onSortChange(newVal);
+    if (onSortChange) {
+      onSortChange(newVal);
+    }
   };
 
   return (
@@ -19,7 +23,12 @@ const CommentsSortButton = ({ defaultSort = options[0], onSortChange }) => {
       >
         <div className="dropdown-list">
           {options.map((opt) => (
-            <button key={opt} className="button-clear dropdown-item" onClick={() => setSort(opt)}>
+            <button
+              type="button"
+              key={opt}
+              className="button-clear dropdown-item"
+              onClick={() => setSort(opt)}
+            >
               {opt}
             </button>
           ))}

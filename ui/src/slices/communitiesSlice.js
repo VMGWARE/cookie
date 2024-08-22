@@ -3,9 +3,12 @@ const initialState = {
   items: {},
 };
 
-const typeCommunityAdded = 'communities/communityAdded';
+const typeCommunityAdded = "communities/communityAdded";
 
-export default function communitiesReducer(state = initialState, action) {
+export default function communitiesReducer(
+  state = initialState,
+  action = undefined,
+) {
   switch (action.type) {
     case typeCommunityAdded: {
       const community = action.payload;
@@ -15,7 +18,9 @@ export default function communitiesReducer(state = initialState, action) {
         names: exists ? state.names : [...state.names, community.name],
         items: {
           ...state.items,
-          [community.name]: exists ? { ...state.items[community.name], ...community } : community,
+          [community.name]: exists
+            ? { ...state.items[community.name], ...community }
+            : community,
         },
       };
     }
@@ -24,7 +29,8 @@ export default function communitiesReducer(state = initialState, action) {
   }
 }
 
-export const selectCommunity = (name) => (state) => state.communities.items[name];
+export const selectCommunity = (name) => (state) =>
+  state.communities.items[name];
 
 export const communityAdded = (community) => {
   return { type: typeCommunityAdded, payload: community };
@@ -33,5 +39,7 @@ export const communityAdded = (community) => {
 export const communitiesAdded =
   (list = []) =>
   (dispatch) => {
-    list.forEach((item) => dispatch(communityAdded(item)));
+    for (const item of list) {
+      dispatch(communityAdded(item));
+    }
   };

@@ -1,27 +1,32 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import ShowMoreBox from '../../components/ShowMoreBox';
-import MarkdownBody from '../../components/MarkdownBody';
-import JoinButton from '../Community/JoinButton';
-import { stringCount } from '../../helper';
-import Link from '../../components/Link';
-import CommunityProPic from '../../components/CommunityProPic';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import CommunityProPic from "../../components/CommunityProPic";
+import Link from "../../components/Link";
+import MarkdownBody from "../../components/MarkdownBody";
+import ShowMoreBox from "../../components/ShowMoreBox";
+import { stringCount } from "../../helper";
+import JoinButton from "../Community/JoinButton";
 
 const CommunityCard = ({ community }) => {
   const { name } = community;
-  const communityURL = `/${CONFIG.communityPrefix}${name}`;
+  const communityUrl = `/${CONFIG.communityPrefix}${name}`;
 
   return (
     <div className="card card-sub about-community">
       <div className="about-comm-head">
-        <Link to={communityURL} className="about-comm-top">
+        <Link to={communityUrl} className="about-comm-top">
           <div className="about-comm-profile">
-            <CommunityProPic name={community.name} proPic={community.proPic} size="large" />
+            <CommunityProPic
+              name={community.name}
+              proPic={community.proPic}
+              size="large"
+            />
           </div>
           <div className="about-comm-head-right">
             <div className="about-comm-name">{name}</div>
             <div className="about-comm-no-members">
-              {stringCount(community.noMembers, false, 'member')}
+              {stringCount(community.noMembers, false, "member")}
             </div>
           </div>
         </Link>

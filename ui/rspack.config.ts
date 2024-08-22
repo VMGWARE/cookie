@@ -1,20 +1,20 @@
-import NodePolyfillPlugin from 'node-polyfill-webpack-plugin';
-import { defineConfig } from '@rspack/cli';
+import fs from "node:fs";
+import path from "node:path";
+import { defineConfig } from "@rspack/cli";
 import {
   type DevTool,
-  rspack,
   type RspackPluginFunction,
   type RspackPluginInstance,
   type RuleSetRule,
-} from '@rspack/core';
-import fs from 'node:fs';
-import path from 'node:path';
-import YAML from 'yaml';
-import CompressionPlugin from 'compression-webpack-plugin';
+  rspack,
+} from "@rspack/core";
+import CompressionPlugin from "compression-webpack-plugin";
+import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
+import YAML from "yaml";
 
 function makeid(length: number) {
-  let result = '';
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = "";
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = chars.length;
   let counter = 0;
   while (counter < length) {
@@ -25,35 +25,35 @@ function makeid(length: number) {
 }
 
 function readYamlConfigFile() {
-  const file = fs.readFileSync('../ui-config.yaml', 'utf-8');
+  const file = fs.readFileSync("../ui-config.yaml", "utf-8");
   const preConfig = YAML.parse(file);
   const allowedKeys = [
-    'siteName',
-    'captchaSiteKey',
-    'emailContact',
-    'facebookURL',
-    'twitterURL',
-    'instagramURL',
-    'discordURL',
-    'githubURL',
-    'substackURL',
-    'disableImagePosts',
-    'disableForumCreation',
-    'forumCreationReqPoints',
-    'defaultFeedSort',
-    'maxImagesPerPost',
+    "siteName",
+    "captchaSiteKey",
+    "emailContact",
+    "facebookURL",
+    "twitterURL",
+    "instagramURL",
+    "discordURL",
+    "githubURL",
+    "substackURL",
+    "disableImagePosts",
+    "disableForumCreation",
+    "forumCreationReqPoints",
+    "defaultFeedSort",
+    "maxImagesPerPost",
   ];
 
   const config: { [key: string]: string } = {};
-  for (let key in preConfig) {
+  for (const key in preConfig) {
     if (allowedKeys.includes(key)) {
       config[key] = preConfig[key];
     }
   }
   if (!config.defaultFeedSort) {
-    config.defaultFeedSort = 'hot';
+    config.defaultFeedSort = "hot";
   }
-  config.communityPrefix = '+'; // currently hardcoded, but could be added to the config file in the future
+  config.communityPrefix = "+"; // currently hardcoded, but could be added to the config file in the future
   config.cacheStorageVersion = makeid(8); // changes on each build
 
   return config;
@@ -61,112 +61,112 @@ function readYamlConfigFile() {
 
 let devtool: DevTool;
 
-if (process.env.NODE_ENV === 'development') {
-  devtool = 'inline-source-map';
-} else if (process.env.NODE_ENV === 'local') {
-  devtool = 'source-map';
+if (process.env.NODE_ENV === "development") {
+  devtool = "inline-source-map";
+} else if (process.env.NODE_ENV === "local") {
+  devtool = "source-map";
 } else {
-  devtool = 'eval';
+  devtool = "eval";
 }
 
 const plugins: (RspackPluginInstance | RspackPluginFunction)[] = [
   new rspack.HtmlRspackPlugin({
-    template: './index.html',
+    template: "./index.html",
   }),
   // @ts-ignore This plugin works fine, TypeScript just doesn't realise it
   new NodePolyfillPlugin(),
+  // biome-ignore lint: Name needs to be in all caps for Rspack magic to work
   new rspack.DefinePlugin({ CONFIG: JSON.stringify(readYamlConfigFile()) }),
 ];
 
 const moduleRules: RuleSetRule[] = [
   {
     test: /\.html$/i,
-    loader: 'html-loader',
+    loader: "html-loader",
   },
   {
     test: /\.js$/,
-    exclude: /(node_modules|service-worker.js)/,
-    use: {
-      loader: 'builtin:swc-loader',
-    },
+    exclude: [/(node_modules|service-worker.js)/],
+    loader: "builtin:swc-loader",
+    type: "javascript/auto",
   },
   {
     test: /\.jsx$/,
     exclude: /(node_modules|service-worker.js)/,
     use: {
-      loader: 'builtin:swc-loader',
+      loader: "builtin:swc-loader",
       options: {
         jsc: {
           parser: {
-            syntax: 'ecmascript',
+            syntax: "ecmascript",
             jsx: true,
           },
         },
       },
     },
-    type: 'javascript/auto',
+    type: "javascript/auto",
   },
   {
     test: /\.s[ac]ss$/i,
-    use: ['sass-loader'],
-    type: 'css/auto',
+    use: ["sass-loader"],
+    type: "css/auto",
   },
   {
     test: /\.(png|svg|jpg|jpeg|gif)$/i,
-    type: 'asset/resource',
+    type: "asset/resource",
   },
   {
     test: /\.(woff|woff2|eot|ttf|otf)$/i,
-    type: 'asset/resource',
+    type: "asset/resource",
   },
   {
     test: /\.(json)$/i,
-    type: 'asset/resource',
+    type: "asset/resource",
   },
 ];
 
-if (['production', 'local'].includes(process.env.NODE_ENV ?? '')) {
+if (["production", "local"].includes(process.env.NODE_ENV ?? "")) {
   plugins.push(
     new rspack.CssExtractRspackPlugin({
-      filename: '[name].[contenthash].css',
-      chunkFilename: '[id].[contenthash].css',
+      filename: "[name].[contenthash].css",
+      chunkFilename: "[id].[contenthash].css",
     }),
     // @ts-ignore This plugin works fine, TypeScript just doesn't realise it
-    new CompressionPlugin()
+    new CompressionPlugin(),
   );
 
   moduleRules.push({
     test: /\.s[ac]ss$/i,
-    use: ['sass-loader'],
-    type: 'css/auto',
+    use: ["sass-loader"],
+    type: "css/auto",
   });
 }
 
 export default defineConfig({
-  mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+  mode: process.env.NODE_ENV === "development" ? "development" : "production",
   entry: {
-    app: './src/index.jsx',
-    'service-worker': {
-      import: './service-worker.js',
-      filename: '[name].js',
+    app: "./src/index.jsx",
+    "service-worker": {
+      import: "./service-worker.js",
+      filename: "[name].js",
     },
   },
   output: {
-    filename: '[name].[contenthash].js',
-    assetModuleFilename: '[name][ext]',
-    path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
+    filename: "[name].[contenthash].js",
+    assetModuleFilename: "[name][ext]",
+    path: path.resolve(__dirname, "dist"),
+    publicPath: "/",
     clean: true,
   },
   devtool,
   devServer:
-    process.env.NODE_ENV === 'development'
+    process.env.NODE_ENV === "development"
       ? {
           // contentBase: './dist',
           historyApiFallback: true,
           proxy: process.env.PROXY_HOST
             ? {
-                context: ['/api', '/images'],
+                context: ["/api", "/images"],
                 target: process.env.PROXY_HOST,
                 secure: false, // keep false for https hosts
               }
@@ -176,7 +176,7 @@ export default defineConfig({
       : undefined,
   plugins,
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: [".js", ".jsx"],
   },
   module: {
     rules: moduleRules,

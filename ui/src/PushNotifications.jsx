@@ -1,48 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import Modal from './components/Modal';
-import { ButtonClose } from './components/Button';
-import { mfetchjson, urlBase64ToUint8Array } from './helper';
-import { useIsMobile } from './hooks';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { ButtonClose } from "./components/Button";
+import Modal from "./components/Modal";
+import { mfetchjson, urlBase64ToUint8Array } from "./helper";
+import { useIsMobile } from "./hooks";
 
-function askDeviceNotificationsPermissions() {
-  return new Promise(function (resolve, reject) {
-    const permissionResult = Notification.requestPermission(function (result) {
+async function askDeviceNotificationsPermissions() {
+  return new Promise((resolve, reject) => {
+    const permissionResult = Notification.requestPermission((result) => {
       resolve(result);
     });
 
     if (permissionResult) {
       permissionResult.then(resolve, reject);
     }
-  }).then(function (permissionResult) {
-    if (permissionResult !== 'granted') {
+  }).then((permissionResult) => {
+    if (permissionResult !== "granted") {
       throw new Error("We weren't granted permission.");
     }
   });
 }
 
-const timestampKey = 'notifPermsLastAskedAt';
+const timestampKey = "notifPermsLastAskedAt";
 
 export const shouldAskForNotificationsPermissions = (
   loggedIn,
   applicationServerKey,
-  considerLastAsked = true
+  considerLastAsked = true,
 ) => {
-  if (!(loggedIn && applicationServerKey)) return false;
-  if (!('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window))
+  if (!(loggedIn && applicationServerKey)) {
     return false;
+  }
+  if (
+    !(
+      "serviceWorker" in navigator &&
+      "PushManager" in window &&
+      "Notification" in window
+    )
+  ) {
+    return false;
+  }
 
-  if (Notification.permission === 'granted') return false;
+  if (Notification.permission === "granted") {
+    return false;
+  }
 
   if (considerLastAsked) {
-    const ts = parseInt(localStorage.getItem(timestampKey), 10);
-    if (!isNaN(ts)) {
+    const ts = Number.parseInt(localStorage.getItem(timestampKey) ?? "", 10);
+    if (!Number.isNaN(ts)) {
       const current = Math.round(Date.now() / 1000);
-      if (current - ts > 3600 * 24 * 30) {
-        return true;
-      } else {
-        return false;
-      }
+      return current - ts > 3600 * 24 * 30;
     }
   }
 
@@ -54,8 +63,12 @@ export const clearNotificationsLocalStorage = () => {
 };
 
 const updatePushSubscription = async (loggedIn, applicationServerKey) => {
-  if (!(loggedIn && applicationServerKey)) return;
-  if (!('serviceWorker' in navigator && 'PushManager' in window)) return;
+  if (!(loggedIn && applicationServerKey)) {
+    return;
+  }
+  if (!("serviceWorker" in navigator && "PushManager" in window)) {
+    return;
+  }
   try {
     const registration = await navigator.serviceWorker.ready;
 
@@ -68,12 +81,12 @@ const updatePushSubscription = async (loggedIn, applicationServerKey) => {
     // Send subscription to server. Always do this. User could be using
     // multiple accounts on this session, which will all use the same
     // PushSubscription.
-    await mfetchjson('/api/push_subscriptions', {
-      method: 'POST',
+    await mfetchjson("/api/push_subscriptions", {
+      method: "POST",
       body: JSON.stringify(subscription),
     });
 
-    console.log('Push subscription updated.');
+    console.info("Push subscription updated.");
   } catch (error) {
     console.error(error);
   }
@@ -81,29 +94,41 @@ const updatePushSubscription = async (loggedIn, applicationServerKey) => {
 
 // Gets device notification permissions and sends the PushSubscription to the
 // server for persistence.
-export const getNotificationsPermissions = async (loggedIn, applicationServerKey) => {
-  if (!(loggedIn && applicationServerKey)) return;
-  if (!('serviceWorker' in navigator && 'PushManager' in window)) return;
+export const getNotificationsPermissions = async (
+  loggedIn,
+  applicationServerKey,
+) => {
+  if (!(loggedIn && applicationServerKey)) {
+    return;
+  }
+  if (!("serviceWorker" in navigator && "PushManager" in window)) {
+    return;
+  }
 
-  let canNotify = Notification.permission === 'granted';
+  let canNotify = Notification.permission === "granted";
 
   if (!canNotify) {
     try {
       await askDeviceNotificationsPermissions();
       canNotify = true;
     } catch (error) {
+      console.error(error);
       alert("It looks like your browser doesn't support push notifications.");
     }
   }
 
-  if (canNotify) updatePushSubscription(loggedIn, applicationServerKey);
+  if (canNotify) {
+    updatePushSubscription(loggedIn, applicationServerKey);
+  }
 };
 
 const PushNotifications = () => {
   const user = useSelector((state) => state.main.user);
   const loggedIn = user !== null;
 
-  const applicationServerKey = useSelector((state) => state.main.vapidPublicKey);
+  const applicationServerKey = useSelector(
+    (state) => state.main.vapidPublicKey,
+  );
 
   const isMobile = useIsMobile();
 
@@ -112,8 +137,10 @@ const PushNotifications = () => {
 
   useEffect(() => {
     if (isMobile) {
-      setAskModalOpen(shouldAskForNotificationsPermissions(loggedIn, applicationServerKey));
-      if (window.Notification && Notification.permission === 'granted') {
+      setAskModalOpen(
+        shouldAskForNotificationsPermissions(loggedIn, applicationServerKey),
+      );
+      if (window.Notification && Notification.permission === "granted") {
         updatePushSubscription(loggedIn, applicationServerKey);
       }
     }
@@ -121,7 +148,11 @@ const PushNotifications = () => {
 
   useEffect(() => {
     if (askModalOpen) {
-      return () => localStorage.setItem(timestampKey, Math.round(Date.now() / 1000));
+      return () =>
+        localStorage.setItem(
+          timestampKey,
+          Math.round(Date.now() / 1000).toString(),
+        );
     }
   }, [askModalOpen]);
 
@@ -138,14 +169,20 @@ const PushNotifications = () => {
           <ButtonClose onClick={handleAskModalClose} />
         </div>
         <div className="modal-card-content">
-          To receive notifications when someone comments on your post or likes it, turn on push
-          notifications.
+          To receive notifications when someone comments on your post or likes
+          it, turn on push notifications.
         </div>
         <div className="modal-card-actions">
-          <button className="button-main" onClick={handlePermissionsAsk}>
+          <button
+            type="button"
+            className="button-main"
+            onClick={handlePermissionsAsk}
+          >
             Turn on
           </button>
-          <button onClick={handleAskModalClose}>Not now</button>
+          <button type="button" onClick={handleAskModalClose}>
+            Not now
+          </button>
         </div>
       </div>
     </Modal>

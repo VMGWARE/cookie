@@ -3,16 +3,18 @@ const initialState = {
   items: {},
 };
 
-const typeUserAdded = 'users/userAdded';
+const typeUserAdded = "users/userAdded";
 
-export default function usersReducer(state = initialState, action) {
+export default function usersReducer(state = initialState, action = undefined) {
   switch (action.type) {
     case typeUserAdded: {
       const user = action.payload;
       const exists = Boolean(state.items[user.username]);
       return {
         ...state,
-        usernames: exists ? [...state.usernames, user.username] : state.usernames,
+        usernames: exists
+          ? [...state.usernames, user.username]
+          : state.usernames,
         items: {
           ...state.items,
           [user.username]: user,

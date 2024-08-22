@@ -1,5 +1,6 @@
-import React from 'react';
-import Spinner from '../components/Spinner';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import Spinner from "../components/Spinner";
 
 const AppLoading = () => {
   return (

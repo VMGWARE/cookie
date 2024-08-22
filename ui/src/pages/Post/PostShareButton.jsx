@@ -1,9 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import { copyToClipboard } from '../../helper';
-import { snackAlert } from '../../slices/mainSlice';
-import Dropdown from '../../components/Dropdown';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import Dropdown from "../../components/Dropdown";
+import { copyToClipboard } from "../../helper";
+import { snackAlert } from "../../slices/mainSlice";
 
 const Target = ({ ...props }) => {
   return (
@@ -33,15 +34,16 @@ const PostShareButton = ({ post }) => {
   const dispatch = useDispatch();
 
   const url = `${window.location.origin}/${CONFIG.communityPrefix}${post.communityName}/post/${post.publicId}`;
-  const handleCopyURL = () => {
-    let text = 'Failed to copy link to clipboard.';
+  const handleCopyUrl = () => {
+    let text = "Failed to copy link to clipboard.";
     if (copyToClipboard(url)) {
-      text = 'Link copied to clipboard.';
+      text = "Link copied to clipboard.";
     }
-    dispatch(snackAlert(text, 'pl_copied'));
+    dispatch(snackAlert(text, "pl_copied"));
   };
 
-  const hasMoreShareableOptions = window.innerWidth < 1171 && Boolean(navigator.share);
+  const hasMoreShareableOptions =
+    window.innerWidth < 1171 && Boolean(navigator.share);
   const handleMoreButtonClick = async () => {
     try {
       await navigator.share({
@@ -56,7 +58,10 @@ const PostShareButton = ({ post }) => {
   const renderImageDownloadButton = () => {
     if (post.images.length === 0) {
       return (
-        <div className="button-clear dropdown-item" style={{ opacity: 'var(--disabled-opacity)' }}>
+        <div
+          className="button-clear dropdown-item"
+          style={{ opacity: "var(--disabled-opacity)" }}
+        >
           Download image
         </div>
       );
@@ -95,12 +100,20 @@ const PostShareButton = ({ post }) => {
         >
           To Facebook
         </a>
-        <button className="button-clear dropdown-item" onClick={handleCopyURL}>
+        <button
+          type="button"
+          className="button-clear dropdown-item"
+          onClick={handleCopyUrl}
+        >
           Copy URL
         </button>
-        {post.type === 'image' && renderImageDownloadButton()}
+        {post.type === "image" && renderImageDownloadButton()}
         {hasMoreShareableOptions && (
-          <button className="button-clear dropdown-item" onClick={handleMoreButtonClick}>
+          <button
+            type="button"
+            className="button-clear dropdown-item"
+            onClick={handleMoreButtonClick}
+          >
             More
           </button>
         )}

@@ -1,4 +1,4 @@
-import { multiplePostsAdded } from './postsSlice.js';
+import { multiplePostsAdded } from "./postsSlice.js";
 
 const initialState = {
   urls: [],
@@ -22,12 +22,12 @@ export function FeedItem(item, type, key) {
   this.height = null;
 }
 
-export const typeFeedUpdated = 'feeds/feedUpdated';
-export const typeFeedReloaded = 'feeds/feedReloaded';
-export const typeFeedItemHeightChanged = 'feeds/feedItemHeightChanged';
-export const typeFeedItemsInViewUpdated = 'feeds/feedItemsInViewUpdated';
+export const typeFeedUpdated = "feeds/feedUpdated";
+export const typeFeedReloaded = "feeds/feedReloaded";
+export const typeFeedItemHeightChanged = "feeds/feedItemHeightChanged";
+export const typeFeedItemsInViewUpdated = "feeds/feedItemsInViewUpdated";
 
-export default function feedsReducer(state = initialState, action) {
+export default function feedsReducer(state = initialState, action = undefined) {
   switch (action.type) {
     case typeFeedUpdated: {
       const { url, items, next } = action.payload;
@@ -45,7 +45,7 @@ export default function feedsReducer(state = initialState, action) {
         feed = { ...feed, keys, next };
       }
       const feedItems = {};
-      items.forEach((item) => {
+      for (let item of items) {
         // Preserve height, etc of existing items.
         if (state.feedItems[item.key]) {
           item = {
@@ -54,7 +54,7 @@ export default function feedsReducer(state = initialState, action) {
           };
         }
         feedItems[item.key] = item;
-      });
+      }
       return {
         ...state,
         feeds: {
@@ -117,35 +117,43 @@ export default function feedsReducer(state = initialState, action) {
 //     next: '', // next cursor
 //   }
 export const selectFeed = (url) => (state) => {
-  if (!state.feeds.feeds[url]) return undefined;
+  if (!state.feeds.feeds[url]) {
+    return undefined;
+  }
   if (state.feeds.feeds[url].loading) {
     return { loading: true, items: [], next: undefined };
   }
   const { keys, next, loading } = state.feeds.feeds[url];
-  let items = keys
+  const items = keys
     .map((key) => state.feeds.feedItems[key])
     .map((item) => {
       return {
         ...item,
-        item: item.type === 'post' ? state.posts.items[item.item] : item.item,
+        item: item.type === "post" ? state.posts.items[item.item] : item.item,
       };
     });
   return { items, next, loading };
 };
 
 export const selectFeedInViewItems = (url) => (state) => {
-  if (!state.feeds.feeds[url]) return [];
+  if (!state.feeds.feeds[url]) {
+    return [];
+  }
   return state.feeds.feeds[url].inView;
 };
 
 export const feedUpdated = (url, items, next) => (dispatch) => {
-  const posts = items.filter((item) => item.type === 'post').map((item) => item.item);
-  items = items.map((item) => {
-    if (item.type === 'post') item.item = item.item.publicId;
+  const posts = items
+    .filter((item) => item.type === "post")
+    .map((item) => item.item);
+  const postItems = items.map((item) => {
+    if (item.type === "post") {
+      item.item = item.item.publicId;
+    }
     return item;
   });
   dispatch(multiplePostsAdded(posts));
-  dispatch({ type: typeFeedUpdated, payload: { url, items, next } });
+  dispatch({ type: typeFeedUpdated, payload: { url, items: postItems, next } });
 };
 
 export const feedReloaded = (url) => {

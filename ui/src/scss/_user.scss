@@ -1,4 +1,4 @@
-@use 'mixins';
+@use "mixins";
 
 .page-user {
     padding-top: 0 !important;
@@ -230,7 +230,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(1deg, rgba(28, 23, 120, 1) 0%, rgba(148, 113, 217, 1) 100%);
+        background: linear-gradient(
+            1deg,
+            rgba(28, 23, 120, 1) 0%,
+            rgba(148, 113, 217, 1) 100%
+        );
         .modal-badges-close {
             position: absolute;
             right: 0;

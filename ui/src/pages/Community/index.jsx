@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
-import Link from '../../components/Link';
-import { Helmet } from 'react-helmet-async';
-import MiniFooter from '../../components/MiniFooter';
-import Sidebar from '../../components/Sidebar';
-import { APIError, dateString1, mfetch, stringCount } from '../../helper';
-import { snackAlertError } from '../../slices/mainSlice';
-import JoinButton from './JoinButton';
-import Rules from './Rules';
-import PostsFeed from '../../views/PostsFeed';
-import ShowMoreBox from '../../components/ShowMoreBox';
-import MarkdownBody from '../../components/MarkdownBody';
-import { communityAdded, selectCommunity } from '../../slices/communitiesSlice';
-import PageLoading from '../../components/PageLoading';
-import NotFound from '../NotFound';
-import CommunityProPic from '../../components/CommunityProPic';
-import Banner from './Banner';
-import { useMuteCommunity } from '../../hooks';
-import Dropdown from '../../components/Dropdown';
-import { ButtonMore } from '../../components/Button';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useLocation, useParams } from "react-router-dom";
+import { ButtonMore } from "../../components/Button";
+import CommunityProPic from "../../components/CommunityProPic";
+import Dropdown from "../../components/Dropdown";
+import Link from "../../components/Link";
+import MarkdownBody from "../../components/MarkdownBody";
+import MiniFooter from "../../components/MiniFooter";
+import PageLoading from "../../components/PageLoading";
+import ShowMoreBox from "../../components/ShowMoreBox";
+import Sidebar from "../../components/Sidebar";
+import { ApiError, dateString1, mfetch, stringCount } from "../../helper";
+import { useMuteCommunity } from "../../hooks";
+import { communityAdded, selectCommunity } from "../../slices/communitiesSlice";
+import { snackAlertError } from "../../slices/mainSlice";
+import PostsFeed from "../../views/PostsFeed";
+import NotFound from "../NotFound";
+import Banner from "./Banner";
+import JoinButton from "./JoinButton";
+import Rules from "./Rules";
 
 const Community = () => {
   const { name } = useParams();
@@ -30,20 +32,26 @@ const Community = () => {
   const dispatch = useDispatch();
 
   const community = useSelector(selectCommunity(name));
-  const loading = !(community && Array.isArray(community.mods) && Array.isArray(community.rules));
+  const loading = !(
+    community &&
+    Array.isArray(community.mods) &&
+    Array.isArray(community.rules)
+  );
   const [error, setError] = useState(null);
   useEffect(() => {
-    if (!loading) return;
+    if (!loading) {
+      return;
+    }
     setError(null);
     (async () => {
       try {
         const res = await mfetch(`/api/communities/${name}?byName=true`);
         if (!res.ok) {
           if (res.status === 404) {
-            setError('notfound');
+            setError("notfound");
             return;
           }
-          throw new APIError(res.status, await res.json());
+          throw new ApiError(res.status, await res.json());
         }
 
         const rcomm = await res.json();
@@ -64,19 +72,24 @@ const Community = () => {
   const loggedIn = user !== null;
   const bannedFrom = useSelector((state) => state.main.bannedFrom);
   const isBanned =
-    loggedIn && community && bannedFrom.find((id) => id === community.id) !== undefined;
+    loggedIn &&
+    community &&
+    bannedFrom.find((id) => id === community.id) !== undefined;
 
-  const [tab, setTab] = useState('posts');
+  const [tab, setTab] = useState("posts");
   useEffect(() => {
-    setTab('posts');
+    setTab("posts");
   }, [location]);
 
-  const { toggleMute: toggleCommunityMute, displayText: muteDisplayText } = useMuteCommunity(
-    community ? { communityId: community.id, communityName: community.name } : {}
-  );
+  const { toggleMute: toggleCommunityMute, displayText: muteDisplayText } =
+    useMuteCommunity(
+      community
+        ? { communityId: community.id, communityName: community.name }
+        : {},
+    );
 
   if (loading) {
-    if (error === 'notfound') {
+    if (error === "notfound") {
       return <NotFound />;
     }
     return <PageLoading />;
@@ -97,12 +110,11 @@ const Community = () => {
         </div>
         <div className="card-content">
           <ul>
-            {community.mods &&
-              community.mods.map((mod) => (
-                <li key={mod.id}>
-                  <Link to={`/@${mod.username}`}>{mod.username}</Link>
-                </li>
-              ))}
+            {community.mods?.map((mod) => (
+              <li key={mod.id}>
+                <Link to={`/@${mod.username}`}>{mod.username}</Link>
+              </li>
+            ))}
           </ul>
           {/*loggedIn && <button className="card-mods-message-btn">Message mods</button>*/}
         </div>
@@ -121,15 +133,18 @@ const Community = () => {
     return (
       <>
         <a
-          className={'button button-main border-radius-0' + (isBanned ? ' is-disabled' : '')}
+          className={`button button-main border-radius-0 ${isBanned ? " is-disabled" : ""}`}
           href={url}
           onClick={handleClick}
         >
           Create post
         </a>
-        {(community.userMod || (user && user.isAdmin)) && (
-          <Link className="button border-radius-0" to={`${CONFIG.communityPrefix}${name}/modtools`}>
-            {`MOD TOOLS` + (!community.userMod ? ' (ADMIN)' : '')}
+        {(community.userMod || user?.isAdmin) && (
+          <Link
+            className="button border-radius-0"
+            to={`${CONFIG.communityPrefix}${name}/modtools`}
+          >
+            {`MOD TOOLS${community.userMod ? "" : " (ADMIN)"}`}
           </Link>
         )}
       </>
@@ -155,7 +170,10 @@ const Community = () => {
               size="large"
             />
             <div className="comm-main-top-bar">
-              <JoinButton className="comm-main-top-join-button" community={community} />
+              <JoinButton
+                className="comm-main-top-join-button"
+                community={community}
+              />
               {/*loggedIn && (
                 <Dropdown target={<ButtonMore vertical />} aligned="right">
                   <div className="dropdown-list">
@@ -166,7 +184,11 @@ const Community = () => {
               {loggedIn && (
                 <Dropdown target={<ButtonMore />} aligned="right">
                   <div className="dropdown-list">
-                    <button className="button-clear dropdown-item" onClick={toggleCommunityMute}>
+                    <button
+                      type="button"
+                      className="button-clear dropdown-item"
+                      onClick={toggleCommunityMute}
+                    >
                       {muteDisplayText}
                     </button>
                   </div>
@@ -177,7 +199,7 @@ const Community = () => {
           <div className="comm-main-title">
             <h1>{community.name}</h1>
             <div className="comm-main-followers">
-              {stringCount(community.noMembers, false, 'member')}
+              {stringCount(community.noMembers, false, "member")}
             </div>
             <div className="comm-main-description">
               <ShowMoreBox showButton maxHeight="120px">
@@ -190,23 +212,27 @@ const Community = () => {
           </div>
           <div className="tabs is-m">
             <button
-              className={'button-clear tab-item' + (tab === 'posts' ? ' is-active' : '')}
-              onClick={() => setTab('posts')}
+              type="button"
+              className={`button-clear tab-item ${tab === "posts" ? " is-active" : ""}`}
+              onClick={() => setTab("posts")}
             >
               Posts
             </button>
             <button
-              className={'button-clear tab-item' + (tab === 'about' ? ' is-active' : '')}
-              onClick={() => setTab('about')}
+              type="button"
+              className={`button-clear tab-item ${tab === "about" ? " is-active" : ""}`}
+              onClick={() => setTab("about")}
             >
               About
             </button>
           </div>
         </header>
-        {loggedIn && <div className="comm-action-buttons-m">{renderActionButtons()}</div>}
+        {loggedIn && (
+          <div className="comm-action-buttons-m">{renderActionButtons()}</div>
+        )}
         <div className="comm-posts">
-          {tab === 'posts' && <PostsFeed communityId={community.id} />}
-          {tab === 'about' && (
+          {tab === "posts" && <PostsFeed communityId={community.id} />}
+          {tab === "about" && (
             <div className="comm-about">
               {renderRules()}
               {renderModeratorsList()}

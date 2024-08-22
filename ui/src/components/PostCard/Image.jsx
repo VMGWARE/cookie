@@ -1,18 +1,28 @@
-import React, { useLayoutEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { getImageContainSize } from '../../helper';
-import ServerImage from '../ServerImage';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useLayoutEffect, useState } from "react";
+import { getImageContainSize } from "../../helper";
+import ServerImage from "../ServerImage";
 
-const Image = ({ image, to, target, isMobile, loading = 'lazy' }) => {
+const Image = ({ image, to, target, isMobile, loading = "lazy" }) => {
   const maxImageHeight = 520;
   const maxImageHeightMobile = () => window.innerHeight * 0.8;
 
-  const [imageSize, setImageSize] = useState({ width: undefined, height: undefined });
+  const [imageSize, setImageSize] = useState({
+    width: undefined,
+    height: undefined,
+  });
   const [cardWidth, setCardWidth] = useState(0);
   const updateImageSize = () => {
-    let w = document.querySelector('.post-card-body').clientWidth;
-    let h = isMobile ? maxImageHeightMobile() : maxImageHeight;
-    let { width, height } = getImageContainSize(image.width, image.height, w, h);
+    const w = document.querySelector(".post-card-body").clientWidth;
+    const h = isMobile ? maxImageHeightMobile() : maxImageHeight;
+    let { width, height } = getImageContainSize(
+      image.width,
+      image.height,
+      w,
+      h,
+    );
     if (w - width < 35 && width / height < 1.15 && width / height > 0.85) {
       // Cover image to fit card if the image is only slightly not fitting.
       // A small part of the original image may not be visible because of this.
@@ -29,7 +39,7 @@ const Image = ({ image, to, target, isMobile, loading = 'lazy' }) => {
 
   return (
     <div
-      className={'post-image' + (isImageFittingCard ? ' is-no-fit' : '')}
+      className={`post-image ${isImageFittingCard ? "is-no-fit" : ""}`}
       to={to}
       target={target}
     >

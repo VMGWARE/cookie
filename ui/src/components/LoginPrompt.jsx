@@ -1,9 +1,10 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginPromptToggled, signupModalOpened } from '../slices/mainSlice';
-import { ButtonClose } from './Button';
-import Modal from './Modal';
-import { loginModalOpened } from '../slices/mainSlice';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginPromptToggled, signupModalOpened } from "../slices/mainSlice";
+import { loginModalOpened } from "../slices/mainSlice";
+import { ButtonClose } from "./Button";
+import Modal from "./Modal";
 
 const LoginPrompt = () => {
   const loginPromptOpen = useSelector((state) => state.main.loginPromptOpen);
@@ -23,17 +24,31 @@ const LoginPrompt = () => {
   };
 
   return (
-    <Modal open={loginPromptOpen} onClose={handleClose} noOuterClickClose={false}>
-      <div className="modal-card is-compact-mobile is-desktop-style" style={{ minWidth: '300px' }}>
+    <Modal
+      open={loginPromptOpen}
+      onClose={handleClose}
+      noOuterClickClose={false}
+    >
+      <div
+        className="modal-card is-compact-mobile is-desktop-style"
+        style={{ minWidth: "300px" }}
+      >
         <div className="modal-card-head">
           <div className="modal-card-title">Login to continue</div>
           <ButtonClose onClick={handleClose} />
         </div>
         <div className="modal-card-content flex flex-column">
-          <button className="button-main" style={{ marginBottom: '7px' }} onClick={handleLogin}>
+          <button
+            type="button"
+            className="button-main"
+            style={{ marginBottom: "7px" }}
+            onClick={handleLogin}
+          >
             Login
           </button>
-          <button onClick={handleSignup}>Signup</button>
+          <button type="button" onClick={handleSignup}>
+            Signup
+          </button>
         </div>
       </div>
     </Modal>

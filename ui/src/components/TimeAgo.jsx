@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { timeAgo } from '../helper';
+import PropTypes from "prop-types";
+import React, { useEffect, useState } from "react";
+import { timeAgo } from "../helper";
 
-const TimeAgo = ({ time, inline = true, prefix = '', suffix = ' ago', short = false, ...rest }) => {
+const TimeAgo = ({
+  time,
+  inline = true,
+  prefix = "",
+  suffix = " ago",
+  short = false,
+  ...rest
+}) => {
   const t = time instanceof Date ? time : new Date(time);
 
   const [, setCounter] = useState(0);
@@ -16,18 +23,18 @@ const TimeAgo = ({ time, inline = true, prefix = '', suffix = ' ago', short = fa
   }, []);
 
   return React.createElement(
-    inline ? 'span' : 'div',
+    inline ? "span" : "div",
     {
-      title: t.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
+      title: t.toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
       }),
       ...rest,
     },
-    `${prefix}${timeAgo(t, suffix, true, short)}`
+    `${prefix}${timeAgo(t, suffix, true, short)}`,
   );
 };
 

@@ -1,34 +1,35 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import Sidebar from '../components/Sidebar';
-import WelcomeBanner from '../views/WelcomeBanner';
-import MiniFooter from '../components/MiniFooter';
-import CommunityProPic from '../components/CommunityProPic';
-import PageLoading from '../components/PageLoading';
-import { mfetch, mfetchjson } from '../helper';
-import { useDispatch, useSelector } from 'react-redux';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { ButtonClose } from "../components/Button";
+import CommunityProPic from "../components/CommunityProPic";
+import { InputWithCount, useInputMaxLength } from "../components/Input";
+import MarkdownBody from "../components/MarkdownBody";
+import MiniFooter from "../components/MiniFooter";
+import Modal from "../components/Modal";
+import PageLoading from "../components/PageLoading";
+import ShowMoreBox from "../components/ShowMoreBox";
+import Sidebar from "../components/Sidebar";
+import { communityNameMaxLength } from "../config";
+import { mfetch, mfetchjson } from "../helper";
+import { useInputUsername } from "../hooks";
 import {
   allCommunitiesUpdated,
   loginPromptToggled,
   snackAlert,
   snackAlertError,
-} from '../slices/mainSlice';
-import ShowMoreBox from '../components/ShowMoreBox';
-import MarkdownBody from '../components/MarkdownBody';
-import Link from '../components/Link';
-import LoginForm from '../views/LoginForm';
-import Modal from '../components/Modal';
-import { ButtonClose } from '../components/Button';
-import { InputWithCount, useInputMaxLength } from '../components/Input';
-import { communityNameMaxLength } from '../config';
-import { useInputUsername } from '../hooks';
-import JoinButton from './Community/JoinButton';
-import { useHistory, useLocation } from 'react-router-dom';
-import Feed from '../components/Feed';
-import { useInView } from 'react-intersection-observer';
+} from "../slices/mainSlice";
+import LoginForm from "../views/LoginForm";
+import JoinButton from "./Community/JoinButton";
 
 const prepareText = (isMobile = false) => {
-  const x = isMobile ? 'by filling out the form below' : 'by clicking on the button below';
+  const x = isMobile
+    ? "by filling out the form below"
+    : "by clicking on the button below";
   return `Communities are currently available only on a per request
     basis. You can request one ${x}, and if you seem
     reasonable and trustworthy, the requested community will be created and you will
@@ -45,7 +46,10 @@ const AllCommunities = () => {
     const names = state.main.allCommunities.items;
     const communities = state.communities.items;
     const items = [];
-    names.forEach((name) => items.push(communities[name]));
+    for (const name of names) {
+      items.push(communities[name]);
+    }
+
     return {
       items: items || [],
       loading: state.main.allCommunities.loading,
@@ -55,7 +59,7 @@ const AllCommunities = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await mfetchjson('/api/communities');
+        const res = await mfetchjson("/api/communities");
         dispatch(allCommunitiesUpdated(res));
       } catch (error) {
         dispatch(snackAlertError(error));
@@ -131,7 +135,9 @@ const CommItem = ({ itemKey, children }) => {
   }, [height]);
 
   let h = height;
-  if (h < 100) h = 100;
+  if (h < 100) {
+    h = 100;
+  }
 
   return (
     <div className="comm-item" ref={ref}>
@@ -152,7 +158,9 @@ const CommunityCreationCard = () => {
       <div className="home-welcome-join">New communities</div>
       <div className="home-welcome-subtext">{prepareText()}</div>
       <div className="home-welcome-buttons">
-        <RequestCommunityButton className="button-main">Request a community</RequestCommunityButton>
+        <RequestCommunityButton className="button-main">
+          Request a community
+        </RequestCommunityButton>
       </div>
     </div>
   );
@@ -180,19 +188,19 @@ const RequestCommunityButton = ({ children, isMobile = false, ...props }) => {
 
   const handleSubmit = async () => {
     if (name.length < 3) {
-      alert('Community name has to have at least 3 characters.');
+      alert("Community name has to have at least 3 characters.");
       return;
     }
     try {
-      const res = await mfetch(`/api/community_requests`, {
-        method: 'POST',
+      const res = await mfetch("/api/community_requests", {
+        method: "POST",
         body: JSON.stringify({
           name,
           note,
         }),
       });
       if (res.ok) {
-        dispatch(snackAlert('Requested!'));
+        dispatch(snackAlert("Requested!"));
         handleClose();
       } else {
         throw new Error(await res.text());
@@ -218,7 +226,7 @@ const RequestCommunityButton = ({ children, isMobile = false, ...props }) => {
               label="Community name"
               description="Community name cannot be changed."
               maxLength={communityNameMaxLength}
-              style={{ marginBottom: '0' }}
+              style={{ marginBottom: "0" }}
               autoFocus
             />
             <InputWithCount
@@ -230,7 +238,11 @@ const RequestCommunityButton = ({ children, isMobile = false, ...props }) => {
               rows="4"
               maxLength={noteLength}
             />
-            <button className="button-main" onClick={handleSubmit}>
+            <button
+              type="button"
+              className="button-main"
+              onClick={handleSubmit}
+            >
               Request community
             </button>
           </div>
@@ -255,7 +267,7 @@ const ListItem = ({ community }) => {
   const ref = useRef();
 
   const handleClick = (e) => {
-    if (e.target.tagName !== 'BUTTON') {
+    if (e.target.tagName !== "BUTTON") {
       history.push(to);
     }
   };
@@ -265,7 +277,7 @@ const ListItem = ({ community }) => {
       ref={ref}
       className="comms-list-item card"
       onClick={handleClick}
-      style={{ minHeight: '100px' }}
+      style={{ minHeight: "100px" }}
     >
       <div className="comms-list-item-left">
         <CommunityProPic

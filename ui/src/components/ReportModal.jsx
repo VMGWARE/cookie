@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { ButtonClose } from './Button';
-import Modal from './Modal';
-import { snackAlert, snackAlertError } from '../slices/mainSlice';
-import { APIError, mfetch } from '../helper';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { ApiError, mfetch } from "../helper";
+import { snackAlert, snackAlertError } from "../slices/mainSlice";
+import { ButtonClose } from "./Button";
+import Modal from "./Modal";
 
 const ReportModal = ({
   target,
   targetType,
-  buttonClassName = 'button-text',
+  buttonClassName = "button-text",
   disabled = false,
   noButton,
   open: outerOpen = null,
@@ -24,7 +26,9 @@ const ReportModal = ({
 
   const handleClose = onClose ?? (() => setInnerOpen(false));
   useEffect(() => {
-    if (open) setSelected(null);
+    if (open) {
+      setSelected(null);
+    }
   }, [open]);
 
   const handleRadioChange = (e) => {
@@ -34,23 +38,28 @@ const ReportModal = ({
   const handleReport = async () => {
     if (selected !== null) {
       try {
-        const res = await mfetch('/api/_report', {
-          method: 'POST',
+        const res = await mfetch("/api/_report", {
+          method: "POST",
           body: JSON.stringify({
             targetId: target.id,
             type: targetType,
-            reason: parseInt(selected),
+            reason: Number.parseInt(selected),
           }),
         });
         if (!res.ok) {
           if (res.status === 409) {
-            dispatch(snackAlert('You have already reported this ' + targetType));
+            dispatch(
+              snackAlert(`You have already reported this ${targetType}`),
+            );
             return;
-          } else {
-            throw new APIError(res.status, await res.json());
           }
+          throw new ApiError(res.status, await res.json());
         }
-        dispatch(snackAlert(`${targetType[0].toUpperCase() + targetType.slice(1)} reported.`));
+        dispatch(
+          snackAlert(
+            `${targetType[0].toUpperCase() + targetType.slice(1)} reported.`,
+          ),
+        );
       } catch (error) {
         dispatch(snackAlertError(error));
       } finally {
@@ -62,7 +71,12 @@ const ReportModal = ({
   return (
     <>
       {noButton ? null : (
-        <button className={buttonClassName} onClick={() => setInnerOpen(true)} disabled={disabled}>
+        <button
+          type="button"
+          className={buttonClassName}
+          onClick={() => setInnerOpen(true)}
+          disabled={disabled}
+        >
           Report
         </button>
       )}
@@ -76,21 +90,37 @@ const ReportModal = ({
             <div
               className="flex flex-column"
               onChange={handleRadioChange}
-              style={{ minWidth: '340px' }}
+              style={{ minWidth: "340px" }}
             >
               {reasons.map((r) => (
-                <div key={r.id} className="radio" style={{ margin: '0.7rem 0' }}>
-                  <input id={'report-reason' + r.id} type="radio" name="reason" value={r.id} />
-                  <label htmlFor={'report-reason' + r.id}>{r.title}</label>
+                <div
+                  key={r.id}
+                  className="radio"
+                  style={{ margin: "0.7rem 0" }}
+                >
+                  <input
+                    id={`report-reason${r.id}`}
+                    type="radio"
+                    name="reason"
+                    value={r.id}
+                  />
+                  <label htmlFor={`report-reason${r.id}`}>{r.title}</label>
                 </div>
               ))}
             </div>
           </div>
           <div className="modal-card-actions">
-            <button className="button-main" onClick={handleReport} disabled={selected === null}>
+            <button
+              type="button"
+              className="button-main"
+              onClick={handleReport}
+              disabled={selected === null}
+            >
               Report
             </button>
-            <button onClick={handleClose}>Cancel</button>
+            <button type="button" onClick={handleClose}>
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>

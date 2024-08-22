@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+// biome-ignore lint: This is necessary for it to work
+import React from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 
 const DelayedRender = ({ delay = 0, children }) => {
   const [show, setShow] = useState(delay === 0);
