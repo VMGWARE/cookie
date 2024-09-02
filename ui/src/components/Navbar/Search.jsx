@@ -29,6 +29,9 @@ const Search = () => {
     const q = encodeURIComponent(`${query} site:${window.location.hostname}`);
     return `https://www.google.com/search?q=${q}`;
   };
+
+  const getApiUrl = (query) => `/api/search?q=${encodeURIComponent(query)}&index=communities`;
+
   // Fallback on Google search until search is implemented.
   const handleSearch = () => {
     const win = window.open(getGoogleUrl(searchQuery), "_blank");
