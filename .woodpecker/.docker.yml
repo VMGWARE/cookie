@@ -13,22 +13,49 @@ variables:
     from_secret: docker_repo
 
 steps:
-  build:
+  build-aio:
     image: *buildx_image
     settings:
       dry_run: true
       repo: *docker_repo
-      dockerfile: docker/Dockerfile.amd64
+      dockerfile: docker/Dockerfile.aio
       platforms: linux/amd64
     when:
       - evaluate: 'not (CI_COMMIT_PULL_REQUEST_LABELS contains "build_pr_images")'
         event: pull_request
 
+  build:
+    image: *buildx_image
+    settings:
+      dry_run: true
+      repo: *docker_repo
+      dockerfile: docker/Dockerfile
+      platforms: linux/amd64
+    when:
+      - evaluate: 'not (CI_COMMIT_PULL_REQUEST_LABELS contains "build_pr_images")'
+        event: pull_request
+
+  build-push-aio:
+    image: *buildx_image
+    settings:
+      repo: *docker_repo
+      dockerfile: docker/Dockerfile.aio
+      platforms: linux/amd64
+      tag: ['next-aio', 'next-aio-${CI_COMMIT_SHA}']
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    when:
+      - event: push
+        branch:
+          - ${CI_REPO_DEFAULT_BRANCH}
+
   build-push:
     image: *buildx_image
     settings:
       repo: *docker_repo
-      dockerfile: docker/Dockerfile.amd64
+      dockerfile: docker/Dockerfile
       platforms: linux/amd64
       tag: ['next', 'next-${CI_COMMIT_SHA}']
       username:

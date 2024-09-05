@@ -1,0 +1,52 @@
+{{- if (empty .Values.redis.host) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "camphouse.fullname" . }}-redis
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-redis
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: {{ template "camphouse.fullname" . }}-redis
+  template:
+    metadata:
+      labels:
+        app: {{ template "camphouse.name" . }}
+        component: {{ template "camphouse.fullname" . }}-redis
+        chart: {{ template "camphouse.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      containers:
+        - name: {{ template "camphouse.name" . }}-redis
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+          ports:
+            - containerPort: 6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "camphouse.fullname" . }}-redis
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-redis
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: redis
+      port: 6379
+  selector:
+    component: {{ template "camphouse.fullname" . }}-redis
+
+{{- end -}}

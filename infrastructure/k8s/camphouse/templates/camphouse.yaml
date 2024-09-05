@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "camphouse.fullname" . }}-camphouse
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-camphouse
+    tier: {{ template "camphouse.fullname" . }}-camphouse
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.camphouse.replicaCount }}
+  selector:
+    matchLabels:
+      component: {{ template "camphouse.fullname" . }}-camphouse
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "camphouse.name" . }}
+        component: {{ template "camphouse.fullname" . }}-camphouse
+        tier: {{ template "camphouse.fullname" . }}-camphouse
+        chart: {{ template "camphouse.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      containers:
+        - name: {{ template "camphouse.name" . }}-camphouse
+          image: "{{ .Values.registry }}/{{ .Values.repositoryBase }}{{ .Values.camphouse.image.repository }}:{{ .Values.version }}"
+          imagePullPolicy: {{ .Values.camphouse.image.pullPolicy }}
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 500m
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: {{ template "camphouse.fullname" . }}-config
+            - secretRef:
+                name: camphouse-secrets
+          volumeMounts:
+            - name: discuit-db-volume
+              mountPath: /var/lib/mysql
+            - name: discuit-redis-volume
+              mountPath: /var/lib/redis
+            - name: discuit-images-volume
+              mountPath: /app/images
+      volumes:
+        - name: discuit-db-volume
+          persistentVolumeClaim:
+            claimName: discuit-db-pvc
+        - name: discuit-redis-volume
+          persistentVolumeClaim:
+            claimName: discuit-redis-pvc
+        - name: discuit-images-volume
+          persistentVolumeClaim:
+            claimName: discuit-images-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "camphouse.fullname" . }}-camphouse
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-camphouse
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    component: {{ template "camphouse.fullname" . }}-camphouse
+  type: ClusterIP
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: api-path-rewrite
+  namespace: {{ .Release.Namespace }}
+spec:
+  replacePathRegex:
+    regex: "^/"
+    replacement: "/api/"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "camphouse.fullname" . }}-camphouse-app
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-camphouse
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  rules:
+    - host: {{ .Values.hosts.app }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ template "camphouse.fullname" . }}-camphouse
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "camphouse.fullname" . }}-camphouse-api
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-camphouse
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-api-path-rewrite@kubernetescrd
+spec:
+  rules:
+    - host: {{ .Values.hosts.api }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ template "camphouse.fullname" . }}-camphouse
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix

@@ -1,0 +1,25 @@
+# values-dev.yaml
+camphouse:
+  replicaCount: 1
+  image:
+    repository: camphouse
+    pullPolicy: Always
+
+service:
+  type: ClusterIP
+
+redis:
+  host:
+  password:
+  image:
+    repository: redis
+    tag: latest
+    pullPolicy: IfNotPresent
+
+hosts:
+  app: dev.camphouse.org
+  api: api-dev.camphouse.org
+
+registry: registry-1.docker.io
+repositoryBase: vmgware/
+version: next

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ template "camphouse.fullname" . }}-config
+data:
+    DISCUIT_IS_DEVELOPMENT: "false"
+    DISCUIT_ADDR: "0.0.0.0:8080"
+    DISCUIT_SITE_NAME: "Camphouse"
+    DISCUIT_SESSION_COOKIE_NAME: "camphouse-cookie"
+    DISCUIT_REDIS_ADDRESS: {{ template "camphouse.fullname" . }}-redis:6379
+    DISCUIT_MEILI_ENABLED: "true"
+    DISCUIT_MEILI_HOST: http://{{ template "camphouse.fullname" . }}-meilisearch:7700
+    DISCUIT_CSRF_OFF: "false"
+    DISCUIT_NO_LOG_TO_FILE: "true"
+    DISCUIT_PAGINATION_LIMIT: "10"
+    DISCUIT_PAGINATION_LIMIT_MAX: "100"
+    DISCUIT_DEFAULT_FEED_SORT: "hot"
+    DISCUIT_DISABLE_RATE_LIMITS: "false"
+    DISCUIT_FORUM_CREATION_REQ_POINTS: "10"
+    DISCUIT_MAX_FORUMS_PER_USER: "10"
+    DISCUIT_GITHUB_URL: "https://git.vmgware.dev/vmgware/camphouse"
+    DISCUIT_EMAIL_CONTACT: "developers@vmgware.dev"
+    DISCUIT_DISCORD_URL: "https://discord.vmgware.dev"
+{{- if .Values.config }}
+{{ toYaml .Values.config | indent 4 }}
+{{- end }}

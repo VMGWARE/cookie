@@ -34,18 +34,20 @@ RUN bun install --frozen-lockfile
 COPY ui/ .
 
 # Final stage: setup the runtime environment
-FROM oven/bun
+FROM node:18
+
 # Avoid prompts from the package manager during build
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6 \
-    mariadb-server \
-    redis-server \
     libvips-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install bun
+RUN npm install -g bun
 
 # Copy built artifacts from previous stages
 COPY --from=frontend-builder /app/ui /app/ui
