@@ -141,6 +141,11 @@ func Parse(path string) (*Config, error) {
 		"DISCUIT_DISABLE_RATE_LIMITS": &c.DisableRateLimits,
 		"DISCUIT_MAX_IMAGE_SIZE":      &c.MaxImageSize,
 
+		// MeiliSearch credentials.
+		"DISCUIT_MEILI_ENABLED": &c.MeiliEnabled,
+		"DISCUIT_MEILI_HOST":    &c.MeiliHost,
+		"DISCUIT_MEILI_KEY":     &c.MeiliKey,
+
 		// If API requests have a URL query parameter of the form 'adminKey=value',
 		// where value is AdminApiKey, rate limits are disabled.
 		"DISCUIT_ADMIN_API_KEY": &c.AdminAPIKey,

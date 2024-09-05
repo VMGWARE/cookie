@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "camphouse.fullname" . }}-meilisearch
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-meilisearch
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: {{ template "camphouse.fullname" . }}-meilisearch
+  template:
+    metadata:
+      labels:
+        app: {{ template "camphouse.name" . }}
+        component: {{ template "camphouse.fullname" . }}-meilisearch
+        chart: {{ template "camphouse.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      containers:
+        - name: {{ template "camphouse.name" . }}-meilisearch
+          image: "getmeili/meilisearch:v1.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7700
+              name: http
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 500m
+          env:
+            - name: MEILI_NO_ANALYTICS
+              value: "true"
+            - name: MEILI_HTTP_ADDR
+              value: "0.0.0.0:7700"
+          volumeMounts:
+            - name: meilisearch-data-volume
+              mountPath: /meili_data
+      volumes:
+        - name: meilisearch-data-volume
+          persistentVolumeClaim:
+            claimName: meilisearch-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "camphouse.fullname" . }}-meilisearch
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-meilisearch
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: meilisearch
+      port: 7700
+  selector:
+    component: {{ template "camphouse.fullname" . }}-meilisearch

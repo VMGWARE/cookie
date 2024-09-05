@@ -1,0 +1,7 @@
+apiVersion: v2
+name: camphouse
+version: '0.0.1'
+appVersion: '0.0.1'
+home: https://git.vmgware.dev/vmgware/camphouse
+description: A Helm chart for Camphouse deployments
+icon: https://git.vmgware.dev/uploads/-/system/project/avatar/9/Camphouse-v2-compress.png
