@@ -1,0 +1,86 @@
+image: golang:1.22
+
+stages:
+  - prepare
+  - test
+  - security
+  - build
+
+# Common settings for jobs
+.common_template:
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - vendor/
+
+prepare:
+  extends: .common_template
+  stage: prepare
+  script:
+    - make vendor
+
+format:
+  extends: .common_template
+  stage: test
+  script:
+    - apt-get update
+    - apt-get install -y libvips-dev libvips
+    - go fmt $(go list ./... | grep -v /vendor/)
+    - go vet $(go list ./... | grep -v /vendor/)
+    - go test -race $(go list ./... | grep -v /vendor/)
+
+sast-go:
+  extends: .common_template
+  stage: security
+  before_script:
+    - go install github.com/securego/gosec/v2/cmd/gosec@latest
+  script:
+    - gosec ./...
+
+semgrep-sast:
+  stage: security
+include:
+- template: Security/SAST.gitlab-ci.yml
+
+build:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile"
+      --no-push
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-push:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:next-${CI_COMMIT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}:next"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+build-push-aio:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.aio"
+      --destination "${CI_REGISTRY_IMAGE}:next-aio-${CI_COMMIT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}:next-aio"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

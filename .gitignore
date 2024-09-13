@@ -37,3 +37,7 @@ ui/node_modules/
 
 ### Kubernetes ###
 infrastructure/k8s/secrets.yaml
+
+# gitlab-ci-local
+.gitlab-ci-local/
+.gitlab-ci-local-*
