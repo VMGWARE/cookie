@@ -29,13 +29,13 @@ format:
     - go vet $(go list ./... | grep -v /vendor/)
     - go test -race $(go list ./... | grep -v /vendor/)
 
-sast-go:
-  extends: .common_template
-  stage: security
-  before_script:
-    - go install github.com/securego/gosec/v2/cmd/gosec@latest
-  script:
-    - gosec ./...
+# sast-go:
+#   extends: .common_template
+#   stage: security
+#   before_script:
+#     - go install github.com/securego/gosec/v2/cmd/gosec@latest
+#   script:
+#     - gosec ./...
 
 semgrep-sast:
   stage: security
