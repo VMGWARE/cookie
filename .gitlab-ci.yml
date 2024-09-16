@@ -65,9 +65,15 @@ build-push:
     - /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile"
+      --label org.opencontainers.image.vendor="${IMAGE_VENDOR:-$GITLAB_USER_EMAIL}"
+      --label org.opencontainers.image.title="${CI_PROJECT_NAME}${IMAGE_SUFFIX:+/$IMAGE_SUFFIX}${IMAGE_TAG:+:$IMAGE_TAG}"
+      --label org.opencontainers.image.source="${CI_PROJECT_URL}"
+      --label org.opencontainers.image.ref.name="${CI_COMMIT_REF_NAME}"
+      --label org.opencontainers.image.revision="${CI_COMMIT_SHA}"
       --destination "${DOCKER_REGISTRY_IMAGE}:next-${CI_COMMIT_SHA:0:8}"
       --destination "${DOCKER_REGISTRY_IMAGE}:next"
       --destination "${HARBOR_REGISTRY_IMAGE}:next-${CI_COMMIT_SHA:0:8}"
       --destination "${HARBOR_REGISTRY_IMAGE}:next"
+      
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
