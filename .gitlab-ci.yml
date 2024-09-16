@@ -1,10 +1,14 @@
 image: golang:1.22
 
+variables:
+  KUBE_CONTEXT: vmgware/infrastructure:camphouse-dev
+
 stages:
   - prepare
   - test
   - security
   - build
+  - deploy
 
 # Common settings for jobs
 .common_template:
@@ -30,12 +34,12 @@ format:
     - go test -race $(go list ./... | grep -v /vendor/)
 
 # sast-go:
-#   extends: .common_template
-#   stage: security
-#   before_script:
-#     - go install github.com/securego/gosec/v2/cmd/gosec@latest
-#   script:
-#     - gosec ./...
+# #   extends: .common_template
+# #   stage: security
+# #   before_script:
+# #     - go install github.com/securego/gosec/v2/cmd/gosec@latest
+# #   script:
+# #     - gosec ./...
 
 semgrep-sast:
   stage: security
@@ -74,6 +78,19 @@ build-push:
       --destination "${DOCKER_REGISTRY_IMAGE}:next"
       --destination "${HARBOR_REGISTRY_IMAGE}:next-${CI_COMMIT_SHA:0:8}"
       --destination "${HARBOR_REGISTRY_IMAGE}:next"
-      
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+deploy-dev:
+  stage: deploy
+  image:
+    name: insidiousfiddler/azure-aks-helm-cli:latest
+    entrypoint: ['']
+  script:
+    - kubectl config get-contexts
+    - kubectl config use-context $KUBE_CONTEXT
+    - cd infrastructure/k8s
+    - bash ./deploy.sh dev
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  when: manual
