@@ -90,7 +90,7 @@ deploy-dev:
     - kubectl config get-contexts
     - kubectl config use-context $KUBE_CONTEXT
     - cd infrastructure/k8s
-    - bash ./deploy.sh dev
+    - bash ./deploy.sh --version next-${CI_COMMIT_SHA:0:8} dev
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   when: manual
