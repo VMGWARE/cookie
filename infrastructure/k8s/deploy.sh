@@ -6,23 +6,49 @@ RELEASE_NAME="camphouse"
 HELM_VALUES_DIR="./camphouse"
 # no "stag" "prod" for now
 ENVIRONMENTS=("dev")
+VERSION="next"
 
-# Check if any environments are provided
-if [ $# -eq 0 ]; then
-  echo "No environments provided. Please specify at least one environment (e.g., dev, stag, prod)."
-  exit 1
-fi
+# Usage function
+usage() {
+    echo "Usage: $0 [--version <version>] <environment1> [environment2 ...]"
+    exit 1
+}
 
-# Validate the provided environments
-for ENVIRONMENT in "$@"; do
-    if [[ ! " ${ENVIRONMENTS[@]} " =~ " ${ENVIRONMENT} " ]]; then
-        echo "Invalid environment: ${ENVIRONMENT}. Please specify one of the following environments: ${ENVIRONMENTS[*]}"
-        exit 1
-    fi
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    
+    case $key in
+        --version)
+            VERSION="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -h|--help)
+            usage
+            ;;
+        *)
+            # Assume this is an environment argument
+            if [[ ! " ${ENVIRONMENTS[@]} " =~ " $1 " ]]; then
+                echo "Invalid environment: $1. Please specify one of the following environments: ${ENVIRONMENTS[*]}"
+                exit 1
+            fi
+            ENVIRONMENTS_TO_DEPLOY+=("$1")
+            shift # past argument
+            ;;
+    esac
 done
 
+# Check if any environments are provided
+if [ ${#ENVIRONMENTS_TO_DEPLOY[@]} -eq 0 ]; then
+    echo "No environments provided. Please specify at least one environment (e.g., dev)."
+    usage
+fi
+
+echo "Deploying version ${VERSION} of ${CHART_NAME} to the following environments: ${ENVIRONMENTS_TO_DEPLOY[*]}"
+
 # Loop through each provided environment and deploy the Helm chart
-for ENVIRONMENT in "$@"; do
+for ENVIRONMENT in "${ENVIRONMENTS_TO_DEPLOY[@]}"; do
     echo "Deploying ${CHART_NAME} to ${ENVIRONMENT}..."
 
     # Check if the corresponding values file exists
@@ -37,14 +63,13 @@ for ENVIRONMENT in "$@"; do
     # Create the namespace if it doesn't exist
     kubectl get namespace "$NAMESPACE" || kubectl create namespace "$NAMESPACE"
 
-    # Ensure the secrets are created in the namespace: camphouse-secrets
-
     # Deploy the Helm chart
     helm upgrade --install \
         "${NAMESPACE}" \
         "${CHART_NAME}" \
         --namespace "$NAMESPACE" \
-        --values "$VALUES_FILE"
+        --values "$VALUES_FILE" \
+        --set "version=${VERSION}"
 
     echo "Deployment to ${ENVIRONMENT} completed."
 done
