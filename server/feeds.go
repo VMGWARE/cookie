@@ -65,7 +65,7 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 	commPublicUrl := fmt.Sprintf("%s/%s%s", s.config.PublicUrl, s.config.CommunityPrefix, comm.Name)
 
 	feed := &feeds.Feed{
-		Title:       comm.Name,
+		Title:       comm.Name + " Feed - " + s.config.SiteName,
 		Link:        &feeds.Link{Href: commPublicUrl},
 		Description: comm.About.String,
 		Id:          comm.ID.String(),
