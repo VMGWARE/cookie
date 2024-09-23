@@ -93,6 +93,17 @@ spec:
     regex: "^/"
     replacement: "/api/"
 ---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: feed-root-path-rewrite
+  namespace: {{ .Release.Namespace }}
+spec:
+  replacePathRegex:
+    regex: "^/(.*)"
+    replacement: "/api/feed/$1"
+
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -131,6 +142,31 @@ metadata:
 spec:
   rules:
     - host: {{ .Values.hosts.api }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ template "camphouse.fullname" . }}-camphouse
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "camphouse.fullname" . }}-camphouse-feed
+  labels:
+    app: {{ template "camphouse.name" . }}
+    component: {{ template "camphouse.fullname" . }}-camphouse
+    chart: {{ template "camphouse.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-feed-root-path-rewrite@kubernetescrd
+spec:
+  rules:
+    - host: {{ .Values.hosts.feed }}
       http:
         paths:
           - backend:

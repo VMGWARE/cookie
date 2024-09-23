@@ -19,6 +19,7 @@ redis:
 hosts:
   app: dev.camphouse.org
   api: api-dev.camphouse.org
+  feed: feed-dev.camphouse.org
 
 registry: registry-1.docker.io
 repositoryBase: vmgware/
