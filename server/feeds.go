@@ -104,8 +104,10 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 
 		switch item.Type {
 		case core.PostTypeImage:
+			fi.Title = fi.Title + " (Image)"
 			fi.Description = fi.Description + fmt.Sprintf(`<br><img src="%s" alt="Image" />`, *item.Image.URL)
 		case core.PostTypeLink:
+			fi.Title = fi.Title + " (Link)"
 			fi.Description = fi.Description + fmt.Sprintf(`<br>Submitted link: <a href="%s"%s</a>`, item.Link.URL, item.Link.Hostname)
 		case core.PostTypeText:
 			html := mdToHTML([]byte(item.Body.String))
