@@ -77,6 +77,12 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 			Title: comm.Name,
 			Link:  commPublicUrl,
 		}
+	} else {
+		feed.Image = &feeds.Image{
+			Url:   fmt.Sprintf("%s/favicon.png", s.config.PublicUrl),
+			Title: comm.Name,
+			Link:  commPublicUrl,
+		}
 	}
 
 	feed.Items = []*feeds.Item{}
@@ -105,10 +111,10 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 		switch item.Type {
 		case core.PostTypeImage:
 			fi.Title = fi.Title + " (Image)"
-			fi.Description = fi.Description + fmt.Sprintf(`<br><img src="%s" alt="Image" />`, *item.Image.URL)
+			fi.Content = fi.Content + fmt.Sprintf(`<br><img src="%s" alt="Image" />`, *item.Image.URL)
 		case core.PostTypeLink:
 			fi.Title = fi.Title + " (Link)"
-			fi.Description = fi.Description + fmt.Sprintf(`<br>Submitted link: <a href="%s">%s</a>`, item.Link.URL, item.Link.Hostname)
+			fi.Content = fi.Content + fmt.Sprintf(`<br>Submitted link: <a href="%s">%s</a>`, item.Link.URL, item.Link.Hostname)
 		case core.PostTypeText:
 			html := mdToHTML([]byte(item.Body.String))
 			fi.Content = string(html)
@@ -126,6 +132,11 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 		}
 		fi.Description = fi.Description + `</a>`
 		fi.Description = fi.Description + fmt.Sprintf(` • Posted by <a href="%s/@%s">@%s</a>`, s.config.PublicUrl, author, author)
+
+		if item.Type == core.PostTypeText {
+			fi.Content = fi.Content + fmt.Sprintf(`<br><br>%s`, fi.Description)
+			fi.Description = ""
+		}
 
 		feed.Items = append(feed.Items, fi)
 	}
