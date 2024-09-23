@@ -135,8 +135,10 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 
 		if item.Type == core.PostTypeText {
 			fi.Content = fi.Content + fmt.Sprintf(`<br><br>%s`, fi.Description)
-			fi.Description = ""
+		} else {
+			fi.Content = fi.Content + fi.Description
 		}
+		fi.Description = ""
 
 		feed.Items = append(feed.Items, fi)
 	}
