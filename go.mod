@@ -6,18 +6,25 @@ require (
 	github.com/SherClockHolmes/webpush-go v1.2.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-migrate/migrate/v4 v4.15.1
+	github.com/gomarkdown/markdown v0.0.0-20240730141124-034f12af3bf6
 	github.com/gomodule/redigo v1.8.4
+	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/h2non/bimg v1.1.5
 	github.com/meilisearch/meilisearch-go v0.26.2
-	golang.org/x/crypto v0.11.0
+	github.com/microcosm-cc/bluemonday v1.0.27
+	golang.org/x/crypto v0.24.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/image v0.0.0-20210216034530-4410531fe030
-	golang.org/x/net v0.10.0
+	golang.org/x/net v0.26.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require golang.org/x/tools v0.5.1-0.20230111220935-a7f7db3f17fc // indirect
+require (
+	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/gorilla/css v1.0.1 // indirect
+	golang.org/x/tools v0.5.1-0.20230111220935-a7f7db3f17fc // indirect
+)
 
 require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect

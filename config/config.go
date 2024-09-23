@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -14,8 +15,9 @@ import (
 type Config struct {
 	IsDevelopment bool `yaml:"isDevelopment"`
 
-	Addr    string `yaml:"addr"`
-	UIProxy string `yaml:"uiProxy"`
+	Addr      string `yaml:"addr"`
+	UIProxy   string `yaml:"uiProxy"`
+	PublicUrl string `yaml:"publicUrl"`
 
 	SiteName        string `yaml:"siteName"`
 	SiteDescription string `yaml:"siteDescription"` // Used for meta tags.
@@ -79,7 +81,7 @@ type Config struct {
 	GithubURL      string `yaml:"githubURL"`
 	SubstackURL    string `yaml:"substackURL"`
 
-	// CommunityPrefix string `yaml:"communityPrefix"`
+	CommunityPrefix string
 }
 
 // Parse parses the yaml file at path and returns a Config.
@@ -101,14 +103,15 @@ func Parse(path string) (*Config, error) {
 		ForumCreationReqPoints: -1,
 		MaxForumsPerUser:       -1,
 
-		// CommunityPrefix: "+",
+		CommunityPrefix: "+",
 	}
 
 	var envConfigMap = map[string]interface{}{
 		"DISCUIT_IS_DEVELOPMENT": &c.IsDevelopment,
 
-		"DISCUIT_ADDR":     &c.Addr,
-		"DISCUIT_UI_PROXY": &c.UIProxy,
+		"DISCUIT_ADDR":         &c.Addr,
+		"DISCUIT_UI_PROXY":     &c.UIProxy,
+		"CAMPHOUSE_PUBLIC_URL": &c.PublicUrl,
 
 		"DISCUIT_SITE_NAME":        &c.SiteName,
 		"DISCUIT_SITE_DESCRIPTION": &c.SiteDescription,
@@ -216,6 +219,11 @@ func Parse(path string) (*Config, error) {
 	}
 	if c.MaxForumsPerUser == -1 {
 		return nil, errors.New("MaxForumsPerUser cannot be (-1)")
+	}
+	c.PublicUrl = strings.TrimRight(c.PublicUrl, "/")
+	_, err = url.ParseRequestURI(c.PublicUrl)
+	if err != nil {
+		return nil, errors.New("PublicUrl is not valid")
 	}
 
 	return c, nil

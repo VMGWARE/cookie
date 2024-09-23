@@ -188,6 +188,9 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 
 	r.Handle("/api/analytics", s.withHandler(s.handleAnalytics)).Methods("POST")
 
+	// r.Handle("/api/feed/u/{username}", s.withHandler(s.getUserFeed)).Methods("GET")
+	r.Handle("/api/feed/c/{communityName}", s.withHandler(s.getCommunityFeed)).Methods("GET")
+
 	r.NotFoundHandler = http.HandlerFunc(s.apiNotFoundHandler)
 	r.MethodNotAllowedHandler = http.HandlerFunc(s.apiMethodNotAllowedHandler)
 
