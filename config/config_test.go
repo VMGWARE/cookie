@@ -31,6 +31,7 @@ func TestParse(t *testing.T) {
 isDevelopment: true
 addr: ":8080"
 uiProxy: "http://localhost:3000"
+publicUrl: "http://localhost:8080"
 siteName: "Discuit"
 siteDescription: "A discussion platform"
 dbAddr: "localhost:5432"
