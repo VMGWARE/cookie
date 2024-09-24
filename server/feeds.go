@@ -106,6 +106,7 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 			Created:     item.CreatedAt,
 			Id:          item.PublicID,
 			Description: "",
+			Content:     "",
 		}
 
 		switch item.Type {
@@ -116,8 +117,7 @@ func (s *Server) getCommunityFeed(w *responseWriter, r *request) error {
 			fi.Title = fi.Title + " (Link)"
 			fi.Content = fi.Content + fmt.Sprintf(`<br>Submitted link: <a href="%s">%s</a>`, item.Link.URL, item.Link.Hostname)
 		case core.PostTypeText:
-			html := mdToHTML([]byte(item.Body.String))
-			fi.Content = string(html)
+			fi.Content = string(mdToHTML([]byte(item.Body.String)))
 		}
 
 		// Credits: https://github.com/ttaylor-st/discuit-rss/blob/master/src/index.ts
