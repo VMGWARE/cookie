@@ -17,7 +17,11 @@ stages:
     paths:
       - vendor/
     policy: pull
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"
 
+# @Description Install dependencies
 prepare:
   extends: .common_template
   stage: prepare
@@ -27,38 +31,48 @@ prepare:
     policy: pull-push
     when: on_success
 
+# @Description Run go fmt
 format:
   extends: .common_template
   stage: test
   script:
     - go fmt $(go list ./... | grep -v /vendor/)
 
+# @Description Run go vet
 vet:
   extends: .common_template
   stage: test
   script:
     - go vet $(go list ./... | grep -v /vendor/)
 
+# @Description Run tests
 test:
   extends: .common_template
   stage: test
   script:
     - go test -race $(go list ./... | grep -v /vendor/)
 
+# @Description Run SAST using Gosec
+sast-go:
+  extends: .common_template
+  stage: security
+  before_script:
+    - go install github.com/securego/gosec/v2/cmd/gosec@latest
+  script:
+    - gosec ./...
+  allow_failure: true
 
-# sast-go:
-# #   extends: .common_template
-# #   stage: security
-# #   before_script:
-# #     - go install github.com/securego/gosec/v2/cmd/gosec@latest
-# #   script:
-# #     - gosec ./...
-
+# @Description Run SAST using Semgrep
 semgrep-sast:
   stage: security
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"
 include:
 - template: Security/SAST.gitlab-ci.yml
 
+# @Description Build the image but do not push it to the registry
 build:
   stage: build
   image:
@@ -70,12 +84,11 @@ build:
       --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile"
       --no-push
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  needs:
-    - format
-    - vet
-    - test
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"
 
+# @Description Build and push the image to the registry
 build-push:
   stage: build
   image:
@@ -98,6 +111,7 @@ build-push:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+# @Description Deploy to dev environment
 deploy-dev:
   stage: deploy
   image:
