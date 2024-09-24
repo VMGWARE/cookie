@@ -1,4 +1,4 @@
-image: golang:1.22
+image: registry.vmgware.dev/library/golang:1.22-libvips
 
 variables:
   KUBE_CONTEXT: vmgware/infrastructure:camphouse-dev
@@ -27,11 +27,20 @@ format:
   extends: .common_template
   stage: test
   script:
-    - apt-get update
-    - apt-get install -y libvips-dev libvips
     - go fmt $(go list ./... | grep -v /vendor/)
+
+vet:
+  extends: .common_template
+  stage: test
+  script:
     - go vet $(go list ./... | grep -v /vendor/)
+
+test:
+  extends: .common_template
+  stage: test
+  script:
     - go test -race $(go list ./... | grep -v /vendor/)
+
 
 # sast-go:
 # #   extends: .common_template

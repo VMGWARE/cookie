@@ -2,6 +2,7 @@
 
 # Define the base64-encoded auth strings for Docker and Harbor registries
 docker_auth=$(printf "%s:%s" "${DOCKER_REGISTRY_USER}" "${DOCKER_REGISTRY_PASSWORD}" | base64 | tr -d '\n')
+harbor_auth=$(printf "%s:%s" "${HARBOR_REGISTRY_USER}" "${HARBOR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')
 
 # Define the JSON structure for multiple registries
 json=$(cat <<EOF
@@ -11,7 +12,7 @@ json=$(cat <<EOF
       "auth": "${docker_auth}"
     },
     "${HARBOR_REGISTRY}": {
-      "auth": "${HARBOR_REGISTRY_AUTH}"
+      "auth": "${harbor_auth}"
     }
   }
 }
