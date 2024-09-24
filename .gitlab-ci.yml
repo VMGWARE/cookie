@@ -67,6 +67,10 @@ build:
       --no-push
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  needs:
+    - format
+    - vet
+    - test
 
 build-push:
   stage: build
