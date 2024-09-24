@@ -16,12 +16,16 @@ stages:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - vendor/
+    policy: pull
 
 prepare:
   extends: .common_template
   stage: prepare
   script:
     - make vendor
+  cache:
+    policy: pull-push
+    when: on_success
 
 format:
   extends: .common_template
