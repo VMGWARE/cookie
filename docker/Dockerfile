@@ -1,5 +1,5 @@
 # Use official Go image for the backend build
-FROM golang:1.21 AS backend-builder
+FROM golang:1.22 AS backend-builder
 
 # Install runtime dependencies (libvips)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,6 +16,7 @@ WORKDIR /app
 COPY go.* ./
 RUN go mod download
 COPY . .
+RUN make install-tools && make generate
 RUN go build -o discuit .
 
 # Use official Bun image for the frontend build

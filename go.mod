@@ -1,9 +1,13 @@
 module github.com/discuitnet/discuit
 
-go 1.21
+go 1.22.0
+
+toolchain go1.23.1
 
 require (
+	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
 	github.com/SherClockHolmes/webpush-go v1.2.0
+	github.com/getkin/kin-openapi v0.127.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/gomarkdown/markdown v0.0.0-20240730141124-034f12af3bf6
@@ -13,6 +17,7 @@ require (
 	github.com/h2non/bimg v1.1.5
 	github.com/meilisearch/meilisearch-go v0.26.2
 	github.com/microcosm-cc/bluemonday v1.0.27
+	github.com/swaggo/swag v1.16.3
 	golang.org/x/crypto v0.24.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/image v0.0.0-20210216034530-4410531fe030
@@ -21,9 +26,22 @@ require (
 )
 
 require (
+	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/PuerkitoBio/purell v1.1.1 // indirect
+	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/go-openapi/jsonpointer v0.21.0 // indirect
+	github.com/go-openapi/jsonreference v0.19.6 // indirect
+	github.com/go-openapi/spec v0.20.4 // indirect
+	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
-	golang.org/x/tools v0.5.1-0.20230111220935-a7f7db3f17fc // indirect
+	github.com/invopop/yaml v0.3.1 // indirect
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
+	github.com/perimeterx/marshmallow v1.1.5 // indirect
+	github.com/ugorji/go v1.1.4 // indirect
+	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (

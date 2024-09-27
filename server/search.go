@@ -7,7 +7,14 @@ import (
 	"github.com/discuitnet/discuit/internal/meilisearch"
 )
 
-// /api/search [GET]
+//	@Summary		Search
+//	@Description	Search for content in the MeiliSearch indexes.
+//	@Router			/api/search [GET]
+//	@Success		200
+//	@Tags			Search
+//	@Param			q		query	string	true	"Search query"
+//	@Param			index	query	string	true	"Index to search in"	Enums(communities,posts,users)
+//	@Param			sort	query	string	false	"Sort results by"
 func (s *Server) search(w *responseWriter, r *request) error {
 	if !s.config.MeiliEnabled {
 		return httperr.NewBadRequest("meili_disabled", "MeiliSearch is disabled.")

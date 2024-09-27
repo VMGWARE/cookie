@@ -33,7 +33,12 @@ func userModOrAdmin(ctx context.Context, db *sql.DB, user uid.ID, c *core.Commun
 	return false, nil
 }
 
-// /api/community [POST]
+// @Summary		Create a community.
+// @Description	Create a community.
+// @Router			/api/community [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) createCommunity(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -58,7 +63,13 @@ func (s *Server) createCommunity(w *responseWriter, r *request) error {
 	return w.writeJSON(comm)
 }
 
-// /api/communities [GET] (?set=subscribed&sort=size)
+// @Summary		Get communities.
+// @Description	Get communities.
+// @Router			/api/communities [GET]
+// @Success		200
+// @Tags			Community
+// @Param			set		query	string	false	"Either 'all' or 'default' or 'subscribed'."	Enums(all,default,subscribed)
+// @Param			sort	query	string	false	"Sort by 'size' or 'name'."						Enums(size,name)
 func (s *Server) getCommunities(w *responseWriter, r *request) error {
 	query := r.urlQueryParams()
 	search := query.Get("q")
@@ -122,7 +133,13 @@ func (s *Server) getCommunities(w *responseWriter, r *request) error {
 	return w.writeJSON(comms)
 }
 
-// /api/communities/:communityID [GET]
+// @Summary		Get a community.
+// @Description	Get a community.
+// @Router			/api/communities/{communityID} [GET]
+// @Success		200
+// @Tags			Community
+// @Param			communityID	path	string	true	"Community ID or name."
+// @Param			byName		query	string	false	"If true, communityID is treated as name."
 func (s *Server) getCommunity(w *responseWriter, r *request) error {
 	var (
 		communityID = r.muxVar("communityID") // Community ID or name.
@@ -159,7 +176,13 @@ func (s *Server) getCommunity(w *responseWriter, r *request) error {
 	return w.writeJSON(comm)
 }
 
-// /api/communities/:communityID [PUT]
+// @Summary		Update a community.
+// @Description	Update a community.
+// @Router			/api/communities/{communityID} [PUT]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID or name."
 func (s *Server) updateCommunity(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -210,7 +233,12 @@ func (s *Server) updateCommunity(w *responseWriter, r *request) error {
 	return w.writeJSON(comm)
 }
 
-// /api/_joinCommunity [POST]
+// @Summary		Join a community.
+// @Description	Join a community.
+// @Router			/api/_joinCommunity [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) joinCommunity(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -258,7 +286,12 @@ func (s *Server) joinCommunity(w *responseWriter, r *request) error {
 	return w.writeJSON(community)
 }
 
-// /api/communities/{communityID}/mods [GET]
+// @Summary		Get community mods.
+// @Description	Get community mods.
+// @Router			/api/communities/{communityID}/mods [GET]
+// @Success		200
+// @Tags			Community
+// @Param			communityID	path	string	true	"Community ID"
 func (s *Server) getCommunityMods(w *responseWriter, r *request) error {
 	cid, err := strToID(r.muxVar("communityID"))
 	if err != nil {
@@ -281,7 +314,13 @@ func (s *Server) getCommunityMods(w *responseWriter, r *request) error {
 	return w.writeJSON(mods)
 }
 
-// /api/communities/{communityID}/mods [POST]
+// @Summary		Add a community mod.
+// @Description	Add a community mod.
+// @Router			/api/communities/{communityID}/mods [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
 func (s *Server) addCommunityMod(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -327,7 +366,14 @@ func (s *Server) addCommunityMod(w *responseWriter, r *request) error {
 	return w.writeJSON(mods)
 }
 
-// /api/communities/{communityID}/mods/{mod} [DELETE]
+// @Summary		Remove a community mod.
+// @Description	Remove a community mod.
+// @Router			/api/communities/{communityID}/mods/{mod} [DELETE]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+// @Param			mod				path	string	true	"Mod username"
 func (s *Server) removeCommunityMod(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -361,7 +407,12 @@ func (s *Server) removeCommunityMod(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
-// /api/communities/{communityID}/rules [GET]
+// @Summary		Get community rules.
+// @Description	Get community rules.
+// @Router			/api/communities/{communityID}/rules [GET]
+// @Success		200
+// @Tags			Community
+// @Param			communityID	path	string	true	"Community ID"
 func (s *Server) getCommunityRules(w *responseWriter, r *request) error {
 	cid, err := strToID(r.muxVar("communityID"))
 	if err != nil {
@@ -382,7 +433,13 @@ func (s *Server) getCommunityRules(w *responseWriter, r *request) error {
 	return w.writeJSON(comm.Rules)
 }
 
-// /api/communities/{communityID}/rules [POST]
+// @Summary		Add a community rule.
+// @Description	Add a community rule.
+// @Router			/api/communities/{communityID}/rules [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
 func (s *Server) addCommunityRule(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -418,7 +475,13 @@ func (s *Server) addCommunityRule(w *responseWriter, r *request) error {
 	return w.writeJSON(comm.Rules)
 }
 
-// /api/communities/{communityID}/rules/{ruleID} [GET]
+// @Summary		Get a community rule.
+// @Description	Get a community rule.
+// @Router			/api/communities/{communityID}/rules/{ruleID} [GET]
+// @Success		200
+// @Tags			Community
+// @Param			communityID	path	string	true	"Community ID"
+// @Param			ruleID		path	string	true	"Rule ID"
 func (s *Server) getCommunityRule(w *responseWriter, r *request) error {
 	ruleID, err := strconv.Atoi(r.muxVar("ruleID"))
 	if err != nil {
@@ -433,7 +496,14 @@ func (s *Server) getCommunityRule(w *responseWriter, r *request) error {
 	return w.writeJSON(rule)
 }
 
-// /api/communities/{communityID}/rules/{ruleID} [PUT]
+// @Summary		Update a community rule.
+// @Description	Update a community rule.
+// @Router			/api/communities/{communityID}/rules/{ruleID} [PUT]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+// @Param			ruleID			path	string	true	"Rule ID"
 func (s *Server) updateCommunityRule(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -464,7 +534,14 @@ func (s *Server) updateCommunityRule(w *responseWriter, r *request) error {
 	return w.writeJSON(rule)
 }
 
-// /api/communities/{communityID}/rules/{ruleID} [DELETE]
+// @Summary		Delete a community rule.
+// @Description	Delete a community rule.
+// @Router			/api/communities/{communityID}/rules/{ruleID} [DELETE]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+// @Param			ruleID			path	string	true	"Rule ID"
 func (s *Server) deleteCommunityRule(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -487,7 +564,12 @@ func (s *Server) deleteCommunityRule(w *responseWriter, r *request) error {
 	return w.writeJSON(rule)
 }
 
-// /api/_report [POST]
+// @Summary		Report a post or comment.
+// @Description	Report a post or comment.
+// @Router			/api/_report [POST]
+// @Success		200
+// @Tags			Report
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) report(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -525,7 +607,13 @@ func (s *Server) report(w *responseWriter, r *request) error {
 	return w.writeJSON(report)
 }
 
-// /api/communities/{communityID}/reports [GET]
+// @Summary		Get community reports.
+// @Description	Get community reports.
+// @Router			/api/communities/{communityID}/reports [GET]
+// @Success		200
+// @Tags			Report
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
 func (s *Server) getCommunityReports(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -595,7 +683,14 @@ func (s *Server) getCommunityReports(w *responseWriter, r *request) error {
 	return w.writeJSON(response)
 }
 
-// /api/communities/{communityID}/reports/{reportID} [DELETE]
+// @Summary		Delete a report.
+// @Description	Delete a report.
+// @Router			/api/communities/{communityID}/reports/{reportID} [DELETE]
+// @Success		200
+// @Tags			Report
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+// @Param			reportID		path	string	true	"Report ID"
 func (s *Server) deleteReport(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -637,8 +732,14 @@ func (s *Server) deleteReport(w *responseWriter, r *request) error {
 	return w.writeJSON(report)
 }
 
-// /api/communities/{communityID}/banned [GET, POST, DELETE]
-func (s *Server) handleCommunityBanned(w *responseWriter, r *request) error {
+// @Summary		Get community banned users.
+// @Description	Get community banned users.
+// @Router			/api/communities/{communityID}/banned [GET]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+func (s *Server) CommunityGetBannedUsers(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
 	}
@@ -660,71 +761,24 @@ func (s *Server) handleCommunityBanned(w *responseWriter, r *request) error {
 		return errNotAdminNorMod
 	}
 
-	if r.req.Method == "GET" {
-		users, err := comm.GetBannedUsers(r.ctx)
-		if err != nil {
-			return err
-		}
-		if users == nil {
-			return w.writeString("[]")
-		}
-		return w.writeJSON(users)
+	users, err := comm.GetBannedUsers(r.ctx)
+	if err != nil {
+		return err
 	}
-
-	if r.req.Method == "POST" || r.req.Method == "DELETE" {
-		values, err := r.unmarshalJSONBodyToStringsMap(true)
-		if err != nil {
-			return err
-		}
-
-		username, ok := values["username"]
-		if !ok {
-			return httperr.NewBadRequest("no_username", "No username.")
-		}
-
-		user, err := core.GetUserByUsername(r.ctx, s.db, username, nil)
-		if err != nil {
-			return err
-		}
-		if isMod, err := comm.UserMod(r.ctx, user.ID); err != nil {
-			return err
-		} else if r.req.Method == "POST" && (isMod || user.Admin) {
-			// Cannot ban mod or admin.
-			return httperr.NewForbidden("not_admin_nor_mod", "Neither an admin nor a mod.")
-		}
-
-		var expires *time.Time
-		if expiresText, ok := values["expires"]; ok {
-			expires = new(time.Time)
-			if err = expires.UnmarshalText([]byte(expiresText)); err != nil {
-				return httperr.NewBadRequest("invalid_expires", "Invalid expires.")
-			}
-		}
-
-		if r.req.Method == "POST" {
-			err = comm.BanUser(r.ctx, *r.viewer, user.ID, expires)
-		} else {
-			// Unban user.
-			err = comm.UnbanUser(r.ctx, *r.viewer, user.ID)
-		}
-		if err != nil {
-			if msql.IsErrDuplicateErr(err) {
-				return &httperr.Error{
-					HTTPStatus: http.StatusConflict,
-					Code:       "conflict",
-					Message:    "There's a duplicate row.",
-				}
-			}
-			return err
-		}
-		return w.writeJSON(user)
+	if users == nil {
+		return w.writeString("[]")
 	}
-
-	return httperr.NewBadRequest("", "Unsupported HTTP method.")
+	return w.writeJSON(users)
 }
 
-// /api/communities/{communityID}/pro_pic [POST, DELETE]
-func (s *Server) handleCommunityProPic(w *responseWriter, r *request) error {
+// @Summary		Ban  a user.
+// @Description	Ban a user.
+// @Router			/api/communities/{communityID}/banned [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+func (s *Server) CommunityBanUser(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
 	}
@@ -746,36 +800,175 @@ func (s *Server) handleCommunityProPic(w *responseWriter, r *request) error {
 		return errNotAdminNorMod
 	}
 
-	if r.req.Method == "POST" {
-		r.req.Body = http.MaxBytesReader(w, r.req.Body, int64(s.config.MaxImageSize)) // limit max upload size
-		if err := r.req.ParseMultipartForm(int64(s.config.MaxImageSize)); err != nil {
-			return httperr.NewBadRequest("file_size_exceeded", "Max file size exceeded.")
-		}
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
 
-		file, _, err := r.req.FormFile("image")
-		if err != nil {
-			return err
-		}
-		defer file.Close()
+	username, ok := values["username"]
+	if !ok {
+		return httperr.NewBadRequest("no_username", "No username.")
+	}
 
-		buf, err := io.ReadAll(file)
-		if err != nil {
-			return err
+	user, err := core.GetUserByUsername(r.ctx, s.db, username, nil)
+	if err != nil {
+		return err
+	}
+	if isMod, err := comm.UserMod(r.ctx, user.ID); err != nil {
+		return err
+	} else if r.req.Method == "POST" && (isMod || user.Admin) {
+		// Cannot ban mod or admin.
+		return httperr.NewForbidden("not_admin_nor_mod", "Neither an admin nor a mod.")
+	}
+
+	var expires *time.Time
+	if expiresText, ok := values["expires"]; ok {
+		expires = new(time.Time)
+		if err = expires.UnmarshalText([]byte(expiresText)); err != nil {
+			return httperr.NewBadRequest("invalid_expires", "Invalid expires.")
 		}
-		if err = comm.UpdateProPic(r.ctx, buf); err != nil {
-			return err
+	}
+
+	err = comm.BanUser(r.ctx, *r.viewer, user.ID, expires)
+	if err != nil {
+		if msql.IsErrDuplicateErr(err) {
+			return &httperr.Error{
+				HTTPStatus: http.StatusConflict,
+				Code:       "conflict",
+				Message:    "There's a duplicate row.",
+			}
 		}
-	} else if r.req.Method == "DELETE" {
-		if err = comm.DeleteProPic(r.ctx); err != nil {
-			return err
+		return err
+	}
+	return w.writeJSON(user)
+}
+
+// @Summary		Unban a user.
+// @Description	Unban a user.
+// @Router			/api/communities/{communityID}/banned [DELETE]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+func (s *Server) CommunityUnbanUser(w *responseWriter, r *request) error {
+	if !r.loggedIn {
+		return errNotLoggedIn
+	}
+
+	cid, err := strToID(r.muxVar("communityID"))
+	if err != nil {
+		return err
+	}
+
+	comm, err := core.GetCommunityByID(r.ctx, s.db, cid, r.viewer)
+	if err != nil {
+		return err
+	}
+
+	// Only mods and admins have access.
+	if ok, err := userModOrAdmin(r.ctx, s.db, *r.viewer, comm); err != nil {
+		return err
+	} else if !ok {
+		return errNotAdminNorMod
+	}
+
+	values, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	username, ok := values["username"]
+	if !ok {
+		return httperr.NewBadRequest("no_username", "No username.")
+	}
+
+	user, err := core.GetUserByUsername(r.ctx, s.db, username, nil)
+	if err != nil {
+		return err
+	}
+
+	var expires *time.Time
+	if expiresText, ok := values["expires"]; ok {
+		expires = new(time.Time)
+		if err = expires.UnmarshalText([]byte(expiresText)); err != nil {
+			return httperr.NewBadRequest("invalid_expires", "Invalid expires.")
 		}
+	}
+
+	// Unban user.
+	err = comm.UnbanUser(r.ctx, *r.viewer, user.ID)
+	if err != nil {
+		if msql.IsErrDuplicateErr(err) {
+			return &httperr.Error{
+				HTTPStatus: http.StatusConflict,
+				Code:       "conflict",
+				Message:    "There's a duplicate row.",
+			}
+		}
+		return err
+	}
+	return w.writeJSON(user)
+}
+
+// @Summary		Upload a community profile picture.
+// @Description	Upload a community profile picture.
+// @Router			/api/communities/{communityID}/pro_pic [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+func (s *Server) CommunityUploadProPic(w *responseWriter, r *request) error {
+	if !r.loggedIn {
+		return errNotLoggedIn
+	}
+
+	cid, err := strToID(r.muxVar("communityID"))
+	if err != nil {
+		return err
+	}
+
+	comm, err := core.GetCommunityByID(r.ctx, s.db, cid, r.viewer)
+	if err != nil {
+		return err
+	}
+
+	// Only mods and admins have access.
+	if ok, err := userModOrAdmin(r.ctx, s.db, *r.viewer, comm); err != nil {
+		return err
+	} else if !ok {
+		return errNotAdminNorMod
+	}
+
+	r.req.Body = http.MaxBytesReader(w, r.req.Body, int64(s.config.MaxImageSize)) // limit max upload size
+	if err := r.req.ParseMultipartForm(int64(s.config.MaxImageSize)); err != nil {
+		return httperr.NewBadRequest("file_size_exceeded", "Max file size exceeded.")
+	}
+
+	file, _, err := r.req.FormFile("image")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	buf, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	if err = comm.UpdateProPic(r.ctx, buf); err != nil {
+		return err
 	}
 
 	return w.writeJSON(comm)
 }
 
-// /api/communities/{communityID}/banner_image [POST, DELETE]
-func (s *Server) handleCommunityBannerImage(w *responseWriter, r *request) error {
+// @Summary		Delete a community profile picture.
+// @Description	Delete a community profile picture.
+// @Router			/api/communities/{communityID}/pro_pic [DELETE]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+func (s *Server) CommunityDeleteProPic(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
 	}
@@ -797,36 +990,109 @@ func (s *Server) handleCommunityBannerImage(w *responseWriter, r *request) error
 		return errNotAdminNorMod
 	}
 
-	if r.req.Method == "POST" {
-		r.req.Body = http.MaxBytesReader(w, r.req.Body, int64(s.config.MaxImageSize)) // limit max upload size
-		if err := r.req.ParseMultipartForm(int64(s.config.MaxImageSize)); err != nil {
-			return httperr.NewBadRequest("file_size_exceeded", "Max file size exceeded.")
-		}
-
-		file, _, err := r.req.FormFile("image")
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		buf, err := io.ReadAll(file)
-		if err != nil {
-			return err
-		}
-		if err = comm.UpdateBannerImage(r.ctx, buf); err != nil {
-			return err
-		}
-	} else if r.req.Method == "DELETE" {
-		if err = comm.DeleteBannerImage(r.ctx); err != nil {
-			return err
-		}
+	if err = comm.DeleteProPic(r.ctx); err != nil {
+		return err
 	}
 
 	return w.writeJSON(comm)
 }
 
-// /api/community_requests [GET, POST]
-func (s *Server) handleCommunityRequests(w *responseWriter, r *request) error {
+// @Summary		Upload a community banner image.
+// @Description	Upload a community banner image.
+// @Router			/api/communities/{communityID}/banner_image [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+func (s *Server) CommunityUploadBannerImage(w *responseWriter, r *request) error {
+	if !r.loggedIn {
+		return errNotLoggedIn
+	}
+
+	cid, err := strToID(r.muxVar("communityID"))
+	if err != nil {
+		return err
+	}
+
+	comm, err := core.GetCommunityByID(r.ctx, s.db, cid, r.viewer)
+	if err != nil {
+		return err
+	}
+
+	// Only mods and admins have access.
+	if ok, err := userModOrAdmin(r.ctx, s.db, *r.viewer, comm); err != nil {
+		return err
+	} else if !ok {
+		return errNotAdminNorMod
+	}
+
+	r.req.Body = http.MaxBytesReader(w, r.req.Body, int64(s.config.MaxImageSize)) // limit max upload size
+	if err := r.req.ParseMultipartForm(int64(s.config.MaxImageSize)); err != nil {
+		return httperr.NewBadRequest("file_size_exceeded", "Max file size exceeded.")
+	}
+
+	file, _, err := r.req.FormFile("image")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	buf, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	if err = comm.UpdateBannerImage(r.ctx, buf); err != nil {
+		return err
+	}
+
+	return w.writeJSON(comm)
+}
+
+// @Summary		Delete a community banner image.
+// @Description	Delete a community banner image.
+// @Router			/api/communities/{communityID}/banner_image [DELETE]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			communityID		path	string	true	"Community ID"
+func (s *Server) CommunityDeleteBannerImage(w *responseWriter, r *request) error {
+	if !r.loggedIn {
+		return errNotLoggedIn
+	}
+
+	cid, err := strToID(r.muxVar("communityID"))
+	if err != nil {
+		return err
+	}
+
+	comm, err := core.GetCommunityByID(r.ctx, s.db, cid, r.viewer)
+	if err != nil {
+		return err
+	}
+
+	// Only mods and admins have access.
+	if ok, err := userModOrAdmin(r.ctx, s.db, *r.viewer, comm); err != nil {
+		return err
+	} else if !ok {
+		return errNotAdminNorMod
+	}
+
+	if err = comm.DeleteBannerImage(r.ctx); err != nil {
+		return err
+	}
+
+	return w.writeJSON(comm)
+}
+
+// @Summary		Get community requests.
+// @Description	Get community requests.
+// @Router			/api/community_requests [GET]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"				default(Bearer <personal access token>)
+// @Param			set				query	string	false	"Either 'all' or 'default' or 'subscribed'."	Enums(all,default,subscribed)
+// @Param			sort			query	string	false	"Sort by 'size' or 'name'."						Enums(size,name)
+func (s *Server) CommunityGetRequests(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
 	}
@@ -873,7 +1139,50 @@ func (s *Server) handleCommunityRequests(w *responseWriter, r *request) error {
 	}
 }
 
-// /api/community_requests/{requestID} [DELETE]
+// @Summary		Create a community request.
+// @Description	Create a community request.
+// @Router			/api/community_requests [POST]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+func (s *Server) CommunityCreateRequests(w *responseWriter, r *request) error {
+	if !r.loggedIn {
+		return errNotLoggedIn
+	}
+
+	user, err := core.GetUser(r.ctx, s.db, *r.viewer, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := s.rateLimit(r, "req_comm_1_"+r.viewer.String(), time.Hour*12, 5); err != nil {
+		return err
+	}
+
+	body, err := r.unmarshalJSONBodyToStringsMap(true)
+	if err != nil {
+		return err
+	}
+
+	note := body["note"]
+	if len(note) > 2048 {
+		note = note[:2048]
+	}
+
+	if err := core.CreateCommunityRequest(r.ctx, s.db, user.Username, body["name"], note); err != nil {
+		return err
+	}
+	w.WriteHeader(http.StatusOK)
+	return nil
+}
+
+// @Summary		Delete a community request.
+// @Description	Delete a community request.
+// @Router			/api/community_requests/{requestID} [DELETE]
+// @Success		200
+// @Tags			Community
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			requestID		path	string	true	"Request ID"
 func (s *Server) deleteCommunityRequest(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn

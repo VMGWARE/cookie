@@ -18,7 +18,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// /api/users/{username} [GET]
+// TODO: user.go, add swagger types for all functions and responses
+
+// @Summary		Get a user by username.
+// @Description	Get a user by username.
+// @Router			/api/users/{username} [GET]
+// @Success		200
+// @Tags			Users
+// @Param			username	path	string	true	"Username"
 func (s *Server) getUser(w *responseWriter, r *request) error {
 	username := r.muxVar("username")
 	user, err := core.GetUserByUsername(r.ctx, s.db, username, r.viewer)
@@ -41,7 +48,13 @@ func (s *Server) getUser(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
-// /api/users/{username} [DELETE]
+// @Summary		Delete a user.
+// @Description	Delete a user.
+// @Router			/api/users/{username} [DELETE]
+// @Success		200
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			username		path	string	true	"Username"
 func (s *Server) deleteUser(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -109,7 +122,11 @@ func (s *Server) deleteUser(w *responseWriter, r *request) error {
 	return nil
 }
 
-// /api/_initial [GET]
+// @Summary		Get initial data.
+// @Description	Get initial data.
+// @Router			/api/_initial [GET]
+// @Success		200
+// @Tags			General
 func (s *Server) initial(w *responseWriter, r *request) error {
 	var err error
 	response := struct {
@@ -181,7 +198,11 @@ func (s *Server) initial(w *responseWriter, r *request) error {
 	return w.writeJSON(response)
 }
 
-// /api/_login [POST]
+// @Summary		Login a user.
+// @Description	Login a user.
+// @Router			/api/_login [POST]
+// @Success		200
+// @Tags			Users
 func (s *Server) login(w *responseWriter, r *request) error {
 	if r.loggedIn {
 		user, err := core.GetUser(r.ctx, s.db, *r.viewer, r.viewer)
@@ -235,7 +256,11 @@ func (s *Server) login(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
-// /api/_signup [POST]
+// @Summary		Signup a user.
+// @Description	Signup a user.
+// @Router			/api/_signup [POST]
+// @Success		201
+// @Tags			Users
 func (s *Server) signup(w *responseWriter, r *request) error {
 	if r.loggedIn {
 		return httperr.NewBadRequest("already_logged_in", "You are already logged in")
@@ -282,7 +307,12 @@ func (s *Server) signup(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
-// /api/_user [GET]
+// @Summary		Get the logged in user.
+// @Description	Get the logged in user.
+// @Router			/api/_user [GET]
+// @Success		200
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) getLoggedInUser(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -300,7 +330,13 @@ func (s *Server) getLoggedInUser(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
-// /api/notifications [POST]
+// @Summary		Update notifications.
+// @Description	Update notifications.
+// @Router			/api/notifications [POST]
+// @Success		200
+// @Tags			Notifications
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			action			query	string	true	"Action"
 func (s *Server) updateNotifications(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -336,7 +372,12 @@ func (s *Server) updateNotifications(w *responseWriter, r *request) error {
 	return w.writeString(`{"success":true}`)
 }
 
-// /api/notifications [GET]
+// @Summary		Get notifications.
+// @Description	Get notifications.
+// @Router			/api/notifications [GET]
+// @Success		200
+// @Tags			Notifications
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) getNotifications(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -366,7 +407,13 @@ func (s *Server) getNotifications(w *responseWriter, r *request) error {
 	return w.writeJSON(res)
 }
 
-// /api/notifications/{notificationID} [GET, PUT]
+// @Summary		Get a notification.
+// @Description	Get a notification.
+// @Router			/api/notifications/{notificationID} [GET]
+// @Success		200
+// @Tags			Notifications
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			notificationID	path	string	true	"Notification ID"
 func (s *Server) getNotification(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -385,26 +432,59 @@ func (s *Server) getNotification(w *responseWriter, r *request) error {
 		return httperr.NewForbidden("not_owner", "")
 	}
 
-	query := r.urlQueryParams()
-	if r.req.Method == "PUT" {
-		action := query.Get("action")
-		switch action {
-		case "markAsSeen":
-			if err = notif.Saw(r.ctx, query.Get("seen") != "false"); err != nil {
-				return err
-			}
-			if query.Get("seenFrom") == "webpush" {
-				notif.ResetUserNewNotificationsCount(r.ctx) // attempt
-			}
-		default:
-			return httperr.NewBadRequest("invalid_action", "Unsupported action.")
+	return w.writeJSON(notif)
+}
+
+// @Summary		Mark a notification as seen.
+// @Description	Mark a notification as seen.
+// @Router			/api/notifications/{notificationID} [PUT]
+// @Success		200
+// @Tags			Notifications
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			notificationID	path	string	true	"Notification ID"
+// @Param			action			query	string	true	"Action"	Enums(markAsSeen)
+func (s *Server) markAllNotificationAsSeen(w *responseWriter, r *request) error {
+	if !r.loggedIn {
+		return errNotLoggedIn
+	}
+
+	notifID := r.muxVar("notificationID")
+	notif, err := core.GetNotification(r.ctx, s.db, notifID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return httperr.NewNotFound("notif_not_found", "Notification not found.")
 		}
+		return err
+	}
+
+	if !notif.UserID.EqualsTo(*r.viewer) {
+		return httperr.NewForbidden("not_owner", "")
+	}
+
+	query := r.urlQueryParams()
+	action := query.Get("action")
+	switch action {
+	case "markAsSeen":
+		if err = notif.Saw(r.ctx, query.Get("seen") != "false"); err != nil {
+			return err
+		}
+		if query.Get("seenFrom") == "webpush" {
+			notif.ResetUserNewNotificationsCount(r.ctx) // attempt
+		}
+	default:
+		return httperr.NewBadRequest("invalid_action", "Unsupported action.")
 	}
 
 	return w.writeJSON(notif)
 }
 
-// /api/notifications/{notificationID} [DELETE]
+// @Summary		Delete a notification.
+// @Description	Delete a notification.
+// @Router			/api/notifications/{notificationID} [DELETE]
+// @Success		200
+// @Tags			Notifications
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			notificationID	path	string	true	"Notification ID"
 func (s *Server) deleteNotification(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -430,7 +510,12 @@ func (s *Server) deleteNotification(w *responseWriter, r *request) error {
 	return w.writeJSON(notif)
 }
 
-// /api/push_subscriptions [POST]
+// @Summary		Push subscriptions.
+// @Description	Push subscriptions.
+// @Router			/api/push_subscriptions [POST]
+// @Success		200	{string}	string	"{"success":true}"
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) pushSubscriptions(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -448,7 +533,12 @@ func (s *Server) pushSubscriptions(w *responseWriter, r *request) error {
 	return w.writeString(`{"success":true}`)
 }
 
-// /api/_settings [POST]
+// @Summary		Update user settings.
+// @Description	Update user settings.
+// @Router			/api/_settings [POST]
+// @Success		200
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) updateUserSettings(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -499,8 +589,14 @@ func (s *Server) updateUserSettings(w *responseWriter, r *request) error {
 	return w.writeJSON(user)
 }
 
-// /api/users/{username}/pro_pic [POST, DELETE]
-func (s *Server) handleUserProPic(w *responseWriter, r *request) error {
+// @Summary		Upload a user profile picture.
+// @Description	Upload a user profile picture.
+// @Router			/api/users/{username}/pro_pic [POST]
+// @Success		200
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			username		path	string	true	"Username"
+func (s *Server) UploadUserProPic(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
 	}
@@ -515,35 +611,66 @@ func (s *Server) handleUserProPic(w *responseWriter, r *request) error {
 		return httperr.NewForbidden("not_owner", "")
 	}
 
-	if r.req.Method == "POST" {
-		r.req.Body = http.MaxBytesReader(w, r.req.Body, int64(s.config.MaxImageSize)) // limit max upload size
-		if err := r.req.ParseMultipartForm(int64(s.config.MaxImageSize)); err != nil {
-			return httperr.NewBadRequest("file_size_exceeded", "Max file size exceeded.")
-		}
+	r.req.Body = http.MaxBytesReader(w, r.req.Body, int64(s.config.MaxImageSize)) // limit max upload size
+	if err := r.req.ParseMultipartForm(int64(s.config.MaxImageSize)); err != nil {
+		return httperr.NewBadRequest("file_size_exceeded", "Max file size exceeded.")
+	}
 
-		file, _, err := r.req.FormFile("image")
-		if err != nil {
-			return err
-		}
-		defer file.Close()
+	file, _, err := r.req.FormFile("image")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
-		data, err := io.ReadAll(file)
-		if err != nil {
-			return err
-		}
-		if err := user.UpdateProPic(r.ctx, data); err != nil {
-			return err
-		}
-	} else if r.req.Method == "DELETE" {
-		if err := user.DeleteProPic(r.ctx); err != nil {
-			return err
-		}
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	if err := user.UpdateProPic(r.ctx, data); err != nil {
+		return err
 	}
 
 	return w.writeJSON(user)
 }
 
-// /api/users/{username}/badges/{badgeId}[?byType=false] [DELETE]
+// @Summary		Delete a user profile picture.
+// @Description	Delete a user profile picture.
+// @Router			/api/users/{username}/pro_pic [DELETE]
+// @Success		200
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			username		path	string	true	"Username"
+func (s *Server) deleteUserProPic(w *responseWriter, r *request) error {
+	if !r.loggedIn {
+		return errNotLoggedIn
+	}
+
+	user, err := core.GetUserByUsername(r.ctx, s.db, r.muxVar("username"), r.viewer)
+	if err != nil {
+		return err
+	}
+
+	// Only the owner of the account and admins can proceed.
+	if !(user.ID == *r.viewer || user.Admin) {
+		return httperr.NewForbidden("not_owner", "")
+	}
+
+	if err := user.DeleteProPic(r.ctx); err != nil {
+		return err
+	}
+
+	return w.writeJSON(user)
+}
+
+// @Summary		Delete a badge from a user.
+// @Description	Delete a badge from a user.
+// @Router			/api/users/{username}/badges/{badgeId} [DELETE]
+// @Success		200
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			username		path	string	true	"Username"
+// @Param			badgeId			path	string	true	"Badge ID"
+// @Param			byType			query	string	false	"By type"	Enums(true,false)
 func (s *Server) deleteBadge(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -583,7 +710,13 @@ func (s *Server) deleteBadge(w *responseWriter, r *request) error {
 	return w.writeString(`{"success":true}`)
 }
 
-// /api/users/{username}/badges [POST]
+// @Summary		Add a badge to a user.
+// @Description	Add a badge to a user.
+// @Router			/api/users/{username}/badges [POST]
+// @Success		200
+// @Tags			Users
+// @Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+// @Param			username		path	string	true	"Username"
 func (s *Server) addBadge(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
