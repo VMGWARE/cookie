@@ -53,6 +53,7 @@ RUN npm install -g bun
 # Copy built artifacts from previous stages
 COPY --from=frontend-builder /app/ui /app/ui
 COPY --from=backend-builder /app/discuit /app/discuit
+COPY --from=backend-builder /app/docs/swagger.json /app/docs/swagger.json
 COPY config.default.yaml /app/config.yaml
 COPY migrations /app/migrations
 COPY docker/entrypoint.sh /entrypoint.sh
