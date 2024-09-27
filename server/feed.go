@@ -33,7 +33,16 @@ func getFeedLimit(q url.Values, defaultValue, maxValue int) (n int, err error) {
 	return
 }
 
-// /api/users/{username}/feed [GET]
+//	@Summary		Get user's feed.
+//	@Description	Get user's feed.
+//	@Router			/api/users/{username}/feed [GET]
+//	@Success		200
+//	@Tags			Feed
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+//	@Param			username		path	string	true	"Username"
+//	@Param			filter			query	string	false	"Filter feed by type"	Enums(all,deleted,locked)
+//	@Param			next			query	string	false	"Next cursor"
+//	@Param			limit			query	int		false	"Limit"
 func (s *Server) getUsersFeed(w *responseWriter, r *request) error {
 	user, err := core.GetUserByUsername(r.ctx, s.db, r.muxVar("username"), r.viewer)
 	if err != nil {
@@ -89,7 +98,18 @@ func isFilterValid(filter string) bool {
 
 var errInvalidFeedFilter = httperr.NewBadRequest("invalid_filter", "Invalid feed filter.")
 
-// /api/posts [GET]
+//	@Summary		Get feed.
+//	@Description	Get feed.
+//	@Router			/api/posts [GET]
+//	@Success		200
+//	@Tags			Feed
+//	@Param			Authorization	header	string	false	"Insert your personal access token"	default(Bearer <personal access token>)
+//	@Param			communityId		query	string	false	"Community ID"
+//	@Param			filter			query	string	false	"Filter feed by type"	Enums(all,deleted,locked)
+//	@Param			sort			query	string	false	"Sort feed by"			Enums(latest,top)
+//	@Param			limit			query	int		false	"Limit"
+//	@Param			next			query	string	false	"Next cursor"
+//	@Param			feed			query	string	false	"Feed type"	Enums(home,community)
 func (s *Server) feed(w *responseWriter, r *request) error {
 	query := r.urlQueryParams()
 	communityIDText := query.Get("communityId")

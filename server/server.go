@@ -18,6 +18,8 @@ import (
 	"strings"
 	"time"
 
+	_ "embed"
+
 	"github.com/discuitnet/discuit/config"
 	"github.com/discuitnet/discuit/core"
 	"github.com/discuitnet/discuit/internal/httperr"
@@ -101,6 +103,9 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 
 	s.openLoggers()
 
+	// OpenAPI
+	r.Handle("/api/reference", s.withHandler(s.swaggerReference)).Methods("GET")
+
 	// API routes.
 	r.Handle("/api/_initial", s.withHandler(s.initial)).Methods("GET")
 	r.Handle("/api/_login", s.withHandler(s.login)).Methods("POST")
@@ -112,19 +117,32 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 	r.Handle("/api/users/{username}", s.withHandler(s.getUser)).Methods("GET")
 	r.Handle("/api/users/{username}", s.withHandler(s.deleteUser)).Methods("DELETE")
 	r.Handle("/api/users/{username}/feed", s.withHandler(s.getUsersFeed)).Methods("GET")
-	r.Handle("/api/users/{username}/pro_pic", s.withHandler(s.handleUserProPic)).Methods("POST", "DELETE")
+	r.Handle("/api/users/{username}/pro_pic", s.withHandler(s.UploadUserProPic)).Methods("POST")
+	r.Handle("/api/users/{username}/pro_pic", s.withHandler(s.deleteUserProPic)).Methods("DELETE")
 	r.Handle("/api/users/{username}/badges", s.withHandler(s.addBadge)).Methods("POST")
 	r.Handle("/api/users/{username}/badges/{badgeId}", s.withHandler(s.deleteBadge)).Methods("DELETE")
 
-	r.Handle("/api/users/{username}/lists", s.withHandler(s.handleLists)).Methods("GET", "POST")
+	r.Handle("/api/users/{username}/lists", s.withHandler(s.getUsersLists)).Methods("GET")
+	r.Handle("/api/users/{username}/lists", s.withHandler(s.createList)).Methods("POST")
 	r.Handle("/api/lists/_saved_to", s.withHandler(s.getSaveToLists)).Methods("GET")
-	r.Handle("/api/users/{username}/lists/{listname}", s.withHandler(s.withListByName(s.handeList))).Methods("GET", "PUT", "DELETE")
-	r.Handle("/api/lists/{listId}", s.withHandler(s.withListByID(s.handeList))).Methods("GET", "PUT", "DELETE")
-	r.Handle("/api/users/{username}/lists/{listname}/items", s.withHandler(s.withListByName(s.handleListItems))).Methods("GET", "POST", "DELETE")
-	r.Handle("/api/lists/{listId}/items", s.withHandler(s.withListByID(s.handleListItems))).Methods("GET", "POST", "DELETE")
+	r.Handle("/api/users/{username}/lists/{listname}", s.withHandler(s.withListByName(s.getList))).Methods("GET")
+	r.Handle("/api/users/{username}/lists/{listname}", s.withHandler(s.withListByName(s.updateList))).Methods("PUT")
+	r.Handle("/api/users/{username}/lists/{listname}", s.withHandler(s.withListByName(s.deleteList))).Methods("DELETE")
+	r.Handle("/api/lists/{listId}", s.withHandler(s.withListByID(s.getList))).Methods("GET")
+	r.Handle("/api/lists/{listId}", s.withHandler(s.withListByID(s.updateList))).Methods("PUT")
+	r.Handle("/api/lists/{listId}", s.withHandler(s.withListByID(s.deleteList))).Methods("DELETE")
+	r.Handle("/api/users/{username}/lists/{listname}/items", s.withHandler(s.withListByName(s.getListItems))).Methods("GET")
+	r.Handle("/api/users/{username}/lists/{listname}/items", s.withHandler(s.withListByName(s.addItemToList))).Methods("POST")
+	r.Handle("/api/users/{username}/lists/{listname}/items", s.withHandler(s.withListByName(s.deleteAllItemsFromAList))).Methods("DELETE")
+	r.Handle("/api/lists/{listId}/items", s.withHandler(s.withListByID(s.getListItems))).Methods("GET")
+	r.Handle("/api/lists/{listId}/items", s.withHandler(s.withListByID(s.addItemToList))).Methods("POST")
+	r.Handle("/api/lists/{listId}/items", s.withHandler(s.withListByID(s.deleteAllItemsFromAList))).Methods("DELETE")
+
 	r.Handle("/api/lists/{listId}/items/{itemId}", s.withHandler(s.withListByID(s.deleteListItem))).Methods("DELETE")
 
-	r.Handle("/api/mutes", s.withHandler(s.handleMutes)).Methods("GET", "POST", "DELETE")
+	r.Handle("/api/mutes", s.withHandler(s.getListMutedUsersCommunities)).Methods("GET")
+	r.Handle("/api/mutes", s.withHandler(s.muteUserOrCommunity)).Methods("POST")
+	r.Handle("/api/mutes", s.withHandler(s.clearAllMutes)).Methods("DELETE")
 	r.Handle("/api/mutes/users/{mutedUserID}", s.withHandler(s.deleteUserMute)).Methods("DELETE")
 	r.Handle("/api/mutes/communities/{mutedCommunityID}", s.withHandler(s.deleteCommunityMute)).Methods("DELETE")
 	r.Handle("/api/mutes/{muteID}", s.withHandler(s.deleteMute)).Methods("DELETE")
@@ -163,19 +181,25 @@ func New(db *sql.DB, conf *config.Config) (*Server, error) {
 	r.Handle("/api/communities/{communityID}/reports", s.withHandler(s.getCommunityReports)).Methods("GET")
 	r.Handle("/api/communities/{communityID}/reports/{reportID}", s.withHandler(s.deleteReport)).Methods("DELETE")
 
-	r.Handle("/api/communities/{communityID}/banned", s.withHandler(s.handleCommunityBanned)).Methods("GET", "POST", "DELETE")
+	r.Handle("/api/communities/{communityID}/banned", s.withHandler(s.CommunityGetBannedUsers)).Methods("GET")
+	r.Handle("/api/communities/{communityID}/banned", s.withHandler(s.CommunityBanUser)).Methods("POST")
+	r.Handle("/api/communities/{communityID}/banned", s.withHandler(s.CommunityUnbanUser)).Methods("DELETE")
 
-	r.Handle("/api/communities/{communityID}/pro_pic", s.withHandler(s.handleCommunityProPic)).Methods("POST", "DELETE")
-	r.Handle("/api/communities/{communityID}/banner_image", s.withHandler(s.handleCommunityBannerImage)).Methods("POST", "DELETE")
+	r.Handle("/api/communities/{communityID}/pro_pic", s.withHandler(s.CommunityUploadProPic)).Methods("POST")
+	r.Handle("/api/communities/{communityID}/pro_pic", s.withHandler(s.CommunityDeleteProPic)).Methods("DELETE")
+	r.Handle("/api/communities/{communityID}/banner_image", s.withHandler(s.CommunityUploadBannerImage)).Methods("POST")
+	r.Handle("/api/communities/{communityID}/banner_image", s.withHandler(s.CommunityDeleteBannerImage)).Methods("DELETE")
 
 	r.Handle("/api/notifications", s.withHandler(s.getNotifications)).Methods("GET")
 	r.Handle("/api/notifications", s.withHandler(s.updateNotifications)).Methods("POST")
-	r.Handle("/api/notifications/{notificationID}", s.withHandler(s.getNotification)).Methods("GET", "PUT")
+	r.Handle("/api/notifications/{notificationID}", s.withHandler(s.getNotification)).Methods("GET")
+	r.Handle("/api/notifications/{notificationID}", s.withHandler(s.markAllNotificationAsSeen)).Methods("PUT")
 	r.Handle("/api/notifications/{notificationID}", s.withHandler(s.deleteNotification)).Methods("DELETE")
 
 	r.Handle("/api/push_subscriptions", s.withHandler(s.pushSubscriptions)).Methods("POST")
 
-	r.Handle("/api/community_requests", s.withHandler(s.handleCommunityRequests)).Methods("GET", "POST")
+	r.Handle("/api/community_requests", s.withHandler(s.CommunityGetRequests)).Methods("GET")
+	r.Handle("/api/community_requests", s.withHandler(s.CommunityCreateRequests)).Methods("POST")
 	r.Handle("/api/community_requests/{requestID}", s.withHandler(s.deleteCommunityRequest)).Methods("DELTE")
 
 	r.Handle("/api/_report", s.withHandler(s.report)).Methods("POST")

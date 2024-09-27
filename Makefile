@@ -23,6 +23,22 @@ vendor: ## Update the vendor directory
 	go mod tidy
 	go mod vendor
 
+.PHONY: generate
+generate: install-tools generate-swagger ## Run all code generations
+	go generate ./...
+
+generate-swagger: install-tools ## Run swagger code generation
+	swag init -g server/ -g swagger.go --outputTypes go -output server/docs
+	go generate swagger.go
+
+format-swagger: install-tools ## Format swagger godoc's
+	swag fmt -g server/
+
+install-tools: ## Install development tools
+	hash swag > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		go install github.com/swaggo/swag/cmd/swag@latest; \
+	fi ;
+
 ##@ Test
 
 .PHONY: test

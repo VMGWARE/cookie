@@ -12,7 +12,12 @@ import (
 	"github.com/discuitnet/discuit/internal/uid"
 )
 
-// /api/posts [POST]
+//	@Summary		Add a post.
+//	@Description	Add a post.
+//	@Router			/api/posts [POST]
+//	@Success		200
+//	@Tags			Posts
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) addPost(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -94,7 +99,13 @@ func (s *Server) addPost(w *responseWriter, r *request) error {
 	return w.writeJSON(post)
 }
 
-// /api/posts/:postID [GET]
+//	@Summary		Get a post.
+//	@Description	Get a post.
+//	@Router			/api/posts/{postID} [GET]
+//	@Success		200
+//	@Tags			Posts
+//	@Param			postID			path	string	true	"The ID of the post to get"
+//	@Param			fetchCommunity	query	string	false	"Fetch the community of the post"	Enums(true, false)
 func (s *Server) getPost(w *responseWriter, r *request) error {
 	postID := r.muxVar("postID") // public post id
 	post, err := core.GetPost(r.ctx, s.db, nil, postID, r.viewer, true)
@@ -123,7 +134,14 @@ func (s *Server) getPost(w *responseWriter, r *request) error {
 	return w.writeJSON(post)
 }
 
-// /api/posts/:postID [PUT]
+//	@Summary		Update a post.
+//	@Description	Update a post.
+//	@Router			/api/posts/{postID} [PUT]
+//	@Success		200
+//	@Tags			Posts
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+//	@Param			postID			path	string	true	"The ID of the post to update"
+//	@Param			action			query	string	false	"Action to perform on the post"	Enums(lock, unlock, changeAsUser, pin, unpin)
 func (s *Server) updatePost(w *responseWriter, r *request) error {
 	postID := r.muxVar("postID") // public post id
 	if !r.loggedIn {
@@ -205,7 +223,13 @@ func (s *Server) updatePost(w *responseWriter, r *request) error {
 	return w.writeJSON(post)
 }
 
-// /api/posts/:postID [DELETE]
+//	@Summary		Delete a post.
+//	@Description	Delete a post.
+//	@Router			/api/posts/{postID} [DELETE]
+//	@Success		200
+//	@Tags			Posts
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+//	@Param			postID			path	string	true	"The ID of the post to delete"
 func (s *Server) deletePost(w *responseWriter, r *request) error {
 	postID := r.muxVar("postID") // public post id
 	if !r.loggedIn {
@@ -242,7 +266,12 @@ func (s *Server) deletePost(w *responseWriter, r *request) error {
 	return w.writeJSON(post)
 }
 
-// /api/_postVote [ POST ]
+//	@Summary		Vote on a post.
+//	@Description	Vote on a post.
+//	@Router			/api/_postVote [POST]
+//	@Success		200
+//	@Tags			Posts
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) postVote(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -281,7 +310,12 @@ func (s *Server) postVote(w *responseWriter, r *request) error {
 	return w.writeJSON(post)
 }
 
-// /api/_uploads [ POST ]
+//	@Summary		Uploads an image.
+//	@Description	Uploads an image.
+//	@Router			/api/_uploads [POST]
+//	@Success		200
+//	@Tags			Posts
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) imageUpload(w *responseWriter, r *request) error {
 	if s.config.DisableImagePosts {
 		return httperr.NewForbidden("no_image_posts", "Image posts are not all allowed.")

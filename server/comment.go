@@ -9,7 +9,12 @@ import (
 	"github.com/discuitnet/discuit/internal/uid"
 )
 
-// /api/posts/:postID/comments [GET]
+//	@Summary		Get comments of a post.
+//	@Description	Get comments of a post.
+//	@Router			/api/posts/{postID}/comments [GET]
+//	@Success		200
+//	@Tags			Comments
+//	@Param			postID	path	string	true	"Post ID"
 func (s *Server) getComments(w *responseWriter, r *request) error {
 	post, err := core.GetPost(r.ctx, s.db, nil, r.muxVar("postID"), r.viewer, true)
 	if err != nil {
@@ -64,7 +69,12 @@ func (s *Server) getComments(w *responseWriter, r *request) error {
 	return w.writeJSON(res)
 }
 
-// /api/:commentID [GET]
+//	@Summary		Get a comment.
+//	@Description	Get a comment.
+//	@Router			/api/{commentID} [GET]
+//	@Success		200
+//	@Tags			Comments
+//	@Param			commentID	path	string	true	"Comment ID"
 func (s *Server) getComment(w *responseWriter, r *request) error {
 	commentID, err := strToID(r.muxVar("commentID"))
 	if err != nil {
@@ -79,7 +89,13 @@ func (s *Server) getComment(w *responseWriter, r *request) error {
 	return w.writeJSON(comment)
 }
 
-// /api/posts/:postID/comments [POST]
+//	@Summary		Add a comment to a post.
+//	@Description	Add a comment to a post.
+//	@Router			/api/posts/{postID}/comments [POST]
+//	@Success		200
+//	@Tags			Comments
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+//	@Param			postID			path	string	true	"Post ID"
 func (s *Server) addComment(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -129,7 +145,14 @@ func (s *Server) addComment(w *responseWriter, r *request) error {
 	return w.writeJSON(comment)
 }
 
-// /api/posts/:postID/comments/:commentID [PUT]
+//	@Summary		Update a comment.
+//	@Description	Update a comment.
+//	@Router			/api/posts/{postID}/comments/{commentID} [PUT]
+//	@Success		200
+//	@Tags			Comments
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+//	@Param			postID			path	string	true	"Post ID"
+//	@Param			commentID		path	string	true	"Comment ID"
 func (s *Server) updateComment(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -178,7 +201,14 @@ func (s *Server) updateComment(w *responseWriter, r *request) error {
 	return w.writeJSON(comment)
 }
 
-// /api/posts/:postID/comments/:commentID [DELETE]
+//	@Summary		Delete a comment.
+//	@Description	Delete a comment.
+//	@Router			/api/posts/{postID}/comments/{commentID} [DELETE]
+//	@Success		200
+//	@Tags			Comments
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
+//	@Param			postID			path	string	true	"Post ID"
+//	@Param			commentID		path	string	true	"Comment ID"
 func (s *Server) deleteComment(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
@@ -212,7 +242,12 @@ func (s *Server) deleteComment(w *responseWriter, r *request) error {
 	return w.writeJSON(comment)
 }
 
-// /api/_commentVote [ POST ]
+//	@Summary		Vote on a comment.
+//	@Description	Vote on a comment.
+//	@Router			/api/_commentVote [POST]
+//	@Success		200
+//	@Tags			Comments
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) commentVote(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn

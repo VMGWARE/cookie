@@ -7,7 +7,12 @@ import (
 	"github.com/discuitnet/discuit/internal/httperr"
 )
 
-// /api/_admin [POST]
+//	@Summary		Admin actions
+//	@Description	Perform admin actions like banning users, setting default forums, etc.
+//	@Router			/api/_admin [POST]
+//	@Success		200
+//	@Tags			Admin
+//	@Param			Authorization	header	string	true	"Insert your personal access token"	default(Bearer <personal access token>)
 func (s *Server) adminActions(w *responseWriter, r *request) error {
 	if !r.loggedIn {
 		return errNotLoggedIn
